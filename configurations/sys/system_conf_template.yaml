@@ -22,7 +22,7 @@ databases:                                   # databases' configurations
       host: 127.0.0.1
       port: 6379
       password: password
-save_files:                                  # the remote locations of saving files
+remote_storage:                               # the remote locations of saving files
   ftp:
     host: 127.0.0.1
     port: 21
@@ -31,6 +31,7 @@ save_files:                                  # the remote locations of saving fi
   s3:
     AWS_ACCESS_KEY_ID: AWS_ACCESS_KEY_ID
     AWS_SECRET_ACCESS_KEY: AWS_SECRET_ACCESS_KEY
+    BUCKET: XTRADERBACKTEST
   oss:
     OSS_PUBLIC_KEY: oss_public_key
     OSS_SECRET_KEY: oss_secret_key

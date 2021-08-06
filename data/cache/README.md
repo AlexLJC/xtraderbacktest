@@ -1,1 +1,0 @@
-This folder is for temporate usage of storing data.
