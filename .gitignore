@@ -132,3 +132,4 @@ dmypy.json
 # Personal
 *.csv
 .vscode/
+/data
