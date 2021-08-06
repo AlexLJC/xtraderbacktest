@@ -1,0 +1,34 @@
+---
+name: XAUUSD                            # symbol name
+point: 0.0001                           # point value
+commission: 0                           # commission in points
+slippage: 0                             # slippage in points
+margin_rate: 0.05                       # margin rate 0.05 = 5%
+minimum_tp_sl: 3                        # minimum gap in points between entry price and tpsl price
+contract_size: 100                      # contract size
+spread: 5                               # the spread(between ask and bid) in points for backtest
+type: forex                             # symbol type
+exchange: None                          # the trading exchange
+t+0: true                               # whether is t+0
+swaps:  -5.0                            # the swaps in points
+trade_session:                          # tradable session
+  sunday: []
+  monday:                               # the template of multiple tradable session in one day
+  - - '01:00:00'
+    - '10:59:59'
+  - - '10:59:59'
+    - '23:59:59'
+  tuesday:
+  - - '01:00:00'
+    - '23:59:59'
+  wednesday:
+  - - '01:00:00'
+    - '23:59:59'
+  thursday:
+  - - '01:00:00'
+    - '23:59:59'
+  friday:
+  - - '01:00:00'
+    - '23:59:59'
+  saturday: []
+

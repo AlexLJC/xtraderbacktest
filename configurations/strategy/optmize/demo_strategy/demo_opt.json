@@ -1,0 +1,33 @@
+{
+    "strategy_name":"demo",
+    "opt_ranges":{
+        "symbols":{
+            "type":"list",
+            "values":[
+                ["XAUUSD"],
+                ["XAUUSD","XAGUSD"]
+            ]
+        },
+        "ma_fast":{
+            "type":"range",
+            "values":[10,1,25]
+        },
+        "ma_slow":{
+            "type":"range",
+            "values":[20,1,40]
+        }
+    },
+    "opt_rules": [
+        ["ma_fast","<","ma_slow"]
+    ],
+    "fix_input":{
+        "account_id":"demo_account",
+        "period":"5m",
+        "rollover_type":"none",
+        "start_date": "2021-01-01 00:00:00",
+        "end_date": "2021-06-01 00:00:00",
+        "tag":"demo",
+        "strategy_name_code": "DM",
+        "strategy_name": "demo"
+    }
+}

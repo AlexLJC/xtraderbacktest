@@ -1,0 +1,66 @@
+---
+# The system configurations
+databases:                                   # databases' configurations
+  mysqls:                                    # mysqls' database
+    db1:                                     
+      host: 127.0.0.1                 
+      user: user
+      password: password
+      port: 3433
+  mangos:                                    # mangos database
+    db1:
+      host: 127.0.0.1
+      user: user
+      password: password
+      port: 3433
+  redises:                                   # redis database
+    backtest:
+      host: 127.0.0.1
+      port: 6379
+      password: password
+    live:
+      host: 127.0.0.1
+      port: 6379
+      password: password
+save_files:                                  # the remote locations of saving files
+  ftp:
+    host: 127.0.0.1
+    port: 21
+    user: user
+    password: password
+  s3:
+    AWS_ACCESS_KEY_ID: AWS_ACCESS_KEY_ID
+    AWS_SECRET_ACCESS_KEY: AWS_SECRET_ACCESS_KEY
+  oss:
+    OSS_PUBLIC_KEY: oss_public_key
+    OSS_SECRET_KEY: oss_secret_key
+    END_POINT: http://oss-cn-shanghai.aliyuncs.com
+notification:                                # the notification configurations
+  mail:                                      # email
+    host: smtp.gmail.com
+    port: 465
+    user: admin@gmail.com
+    password: password
+live_conf:                                   # the configuration of live mode 
+  save_order_record:                         # if save order record into database
+    is_on: false                             # on = true or off = false
+    type: mysqls                             # the type of database
+    db_name: db1                             # the name of the database
+  notification:                              # whether send notification
+    is_on: false                             # on = true or off = false
+    type: mail                               # the way of notification
+backtest_conf:                               # the configuration of backtest mode
+  price_timezone: UTC+0                      # the price data's time zone
+  indicator_remote_cache:                    # the configuration of remote cache of indicators temp files
+    is_on: false                             # on = true or off = false
+    type: s3                                 # the location type
+    path: /cache/indicators                  # the location path
+  price_remote_cache:                        # the configuration of remote cache of price data temp files
+    is_on: false                             # on = true or off = false
+    type: s3                                 # the location type
+    path: /cache/prices                      # the location path
+  backtest_result_remote:                    # the configuration of backtest result  files
+    is_on: false                             # on = true or off = false
+    type: s3                                 # the location type
+    path: /cache/backtest_results            # the location path
+timezone: US/Eastern                         # time zone of the system(for display correct backtest result)

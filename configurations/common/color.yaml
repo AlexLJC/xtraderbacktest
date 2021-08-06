@@ -1,0 +1,953 @@
+---
+lightpink:
+  'chineese_name:': 浅粉红
+  code: "#FFB6C1"
+  rgb:
+  - 255
+  - 182
+  - 193
+pink:
+  'chineese_name:': 粉红
+  code: "#FFC0CB"
+  rgb:
+  - 255
+  - 192
+  - 203
+crimson:
+  'chineese_name:': 猩红
+  code: "#DC143C"
+  rgb:
+  - 220
+  - 20
+  - 60
+lavenderblush:
+  'chineese_name:': 脸红的淡紫色
+  code: "#FFF0F5"
+  rgb:
+  - 255
+  - 240
+  - 245
+palevioletred:
+  'chineese_name:': 苍白的紫罗兰红色
+  code: "#DB7093"
+  rgb:
+  - 219
+  - 112
+  - 147
+hotpink:
+  'chineese_name:': 热情的粉红
+  code: "#FF69B4"
+  rgb:
+  - 255
+  - 105
+  - 180
+deeppink:
+  'chineese_name:': 深粉色
+  code: "#FF1493"
+  rgb:
+  - 255
+  - 20
+  - 147
+mediumvioletred:
+  'chineese_name:': 适中的紫罗兰红色
+  code: "#C71585"
+  rgb:
+  - 199
+  - 21
+  - 133
+orchid:
+  'chineese_name:': 兰花的紫色
+  code: "#DA70D6"
+  rgb:
+  - 218
+  - 112
+  - 214
+thistle:
+  'chineese_name:': 蓟
+  code: "#D8BFD8"
+  rgb:
+  - 216
+  - 191
+  - 216
+plum:
+  'chineese_name:': 李子
+  code: "#DDA0DD"
+  rgb:
+  - 221
+  - 160
+  - 221
+violet:
+  'chineese_name:': 紫罗兰
+  code: "#EE82EE"
+  rgb:
+  - 238
+  - 130
+  - 238
+magenta:
+  'chineese_name:': 洋红
+  code: "#FF00FF"
+  rgb:
+  - 255
+  - 0
+  - 255
+fuchsia:
+  'chineese_name:': 灯笼海棠(紫红色)
+  code: "#FF00FF"
+  rgb:
+  - 255
+  - 0
+  - 255
+darkmagenta:
+  'chineese_name:': 深洋红色
+  code: "#8B008B"
+  rgb:
+  - 139
+  - 0
+  - 139
+purple:
+  'chineese_name:': 紫色
+  code: "#800080"
+  rgb:
+  - 128
+  - 0
+  - 128
+mediumorchid:
+  'chineese_name:': 适中的兰花紫
+  code: "#BA55D3"
+  rgb:
+  - 186
+  - 85
+  - 211
+darkvoilet:
+  'chineese_name:': 深紫罗兰色
+  code: "#9400D3"
+  rgb:
+  - 148
+  - 0
+  - 211
+darkorchid:
+  'chineese_name:': 深兰花紫
+  code: "#9932CC"
+  rgb:
+  - 153
+  - 50
+  - 204
+indigo:
+  'chineese_name:': 靛青
+  code: "#4B0082"
+  rgb:
+  - 75
+  - 0
+  - 130
+blueviolet:
+  'chineese_name:': 深紫罗兰的蓝色
+  code: "#8A2BE2"
+  rgb:
+  - 138
+  - 43
+  - 226
+mediumpurple:
+  'chineese_name:': 适中的紫色
+  code: "#9370DB"
+  rgb:
+  - 147
+  - 112
+  - 219
+mediumslateblue:
+  'chineese_name:': 适中的板岩暗蓝灰色
+  code: "#7B68EE"
+  rgb:
+  - 123
+  - 104
+  - 238
+slateblue:
+  'chineese_name:': 板岩暗蓝灰色
+  code: "#6A5ACD"
+  rgb:
+  - 106
+  - 90
+  - 205
+darkslateblue:
+  'chineese_name:': 深岩暗蓝灰色
+  code: "#483D8B"
+  rgb:
+  - 72
+  - 61
+  - 139
+lavender:
+  'chineese_name:': 熏衣草花的淡紫色
+  code: "#E6E6FA"
+  rgb:
+  - 230
+  - 230
+  - 250
+ghostwhite:
+  'chineese_name:': 幽灵的白色
+  code: "#F8F8FF"
+  rgb:
+  - 248
+  - 248
+  - 255
+blue:
+  'chineese_name:': 纯蓝
+  code: "#0000FF"
+  rgb:
+  - 0
+  - 0
+  - 255
+mediumblue:
+  'chineese_name:': 适中的蓝色
+  code: "#0000CD"
+  rgb:
+  - 0
+  - 0
+  - 205
+midnightblue:
+  'chineese_name:': 午夜的蓝色
+  code: "#191970"
+  rgb:
+  - 25
+  - 25
+  - 112
+darkblue:
+  'chineese_name:': 深蓝色
+  code: "#00008B"
+  rgb:
+  - 0
+  - 0
+  - 139
+navy:
+  'chineese_name:': 海军蓝
+  code: "#000080"
+  rgb:
+  - 0
+  - 0
+  - 128
+royalblue:
+  'chineese_name:': 皇军蓝
+  code: "#4169E1"
+  rgb:
+  - 65
+  - 105
+  - 225
+cornflowerblue:
+  'chineese_name:': 矢车菊的蓝色
+  code: "#6495ED"
+  rgb:
+  - 100
+  - 149
+  - 237
+lightsteelblue:
+  'chineese_name:': 淡钢蓝
+  code: "#B0C4DE"
+  rgb:
+  - 176
+  - 196
+  - 222
+lightslategray:
+  'chineese_name:': 浅石板灰
+  code: "#778899"
+  rgb:
+  - 119
+  - 136
+  - 153
+slategray:
+  'chineese_name:': 石板灰
+  code: "#708090"
+  rgb:
+  - 112
+  - 128
+  - 144
+doderblue:
+  'chineese_name:': 道奇蓝
+  code: "#1E90FF"
+  rgb:
+  - 30
+  - 144
+  - 255
+aliceblue:
+  'chineese_name:': 爱丽丝蓝
+  code: "#F0F8FF"
+  rgb:
+  - 240
+  - 248
+  - 255
+steelblue:
+  'chineese_name:': 钢蓝
+  code: "#4682B4"
+  rgb:
+  - 70
+  - 130
+  - 180
+lightskyblue:
+  'chineese_name:': 淡蓝色
+  code: "#87CEFA"
+  rgb:
+  - 135
+  - 206
+  - 250
+skyblue:
+  'chineese_name:': 天蓝色
+  code: "#87CEEB"
+  rgb:
+  - 135
+  - 206
+  - 235
+deepskyblue:
+  'chineese_name:': 深天蓝
+  code: "#00BFFF"
+  rgb:
+  - 0
+  - 191
+  - 255
+lightblue:
+  'chineese_name:': 淡蓝
+  code: "#ADD8E6"
+  rgb:
+  - 173
+  - 216
+  - 230
+powderblue:
+  'chineese_name:': 火药蓝
+  code: "#B0E0E6"
+  rgb:
+  - 176
+  - 224
+  - 230
+cadetblue:
+  'chineese_name:': 军校蓝
+  code: "#5F9EA0"
+  rgb:
+  - 95
+  - 158
+  - 160
+azure:
+  'chineese_name:': 蔚蓝色
+  code: "#F0FFFF"
+  rgb:
+  - 240
+  - 255
+  - 255
+lightcyan:
+  'chineese_name:': 淡青色
+  code: "#E1FFFF"
+  rgb:
+  - 225
+  - 255
+  - 255
+paleturquoise:
+  'chineese_name:': 苍白的绿宝石
+  code: "#AFEEEE"
+  rgb:
+  - 175
+  - 238
+  - 238
+cyan:
+  'chineese_name:': 青色
+  code: "#00FFFF"
+  rgb:
+  - 0
+  - 255
+  - 255
+aqua:
+  'chineese_name:': 水绿色
+  code: "#00FFFF"
+  rgb:
+  - 0
+  - 255
+  - 255
+darkturquoise:
+  'chineese_name:': 深绿宝石
+  code: "#00CED1"
+  rgb:
+  - 0
+  - 206
+  - 209
+darkslategray:
+  'chineese_name:': 深石板灰
+  code: "#2F4F4F"
+  rgb:
+  - 47
+  - 79
+  - 79
+darkcyan:
+  'chineese_name:': 深青色
+  code: "#008B8B"
+  rgb:
+  - 0
+  - 139
+  - 139
+teal:
+  'chineese_name:': 水鸭色
+  code: "#008080"
+  rgb:
+  - 0
+  - 128
+  - 128
+mediumturquoise:
+  'chineese_name:': 适中的绿宝石
+  code: "#48D1CC"
+  rgb:
+  - 72
+  - 209
+  - 204
+lightseagreen:
+  'chineese_name:': 浅海洋绿
+  code: "#20B2AA"
+  rgb:
+  - 32
+  - 178
+  - 170
+turquoise:
+  'chineese_name:': 绿宝石
+  code: "#40E0D0"
+  rgb:
+  - 64
+  - 224
+  - 208
+auqamarin:
+  'chineese_name:': 绿玉/碧绿色
+  code: "#7FFFAA"
+  rgb:
+  - 127
+  - 255
+  - 170
+mediumaquamarine:
+  'chineese_name:': 适中的碧绿色
+  code: "#00FA9A"
+  rgb:
+  - 0
+  - 250
+  - 154
+mediumspringgreen:
+  'chineese_name:': 适中的春天的绿色
+  code: "#F5FFFA"
+  rgb:
+  - 245
+  - 255
+  - 250
+mintcream:
+  'chineese_name:': 薄荷奶油
+  code: "#00FF7F"
+  rgb:
+  - 0
+  - 255
+  - 127
+springgreen:
+  'chineese_name:': 春天的绿色
+  code: "#3CB371"
+  rgb:
+  - 60
+  - 179
+  - 113
+seagreen:
+  'chineese_name:': 海洋绿
+  code: "#2E8B57"
+  rgb:
+  - 46
+  - 139
+  - 87
+honeydew:
+  'chineese_name:': 蜂蜜
+  code: "#F0FFF0"
+  rgb:
+  - 240
+  - 255
+  - 240
+lightgreen:
+  'chineese_name:': 淡绿色
+  code: "#90EE90"
+  rgb:
+  - 144
+  - 238
+  - 144
+palegreen:
+  'chineese_name:': 苍白的绿色
+  code: "#98FB98"
+  rgb:
+  - 152
+  - 251
+  - 152
+darkseagreen:
+  'chineese_name:': 深海洋绿
+  code: "#8FBC8F"
+  rgb:
+  - 143
+  - 188
+  - 143
+limegreen:
+  'chineese_name:': 酸橙绿
+  code: "#32CD32"
+  rgb:
+  - 50
+  - 205
+  - 50
+lime:
+  'chineese_name:': 酸橙色
+  code: "#00FF00"
+  rgb:
+  - 0
+  - 255
+  - 0
+forestgreen:
+  'chineese_name:': 森林绿
+  code: "#228B22"
+  rgb:
+  - 34
+  - 139
+  - 34
+green:
+  'chineese_name:': 纯绿
+  code: "#008000"
+  rgb:
+  - 0
+  - 128
+  - 0
+darkgreen:
+  'chineese_name:': 深绿色
+  code: "#006400"
+  rgb:
+  - 0
+  - 100
+  - 0
+chartreuse:
+  'chineese_name:': 查特酒绿
+  code: "#7FFF00"
+  rgb:
+  - 127
+  - 255
+  - 0
+lawngreen:
+  'chineese_name:': 草坪绿
+  code: "#7CFC00"
+  rgb:
+  - 124
+  - 252
+  - 0
+greenyellow:
+  'chineese_name:': 绿黄色
+  code: "#ADFF2F"
+  rgb:
+  - 173
+  - 255
+  - 47
+olivedrab:
+  'chineese_name:': 橄榄土褐色
+  code: "#556B2F"
+  rgb:
+  - 85
+  - 107
+  - 47
+beige:
+  'chineese_name:': 米色(浅褐色)
+  code: "#6B8E23"
+  rgb:
+  - 107
+  - 142
+  - 35
+lightgoldenrodyellow:
+  'chineese_name:': 浅秋麒麟黄
+  code: "#FAFAD2"
+  rgb:
+  - 250
+  - 250
+  - 210
+ivory:
+  'chineese_name:': 象牙
+  code: "#FFFFF0"
+  rgb:
+  - 255
+  - 255
+  - 240
+lightyellow:
+  'chineese_name:': 浅黄色
+  code: "#FFFFE0"
+  rgb:
+  - 255
+  - 255
+  - 224
+yellow:
+  'chineese_name:': 纯黄
+  code: "#FFFF00"
+  rgb:
+  - 255
+  - 255
+  - 0
+olive:
+  'chineese_name:': 橄榄
+  code: "#808000"
+  rgb:
+  - 128
+  - 128
+  - 0
+darkkhaki:
+  'chineese_name:': 深卡其布
+  code: "#BDB76B"
+  rgb:
+  - 189
+  - 183
+  - 107
+lemonchiffon:
+  'chineese_name:': 柠檬薄纱
+  code: "#FFFACD"
+  rgb:
+  - 255
+  - 250
+  - 205
+palegodenrod:
+  'chineese_name:': 灰秋麒麟
+  code: "#EEE8AA"
+  rgb:
+  - 238
+  - 232
+  - 170
+khaki:
+  'chineese_name:': 卡其布
+  code: "#F0E68C"
+  rgb:
+  - 240
+  - 230
+  - 140
+gold:
+  'chineese_name:': 金
+  code: "#FFD700"
+  rgb:
+  - 255
+  - 215
+  - 0
+cornislk:
+  'chineese_name:': 玉米色
+  code: "#FFF8DC"
+  rgb:
+  - 255
+  - 248
+  - 220
+goldenrod:
+  'chineese_name:': 秋麒麟
+  code: "#DAA520"
+  rgb:
+  - 218
+  - 165
+  - 32
+floralwhite:
+  'chineese_name:': 花的白色
+  code: "#FFFAF0"
+  rgb:
+  - 255
+  - 250
+  - 240
+oldlace:
+  'chineese_name:': 老饰带
+  code: "#FDF5E6"
+  rgb:
+  - 253
+  - 245
+  - 230
+wheat:
+  'chineese_name:': 小麦色
+  code: "#F5DEB3"
+  rgb:
+  - 245
+  - 222
+  - 179
+moccasin:
+  'chineese_name:': 鹿皮鞋
+  code: "#FFE4B5"
+  rgb:
+  - 255
+  - 228
+  - 181
+orange:
+  'chineese_name:': 橙色
+  code: "#FFA500"
+  rgb:
+  - 255
+  - 165
+  - 0
+papayawhip:
+  'chineese_name:': 番木瓜
+  code: "#FFEFD5"
+  rgb:
+  - 255
+  - 239
+  - 213
+blanchedalmond:
+  'chineese_name:': 漂白的杏仁
+  code: "#FFEBCD"
+  rgb:
+  - 255
+  - 235
+  - 205
+navajowhite:
+  'chineese_name:': Navajo白
+  code: "#FFDEAD"
+  rgb:
+  - 255
+  - 222
+  - 173
+antiquewhite:
+  'chineese_name:': 古代的白色
+  code: "#FAEBD7"
+  rgb:
+  - 250
+  - 235
+  - 215
+tan:
+  'chineese_name:': 晒黑
+  code: "#D2B48C"
+  rgb:
+  - 210
+  - 180
+  - 140
+brulywood:
+  'chineese_name:': 结实的树
+  code: "#DEB887"
+  rgb:
+  - 222
+  - 184
+  - 135
+bisque:
+  'chineese_name:': "(浓汤)乳脂,番茄等"
+  code: "#FFE4C4"
+  rgb:
+  - 255
+  - 228
+  - 196
+darkorange:
+  'chineese_name:': 深橙色
+  code: "#FF8C00"
+  rgb:
+  - 255
+  - 140
+  - 0
+linen:
+  'chineese_name:': 亚麻布
+  code: "#FAF0E6"
+  rgb:
+  - 250
+  - 240
+  - 230
+peru:
+  'chineese_name:': 秘鲁
+  code: "#CD853F"
+  rgb:
+  - 205
+  - 133
+  - 63
+peachpuff:
+  'chineese_name:': 桃色
+  code: "#FFDAB9"
+  rgb:
+  - 255
+  - 218
+  - 185
+sandybrown:
+  'chineese_name:': 沙棕色
+  code: "#F4A460"
+  rgb:
+  - 244
+  - 164
+  - 96
+chocolate:
+  'chineese_name:': 巧克力
+  code: "#D2691E"
+  rgb:
+  - 210
+  - 105
+  - 30
+saddlebrown:
+  'chineese_name:': 马鞍棕色
+  code: "#8B4513"
+  rgb:
+  - 139
+  - 69
+  - 19
+seashell:
+  'chineese_name:': 海贝壳
+  code: "#FFF5EE"
+  rgb:
+  - 255
+  - 245
+  - 238
+sienna:
+  'chineese_name:': 黄土赭色
+  code: "#A0522D"
+  rgb:
+  - 160
+  - 82
+  - 45
+lightsalmon:
+  'chineese_name:': 浅鲜肉(鲑鱼)色
+  code: "#FFA07A"
+  rgb:
+  - 255
+  - 160
+  - 122
+coral:
+  'chineese_name:': 珊瑚
+  code: "#FF7F50"
+  rgb:
+  - 255
+  - 127
+  - 80
+orangered:
+  'chineese_name:': 橙红色
+  code: "#FF4500"
+  rgb:
+  - 255
+  - 69
+  - 0
+darksalmon:
+  'chineese_name:': 深鲜肉(鲑鱼)色
+  code: "#E9967A"
+  rgb:
+  - 233
+  - 150
+  - 122
+tomato:
+  'chineese_name:': 番茄
+  code: "#FF6347"
+  rgb:
+  - 255
+  - 99
+  - 71
+mistyrose:
+  'chineese_name:': 薄雾玫瑰
+  code: "#FFE4E1"
+  rgb:
+  - 255
+  - 228
+  - 225
+salmon:
+  'chineese_name:': 鲜肉(鲑鱼)色
+  code: "#FA8072"
+  rgb:
+  - 250
+  - 128
+  - 114
+snow:
+  'chineese_name:': 雪
+  code: "#FFFAFA"
+  rgb:
+  - 255
+  - 250
+  - 250
+lightcoral:
+  'chineese_name:': 淡珊瑚色
+  code: "#F08080"
+  rgb:
+  - 240
+  - 128
+  - 128
+rosybrown:
+  'chineese_name:': 玫瑰棕色
+  code: "#BC8F8F"
+  rgb:
+  - 188
+  - 143
+  - 143
+indianred:
+  'chineese_name:': 印度红
+  code: "#CD5C5C"
+  rgb:
+  - 205
+  - 92
+  - 92
+red:
+  'chineese_name:': 纯红
+  code: "#FF0000"
+  rgb:
+  - 255
+  - 0
+  - 0
+brown:
+  'chineese_name:': 棕色
+  code: "#A52A2A"
+  rgb:
+  - 165
+  - 42
+  - 42
+firebrick:
+  'chineese_name:': 耐火砖
+  code: "#B22222"
+  rgb:
+  - 178
+  - 34
+  - 34
+darkred:
+  'chineese_name:': 深红色
+  code: "#8B0000"
+  rgb:
+  - 139
+  - 0
+  - 0
+maroon:
+  'chineese_name:': 栗色
+  code: "#800000"
+  rgb:
+  - 128
+  - 0
+  - 0
+white:
+  'chineese_name:': 纯白
+  code: "#FFFFFF"
+  rgb:
+  - 255
+  - 255
+  - 255
+whitesmoke:
+  'chineese_name:': 白烟
+  code: "#F5F5F5"
+  rgb:
+  - 245
+  - 245
+  - 245
+gainsboro:
+  'chineese_name:': Gainsboro
+  code: "#DCDCDC"
+  rgb:
+  - 220
+  - 220
+  - 220
+lightgrey:
+  'chineese_name:': 浅灰色
+  code: "#D3D3D3"
+  rgb:
+  - 211
+  - 211
+  - 211
+silver:
+  'chineese_name:': 银白色
+  code: "#C0C0C0"
+  rgb:
+  - 192
+  - 192
+  - 192
+darkgray:
+  'chineese_name:': 深灰色
+  code: "#A9A9A9"
+  rgb:
+  - 169
+  - 169
+  - 169
+gray:
+  'chineese_name:': 灰色
+  code: "#808080"
+  rgb:
+  - 128
+  - 128
+  - 128
+dimgray:
+  'chineese_name:': 暗淡的灰色
+  code: "#696969"
+  rgb:
+  - 105
+  - 105
+  - 105
+black:
+  'chineese_name:': 纯黑
+  code: "#000000"
+  rgb:
+  - 0
+  - 0
+  - 0
