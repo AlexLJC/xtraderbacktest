@@ -35,6 +35,7 @@ remote_storage:                               # the remote locations of saving f
   oss:
     OSS_PUBLIC_KEY: oss_public_key
     OSS_SECRET_KEY: oss_secret_key
+    BUCKET: XTRADERBACKTEST
     END_POINT: http://oss-cn-shanghai.aliyuncs.com
 notification:                                # the notification configurations
   mail:                                      # email
