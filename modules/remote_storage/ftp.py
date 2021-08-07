@@ -100,7 +100,6 @@ def dataframe_read(file_name,file_path,abs_path):
 Save dataframe to FTP as pickles
 '''
 def dataframe_write(file_name,file_path,df):
-    print(file_name,file_path)
     ftp = ftplib.FTP()
     ftp.connect(FTP_CONFIG["host"],FTP_CONFIG["port"])
     ftp.login(FTP_CONFIG["user"],FTP_CONFIG["password"])
@@ -141,9 +140,9 @@ def _chdir(ftp, directory):
 # Check if directory exists (in current location)
 def _directory_exists(ftp, directory):
     filelist = []
-    ftp.retrlines('LIST',filelist.append)
+    filelist = ftp.nlst()
     for f in filelist:
-        if f.split()[-1] == directory and f.upper().startswith('D'):
+        if f == directory:
             return True
     return False
 
@@ -153,7 +152,7 @@ def _ch_dir_rec(ftp, descending_path_split):
 
     next_level_directory = descending_path_split.pop(0)
     if next_level_directory != '':
-        if not _directory_exists(ftp,next_level_directory):
+        if _directory_exists(ftp,next_level_directory) == False:
             print(next_level_directory)
             ftp.mkd(next_level_directory)
         ftp.cwd(next_level_directory)

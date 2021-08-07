@@ -27,8 +27,8 @@ def load_price(symbol,fr,to,mode):
 
 def _load_price_backtest(symbol,fr,to):
     # First construct the cache file name
-    # The file name should be in this format XAUUSD_2020-01-02-01-01-00_2020-01-02-02-23-59_price.pikle
-    file_name = symbol + '_' + str(fr).replace(':','-').replace(' ','-') + '_' + str(to).replace(':','-').replace(' ','-')  + "_price.pikle"
+    # The file name should be in this format XAUUSD_2020-01-02-01-01-00_2020-01-02-02-23-59_price.pickle
+    file_name = symbol + '_' + str(fr).replace(':','-').replace(' ','-') + '_' + str(to).replace(':','-').replace(' ','-')  + "_price.pickle"
     # Then check whether it is in the cache
     file_path_dir = sys_conf_loader.get_sys_path() + "/data/__cache__/"
     # if the __cache__ folder does not exist then create it
@@ -37,8 +37,8 @@ def _load_price_backtest(symbol,fr,to):
     if os.path.isdir(file_path_dir) is False:
         os.mkdir(file_path_dir)
 
-    # if the pikles does not exist in folder then create it 
-    file_path_dir = os.path.join(file_path_dir,"pikles")
+    # if the pickle does not exist in folder then create it 
+    file_path_dir = os.path.join(file_path_dir,"pickles")
     if sys.platform.startswith('linux') == False:
         file_path_dir = file_path_dir.replace('/','\\')
     if os.path.isdir(file_path_dir) is False:
@@ -106,4 +106,4 @@ def _load_price_live(symbol,fr,to):
 
 if __name__ == '__main__':
     #print(_load_local_price_storage("AAPL","2019-02-15 09:41:00","2019-02-15 10:03:00"))
-    print(_load_price_backtest("AAPL","2019-02-15 09:41:00","2019-02-15 10:03:00"))
+    print(load_price("AAPL","2019-02-15 09:41:00","2019-02-15 10:03:00","backtest"))
