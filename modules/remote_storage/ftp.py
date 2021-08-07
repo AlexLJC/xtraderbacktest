@@ -100,11 +100,14 @@ def dataframe_read(file_name,file_path,abs_path):
 Save dataframe to FTP as pickles
 '''
 def dataframe_write(file_name,file_path,df):
+    print(file_name,file_path)
     ftp = ftplib.FTP()
     ftp.connect(FTP_CONFIG["host"],FTP_CONFIG["port"])
     ftp.login(FTP_CONFIG["user"],FTP_CONFIG["password"])
+    _chdir(ftp,file_path)
     # Write to local cache then upload
     try:
+        
         df.to_pickle(temp_cache_path + file_name)
         with open(temp_cache_path + file_name, "rb") as f:
             ftp.storbinary('STOR '  + file_path + file_name, f)
@@ -122,11 +125,40 @@ def file_check_exist(file_name,file_path):
     ftp.connect(FTP_CONFIG["host"],FTP_CONFIG["port"])
     ftp.login(FTP_CONFIG["user"],FTP_CONFIG["password"])
     result = False
-    ftp.cwd(file_path)
-    list_of_file = ftp.nlst()
-    if file_name in list_of_file:
-        result = True
+    try:
+        ftp.cwd(file_path)
+        list_of_file = ftp.nlst()
+        if file_name in list_of_file:
+            result = True
+    except Exception as e:
+        pass
     return result
+
+
+def _chdir(ftp, directory):
+    _ch_dir_rec(ftp,directory.split('/')) 
+
+# Check if directory exists (in current location)
+def _directory_exists(ftp, directory):
+    filelist = []
+    ftp.retrlines('LIST',filelist.append)
+    for f in filelist:
+        if f.split()[-1] == directory and f.upper().startswith('D'):
+            return True
+    return False
+
+def _ch_dir_rec(ftp, descending_path_split):
+    if len(descending_path_split) == 0:
+        return
+
+    next_level_directory = descending_path_split.pop(0)
+    if next_level_directory != '':
+        if not _directory_exists(ftp,next_level_directory):
+            print(next_level_directory)
+            ftp.mkd(next_level_directory)
+        ftp.cwd(next_level_directory)
+    _ch_dir_rec(ftp,descending_path_split)
+
 
 if __name__ == '__main__':
     #print("FTP Configs",FTP_CONFIG)
