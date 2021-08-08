@@ -1,6 +1,6 @@
 This folder is for storing the original price data.     
 The data should be better in the following format :     
-%Y-%m-%d %H:%M:%S,open,high,low,close,volume        
+%Y-%m-%d %H:%M:%S,open,high,low,close,volume,open_interest        
 in file name like symbol_name.txt.      
 
 The AAPL is a template data just for demo use, it might not 100% correct to     

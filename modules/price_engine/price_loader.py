@@ -96,8 +96,11 @@ def _load_local_price_storage(symbol,fr,to):
     abs_location  = price_folder + symbol + ".txt"
     if sys.platform.startswith('linux') == False:
         abs_location = abs_location.replace('/','\\')
-    df = pd.read_csv(abs_location,names=["date","open","high","low","close","volume"])
-    result = df[(df["date"] >= fr) & (df["date"] <= to)].copy()
+    df = pd.read_csv(abs_location,names=["date","open","high","low","close","volume","open_interest"]).fillna(0)
+    df["date"] = pd.to_datetime(df["date"])
+    df = df.set_index('date')
+    df["symbol"] = symbol
+    result = df[(df.index >= pd.to_datetime(fr)) & (df.index <= pd.to_datetime(to))].copy()
     return result
 
 def _load_price_live(symbol,fr,to):
@@ -105,5 +108,6 @@ def _load_price_live(symbol,fr,to):
     return 
 
 if __name__ == '__main__':
-    #print(_load_local_price_storage("AAPL","2019-02-15 09:41:00","2019-02-15 10:03:00"))
-    print(load_price("AAPL","2019-02-15 09:41:00","2019-02-15 10:03:00","backtest"))
+    print(_load_local_price_storage("AAPL","2019-02-15 09:41:00","2019-02-15 10:03:00"))
+    #print(load_price("AAPL","2019-02-15 09:41:00","2019-02-15 10:03:00","backtest"))
+    pass
