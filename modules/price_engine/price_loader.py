@@ -4,10 +4,10 @@ It is for loading price in backtest or live mode.
 import pandas as pd
 import sys
 import os
-sys.path.append("..")
-import other.sys_conf_loader as sys_conf_loader
-project_path = sys_conf_loader.get_sys_path()
-sys.path.append(project_path)
+sys.path.append(os.path.join(os.getcwd().split('xtraderbacktest')[0],'xtraderbacktest') )
+import modules.other.sys_conf_loader as sys_conf_loader
+
+
 
 
 '''
@@ -108,6 +108,9 @@ def _load_price_live(symbol,fr,to):
     return 
 
 if __name__ == '__main__':
+    import modules.other.logg 
+    import logging
     print(_load_local_price_storage("AAPL","2019-02-15 09:41:00","2019-02-15 10:03:00"))
     #print(load_price("AAPL","2019-02-15 09:41:00","2019-02-15 10:03:00","backtest"))
+    
     pass

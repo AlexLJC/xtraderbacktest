@@ -34,5 +34,6 @@ if __name__ == '__main__':
     df = price_loader.load_price("AAPL","2019-02-15 09:41:00","2019-03-15 10:03:00","backtest")
     print("Ordinary Dataframe in 1 min","\n",df)
     print("Converted Dataframe in 5 min","\n",convert(df,5))
+    
     pass
     

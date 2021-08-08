@@ -5,8 +5,8 @@ import os
 import sys
 import pickle
 import oss2
-sys.path.append("..")
-import other.sys_conf_loader as sys_conf_loader
+sys.path.append(os.path.join(os.getcwd().split('xtraderbacktest')[0],'xtraderbacktest') )
+import modules.other.sys_conf_loader as sys_conf_loader
 
 # Get s3 configuration from system configurations
 sys_conf = sys_conf_loader.get_sys_conf()
