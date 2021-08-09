@@ -28,18 +28,23 @@ def generate_fake_ticks(symbol,date,row):
         count = len(prices)
         seconds_delta = int(59 / count)
         volume = int(row["volume"] / count)
+        open_interest = row["open_interest"]
         # get symbol configuration to simulate ask bid
         symbol_conf = sys_conf_loader.get_product_info(symbol)
         spread = symbol_conf["spread"] * symbol_conf["point"]
         point =  symbol_conf["point"]
         i = 0
         for price in prices:
+            if i == count - 1:
+                volume = row["volume"] - int(row["volume"] / count) * i
             tick = {
                 "symbol":symbol,
                 "date": (date + datetime.timedelta(seconds = seconds_delta * i)).strftime(TIMESTAMP_FORMAT),
                 "last_price":price,
+                "open_interest":open_interest,
+                "volume":volume,
                 "ask_1":price + spread,
-                "ask_1_volume":volume,
+                "ask_1_volume":1,
                 "ask_2":price + spread + 1 * point,
                 "ask_2_volume":1,
                 "ask_3":price + spread + 2 * point,
@@ -49,7 +54,7 @@ def generate_fake_ticks(symbol,date,row):
                 "ask_5":price + spread + 4 * point,
                 "ask_5_volume":1,
                 "bid_1":price,
-                "bid_1_volume":volume,
+                "bid_1_volume":1,
                 "bid_2":price - 1 * point,
                 "bid_2_volume":1,
                 "bid_3":price - 2 * point,
@@ -57,7 +62,7 @@ def generate_fake_ticks(symbol,date,row):
                 "bid_4":price - 3 * point,
                 "bid_4_volume":1,
                 "bid_5":price - 4 * point,
-                "bid_5_volume":1,
+                "bid_5_volume":1
             }
             result.append(tick)
             i = i + 1

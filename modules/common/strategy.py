@@ -5,8 +5,10 @@ import modules.other.logg
 import logging 
 
 import modules.common.position 
+import modules.price_engine.ohlc 
 from abc import ABC, abstractmethod
- 
+import pandas as pd
+
 class Strategy():
     def __init__(self,pars):
         self.pars = pars["custom"]
@@ -20,9 +22,9 @@ class Strategy():
         self.current_time = None
         self.current_tick = {}
         self.custom_chart = {}
-        self.ohlcs = {}
-
-    
+        self.history_data = {}
+        self._ohlc_counter = {}
+        self._ohlc_counter_1m = {}
 
     # Handle Tick
     @abstractmethod
@@ -32,24 +34,10 @@ class Strategy():
     # Handle Bar
     @abstractmethod
     def handle_bar(self, bar):
-        for symbol in self.context.symbols:
-            logging.debug(symbol)
-            logging.debug(bar[symbol]["open"])
-            logging.debug(bar[symbol]["high"])
-            logging.debug(bar[symbol]["low"])
-            logging.debug(bar[symbol]["close"])
+        
+        logging.debug(bar)
         pass
     
-    def _preload_data(self,symbol,df):
-        self.ohlcs[symbol] = df
-
-    # Send Order
-    def _send_order(self,order):
-        self._pending_orders.append(order)
-
-    def _set_current_time(self,current_time):
-        pass
-
     def open_order(self, symbol, order_type,  volume, direction, limit_price = 0, take_profit = 0, stop_loss = 0, mutiple_exits = None, trailing_stop = None, other_fields = None):
         pass
 
@@ -62,13 +50,6 @@ class Strategy():
     def send_notification(self,message):
         pass
     
-    # is_open： whehter is open tick. Prevent gap
-    def _round_check_before(self,tick,is_open=False):
-        pass
-    
-    def _round_check_after(self,tick,is_open=False):
-        return None
-
     def get_bars(self,symbol,start_date_str,end_date_str,period):
         pass
     
@@ -98,3 +79,42 @@ class Strategy():
         pass
     def draw_chart(self,chart_name,y,x=None,shape='point',point_color='black'):
         pass
+
+     # Send Order
+    def _send_order(self,order):
+        self._pending_orders.append(order)
+
+    def _set_current_time(self,current_time):
+        self.current_time = current_time
+    
+    # process pending orders
+    def _process_pending_order(self,tick):
+        pass
+
+    # is_open: whehter is open tick. Prevent gap
+    def _round_check_before(self,tick,is_open = False):
+        self._set_current_time(tick["date"])
+        self.current_tick[tick["symbol"]] = tick
+        self._process_pending_order(tick)
+
+    # 
+    def _round_check_after(self,tick):
+        self._process_pending_order(tick)
+        if tick["symbol"] not in self._ohlc_counter.keys():
+            self._ohlc_counter[tick["symbol"]] = modules.price_engine.ohlc.OHLCCounter(tick["symbol"],self.context["period"])
+            self._ohlc_counter_1m[tick["symbol"]] = modules.price_engine.ohlc.OHLCCounter(tick["symbol"],"1m")
+        result = self._ohlc_counter[tick["symbol"]].update(tick["last_price"],tick["date"],tick["volume"],tick["open_interest"])
+        new_bar_1m = self._ohlc_counter_1m[tick["symbol"]].update(tick["last_price"],tick["date"],tick["volume"],tick["open_interest"])
+        if new_bar_1m is not None:
+            self._append_history_data(new_bar_1m)
+        return result
+
+    def _append_history_data(self,ohlc):
+        new_ohlc_list =[ohlc.open,ohlc.high,ohlc.low,ohlc.close,ohlc.volume,ohlc.open_interest,ohlc.symbol]
+        self.history_data[ohlc.symbol].loc[pd.to_datetime(ohlc.date)] = new_ohlc_list
+
+    # preload data before strategy start
+    def _preload_data(self,symbol,df):
+        self.history_data[symbol] = df
+
+   

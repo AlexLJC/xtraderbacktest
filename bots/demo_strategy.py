@@ -19,12 +19,9 @@ class Bot(modules.common.strategy.Strategy):
 
     # Handle Bar
     def handle_bar(self, bar):
-        logging.debug(bar["symbol"])
-        logging.debug(bar["open"])
-        logging.debug(bar["high"])
-        logging.debug(bar["low"])
-        logging.debug(bar["close"])
-        
+        logging.info("new bar "+bar["date"])
+        #logging.info("current_time " + self.current_time)
+
 
 if __name__ == "__main__":
     pars = sys_conf_loader.read_configs_json("AAPL_demo.json","/configurations/strategy/single/demo_strategy/")

@@ -43,4 +43,8 @@ if __name__ == "__main__":
     try:
         1/0
     except Exception as e:
+        logging.info(e,exc_info=True)
+        logging.debug(e,exc_info=True)
+        logging.warning(e,exc_info=True)
+        logging.error(e,exc_info=True)
         logging.critical(e,exc_info=True)

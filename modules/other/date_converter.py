@@ -5,27 +5,22 @@ sys.path.append(os.path.join(os.getcwd().split('xtraderbacktest')[0],'xtraderbac
 import datetime
 import modules.other.sys_conf_loader as sys_conf_loader
 
-TIMESTAMP_FORMAT=sys_conf_loader.get_sys_conf()["timeformat"]
 
 '''
 Convert datetime string to date object
 '''
-def convert_str_to_date(date_str,date_format = TIMESTAMP_FORMAT):
+def convert_str_to_date(date_str,date_format = None):
+    if date_format is None:
+        TIMESTAMP_FORMAT=sys_conf_loader.get_sys_conf()["timeformat"]
     return datetime.datetime.strptime(date_str,date_format)
 
 '''
 Convert period string to numbers in min
 '''
 def convert_period_to_int(period):
-    if period == "1m":
-        return 1
-    elif period == "5m":
-        return 5
-    elif period == "15m":
-        return 15
-    elif period == "60m":
-        return 60
+    if "m" in period:
+        return int(period.split('m')[0])
     elif period == "1d":
-        return 60*24
+        return 1440
     else:
         return None

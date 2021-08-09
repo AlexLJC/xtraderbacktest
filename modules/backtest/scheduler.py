@@ -36,7 +36,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
         with tqdm(total=len(symbols)) as pbar:
             for symbol in symbols:
                 pre_load_mins = sys_conf_loader.get_sys_conf()["backtest_conf"]["price_preload"]
-                fr_load = (datetime.datetime.strptime(fr,TIMESTAMP_FORMAT) + datetime.timedelta(minutes=pre_load_mins)).strftime(TIMESTAMP_FORMAT)
+                fr_load = (datetime.datetime.strptime(fr,TIMESTAMP_FORMAT) - datetime.timedelta(minutes=pre_load_mins)).strftime(TIMESTAMP_FORMAT)
                 self.ohlc[symbol] = price_loader.load_price(symbol,fr_load,to,"backtest")
                 pbar.update(1)
         pbar.close()
@@ -89,7 +89,17 @@ class Scheduler(modules.common.scheduler.Scheduler):
                     # if there is a new bar for the timeframe specified by strategy
                     if new_bar is not None:
                         # handle it to the strategy's logic to process new bar
-                        self.strategy.handle_bar(new_bar)
+                        new_bar_dict = {
+                            "open":new_bar.open,
+                            "high":new_bar.high,
+                            "close":new_bar.close,
+                            "low":new_bar.low,
+                            "date":new_bar.date,
+                            "symbol":new_bar.symbol,
+                            "volume":new_bar.volume,
+                            "open_interest":new_bar.open_interest
+                        }
+                        self.strategy.handle_bar(new_bar_dict)
                         # handle to strategy internal fuc to deal with order handling, calculations and etc
                         self.strategy._round_check_after(tick)
                 pbar.update(1) 

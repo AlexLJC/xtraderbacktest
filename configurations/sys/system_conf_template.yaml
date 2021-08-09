@@ -22,12 +22,12 @@ databases:                                    # databases' configurations
       host: 127.0.0.1
       port: 6379
       password: password
-remote_storage:                                 # the remote locations of saving files
+remote_storage:                               # the remote locations of saving files
   ftp:
     host: 127.0.0.1
-    port: 21
-    user: user
-    password: password
+    port: 211
+    user: administrator
+    password: Ljc3388650
   s3:
     AWS_ACCESS_KEY_ID: AWS_ACCESS_KEY_ID
     AWS_SECRET_ACCESS_KEY: AWS_SECRET_ACCESS_KEY
@@ -57,15 +57,15 @@ backtest_conf:                                # the configuration of backtest mo
   indicator_remote_cache:                     # the configuration of remote cache of indicators temp files
     is_on: false                              # on = true or off = false
     type: s3                                  # the location type
-    path: /cache/indicators                   # the location path
+    path: /cache/indicators/                  # the location path
   price_remote_cache:                         # the configuration of remote cache of price data temp files
     is_on: false                              # on = true or off = false
-    type: s3                                  # the location type
-    path: /cache/prices                       # the location path
+    type: ftp                                 # the location type
+    path: /cache/prices/                      # the location path
   backtest_result_remote:                     # the configuration of backtest result  files
     is_on: false                              # on = true or off = false
     type: s3                                  # the location type
-    path: /cache/backtest_results             # the location path
+    path: /cache/backtest_results/            # the location path
 timezone: US/Eastern                          # time zone of the system(for display correct backtest result)
 timeformat: "%Y-%m-%d %H:%M:%S"               # time format
 logger:                                       # the logger configuration
