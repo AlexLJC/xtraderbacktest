@@ -111,6 +111,6 @@ def _load_price_live(symbol,fr,to):
 if __name__ == '__main__':
     import modules.other.logg 
     import logging
-    print(_load_local_price_storage("AAPL","2019-02-15 09:41:00","2019-02-15 10:03:00"))
-    #print(load_price("AAPL","2019-02-15 09:41:00","2019-02-15 10:03:00","backtest"))
+    #print(_load_local_price_storage("AAPL","2019-02-22 09:41:00","2019-02-15 10:03:00"))
+    print(load_price("AAPL","2019-02-22 09:41:00","2019-02-15 10:03:00","backtest"))
     pass

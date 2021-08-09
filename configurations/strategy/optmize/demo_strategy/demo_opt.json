@@ -23,8 +23,8 @@
     "fix_input":{
         "account_id":"demo_account",
         "period":"5m",
-        "start_date": "2021-01-01 00:00:00",
-        "end_date": "2021-06-01 00:00:00",
+        "start_date": "2019-10-28 08:47:00",
+        "end_date": "2021-02-12 19:59:00",
         "tag":"demo",
         "strategy_name_code": "DM",
         "strategy_name": "demo"

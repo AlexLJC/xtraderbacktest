@@ -5,10 +5,9 @@ import os
 sys.path.append(os.path.join(os.getcwd().split('xtraderbacktest')[0],'xtraderbacktest'))
 import modules.other.sys_conf_loader as sys_conf_loader
 
+TIMESTAMP_FORMAT=sys_conf_loader.get_sys_conf()["timeformat"]
 
-# create logger
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+
 
 # create file handler
 sys_conf = sys_conf_loader.get_sys_conf()
@@ -18,18 +17,23 @@ if sys.platform.startswith('linux') == False:
 
 # create formatter
 fmt = "%(asctime)-15s: %(levelname)s %(filename)s line:%(lineno)d process:%(process)d %(message)s"
-datefmt = "%Y-%m-%d %H:%M:%S"
+datefmt = TIMESTAMP_FORMAT
 formatter = logging.Formatter(fmt, datefmt)
+
+file_handler = logging.FileHandler(filename=log_path)
+stdout_handler = logging.StreamHandler(sys.stdout)
+handlers = [file_handler, stdout_handler]
+
 if sys_conf["logger"]["info"]:
-    logging.basicConfig(filename=log_path,level= logging.INFO,datefmt=datefmt,format=fmt)
+    logging.basicConfig(level= logging.INFO,datefmt=datefmt,format=fmt,handlers=handlers)
 if sys_conf["logger"]["debug"]:
-    logging.basicConfig(filename=log_path,level= logging.DEBUG,datefmt=datefmt,format=fmt)
+    logging.basicConfig(level= logging.DEBUG,datefmt=datefmt,format=fmt,handlers=handlers)
 if sys_conf["logger"]["warn"]:
-    logging.basicConfig(filename=log_path,level= logging.WARNING,datefmt=datefmt,format=fmt)
+    logging.basicConfig(level= logging.WARNING,datefmt=datefmt,format=fmt,handlers=handlers)
 if sys_conf["logger"]["error"]:
-    logging.basicConfig(filename=log_path,level= logging.ERROR,datefmt=datefmt,format=fmt)
+    logging.basicConfig(level= logging.ERROR,datefmt=datefmt,format=fmt,handlers=handlers)
 if sys_conf["logger"]["critical"]:
-    logging.basicConfig(filename=log_path,level= logging.CRITICAL,datefmt=datefmt,format=fmt)
+    logging.basicConfig(level= logging.CRITICAL,datefmt=datefmt,format=fmt,handlers=handlers)
 
 if __name__ == "__main__":
     logging.info("test info message")

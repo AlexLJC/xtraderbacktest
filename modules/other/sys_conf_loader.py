@@ -59,6 +59,20 @@ def get_all_products_info():
     return result
 
 '''
+Short cut for get specific products info
+'''
+def get_product_info(symbol):
+    file_ = []
+    file_path = "/configurations/symbols_conf/"
+    for filename in os.listdir(get_sys_path()+ file_path):
+        if filename.endswith(".yaml") and filename.split('.yaml')[0] == symbol: 
+            file_ = filename
+            break
+    json_obj = read_configs_yaml(file_,file_path) 
+    result = json_obj
+    return result
+
+'''
 Get system configurations
 '''
 def get_sys_conf():

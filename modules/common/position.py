@@ -6,7 +6,8 @@ import logging
 
 class Position():
     def __init__(self,cash):
-        self.cash=cash
+        self.cash = cash
+        self.margin = 0
         self.position_current = []
         self.position_history = []
         self.closed_fund = {}

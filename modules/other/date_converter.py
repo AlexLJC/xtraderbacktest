@@ -1,6 +1,11 @@
-import datetime
+import os
+import sys
+sys.path.append(os.path.join(os.getcwd().split('xtraderbacktest')[0],'xtraderbacktest'))
 
-TIMESTAMP_FORMAT="%Y-%m-%d %H:%M:%S"
+import datetime
+import modules.other.sys_conf_loader as sys_conf_loader
+
+TIMESTAMP_FORMAT=sys_conf_loader.get_sys_conf()["timeformat"]
 
 '''
 Convert datetime string to date object

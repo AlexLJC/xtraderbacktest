@@ -53,6 +53,7 @@ live_conf:                                    # the configuration of live mode
     type: mail                                # the way of notification
 backtest_conf:                                # the configuration of backtest mode
   price_timezone: UTC+0                       # the price data's time zone
+  price_preload:  10080                       # preload how many minues previous data into strategy
   indicator_remote_cache:                     # the configuration of remote cache of indicators temp files
     is_on: false                              # on = true or off = false
     type: s3                                  # the location type
@@ -66,6 +67,7 @@ backtest_conf:                                # the configuration of backtest mo
     type: s3                                  # the location type
     path: /cache/backtest_results             # the location path
 timezone: US/Eastern                          # time zone of the system(for display correct backtest result)
+timeformat: "%Y-%m-%d %H:%M:%S"               # time format
 logger:                                       # the logger configuration
   location: /data/logs/                       # log file location
   info: true                                  # record info
