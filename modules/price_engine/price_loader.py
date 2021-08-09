@@ -6,7 +6,8 @@ import sys
 import os
 sys.path.append(os.path.join(os.getcwd().split('xtraderbacktest')[0],'xtraderbacktest') )
 import modules.other.sys_conf_loader as sys_conf_loader
-
+import modules.other.logg
+import logging
 
 
 
@@ -53,7 +54,7 @@ def _load_price_backtest(symbol,fr,to):
     # if there is cache file then load it locally
     if os.path.isfile(abs_path) is True:
         # read it form local file 
-        print('Loding file',file_name,'Locally')
+        logging.info('Loding file '+file_name + ' Locally')
         df = pd.read_pickle(abs_path)
         result =  df
     else:
@@ -112,5 +113,4 @@ if __name__ == '__main__':
     import logging
     print(_load_local_price_storage("AAPL","2019-02-15 09:41:00","2019-02-15 10:03:00"))
     #print(load_price("AAPL","2019-02-15 09:41:00","2019-02-15 10:03:00","backtest"))
-    
     pass

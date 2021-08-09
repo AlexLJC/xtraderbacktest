@@ -23,7 +23,6 @@
     "fix_input":{
         "account_id":"demo_account",
         "period":"5m",
-        "rollover_type":"none",
         "start_date": "2021-01-01 00:00:00",
         "end_date": "2021-06-01 00:00:00",
         "tag":"demo",

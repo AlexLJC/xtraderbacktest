@@ -8,6 +8,8 @@ import ftplib
 
 sys.path.append(os.path.join(os.getcwd().split('xtraderbacktest')[0],'xtraderbacktest') )
 import modules.other.sys_conf_loader as sys_conf_loader
+import modules.other.logg
+import logging
 
 # Get s3 configuration from system configurations
 sys_conf = sys_conf_loader.get_sys_conf()
@@ -41,7 +43,7 @@ def json_read(file_name,file_path):
         f.close()
         os.remove(temp_cache_path + file_name)
     except Exception as e:
-        print(e)
+        logging.error(e,exc_info=True)
     ftp.quit()
     return result
 
@@ -62,7 +64,7 @@ def file_write(file_name,file_path,content):
         f.close()
         os.remove(temp_cache_path + file_name)
     except Exception as e:
-        print(e)
+        logging.error(e,exc_info=True)
     ftp.quit()
 
 
@@ -72,9 +74,9 @@ Read the dataframe from FTP and then save it as cache.
 def dataframe_read(file_name,file_path,abs_path):
     result = None
     if file_check_exist(file_name,file_path) == False:
-        print('FTP does not have',file_path + file_name,'.')
+        logging.info('FTP does not have ' + file_path + file_name +'.')
     else:
-        print('Loading file',file_path + file_name,'From FTP.')
+        logging.info('Loading file ' + file_path + file_name +' from FTP.')
         
         # Download it into the cache file
         ftp = ftplib.FTP()
@@ -92,7 +94,7 @@ def dataframe_read(file_name,file_path,abs_path):
             result =  df
             os.remove(temp_cache_path + file_name)
         except Exception as e:
-            print(e)
+            logging.error(e,exc_info=True)
         ftp.quit()
     return result
 
@@ -113,7 +115,7 @@ def dataframe_write(file_name,file_path,df):
         f.close()
         os.remove(temp_cache_path + file_name)
     except Exception as e:
-        print(e)
+        logging.error(e,exc_info=True)
     ftp.quit()
 
 '''
@@ -153,7 +155,6 @@ def _ch_dir_rec(ftp, descending_path_split):
     next_level_directory = descending_path_split.pop(0)
     if next_level_directory != '':
         if _directory_exists(ftp,next_level_directory) == False:
-            print(next_level_directory)
             ftp.mkd(next_level_directory)
         ftp.cwd(next_level_directory)
     _ch_dir_rec(ftp,descending_path_split)
