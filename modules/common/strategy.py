@@ -8,6 +8,7 @@ import modules.common.position
 import modules.price_engine.ohlc 
 from abc import ABC, abstractmethod
 import pandas as pd
+import uuid
 
 class Strategy():
     def __init__(self,pars):
@@ -38,6 +39,7 @@ class Strategy():
         logging.debug(bar)
         pass
     
+
     def open_order(self, symbol, order_type,  volume, direction, limit_price = 0, tp = 0, sl = 0, mutiple_exits = None, trailing_stop = None, extra = None):
         price = self.current_tick[symbol]
         if order_type == "limit":
@@ -54,8 +56,31 @@ class Strategy():
             else:
                 if price < limit_price:
                     order_type = "market"
-
+        if sl !=0 and order_type == "market":
+            if price <= sl and direction == "long":
+                return None
+            if price >= sl and direction == "short":
+                return None
+        if sl !=0 and order_type != "market":
+            price = limit_price
+            if price <= sl and direction == "long":
+                return None
+            if price >= sl and direction == "short":
+                return None
+        if tp !=0 and order_type == "market":
+            if price >= tp and direction == "long":
+                return None
+            if price <= tp and direction == "short":
+                return None
+        if tp !=0 and order_type != "market":
+            price = limit_price
+            if price >= tp and direction == "long":
+                return None
+            if price <= tp and direction == "short":
+                return None
+        order_ref = self._generarate_orderref()
         order = {
+            "order_ref":order_ref,
             "symbol":symbol,
             "order_type":order_type,
             "volume":volume,
@@ -69,8 +94,13 @@ class Strategy():
             "extra":extra,
             "open_date":self.current_time,
             "close_date":None,
-            "status":"pending"
+            "status":"pending_open",                            # "pending_open","opening","open_filled","pending_close","closing","close_filled"
+            "open_price":0,
+            "close_price":0,
+            "commission":0,
+            "margin":0
         }
+        self._pending_orders.append(order)
 
     def modify_order(self,order_ref,fields):
         pass
@@ -144,6 +174,9 @@ class Strategy():
         new_ohlc_list =[ohlc.open,ohlc.high,ohlc.low,ohlc.close,ohlc.volume,ohlc.open_interest,ohlc.symbol]
         self._history_data[ohlc.symbol].loc[pd.to_datetime(ohlc.date)] = new_ohlc_list
 
+    def _generarate_orderref(self):
+        strategy_name_code = self.context["strategy_name_code"]
+        return strategy_name_code + ":"+ str(uuid.uuid4())
     # preload data before strategy start
     def _preload_data(self,symbol,df):
         self._history_data[symbol] = df
