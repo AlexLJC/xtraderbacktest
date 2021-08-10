@@ -21,8 +21,8 @@ class Strategy():
         self._pending_orders = []
         self.current_time = None
         self.current_tick = {}
-        self.custom_chart = {}
-        self.history_data = {}
+        self._custom_chart = {}
+        self._history_data = {}
         self._ohlc_counter = {}
         self._ohlc_counter_1m = {}
 
@@ -38,8 +38,39 @@ class Strategy():
         logging.debug(bar)
         pass
     
-    def open_order(self, symbol, order_type,  volume, direction, limit_price = 0, take_profit = 0, stop_loss = 0, mutiple_exits = None, trailing_stop = None, other_fields = None):
-        pass
+    def open_order(self, symbol, order_type,  volume, direction, limit_price = 0, tp = 0, sl = 0, mutiple_exits = None, trailing_stop = None, extra = None):
+        price = self.current_tick[symbol]
+        if order_type == "limit":
+            if direction == "long":
+                if price < limit_price:
+                    order_type = "market"  
+            else:
+                if price > limit_price:
+                    order_type = "market"    
+        elif order_type == "stop":
+            if direction == "long":
+                if price > limit_price:
+                    order_type = "market"
+            else:
+                if price < limit_price:
+                    order_type = "market"
+
+        order = {
+            "symbol":symbol,
+            "order_type":order_type,
+            "volume":volume,
+            "filled":0,
+            "direction":direction,
+            "limit_price":limit_price,
+            "tp":tp,
+            "sl":sl,
+            "mutiple_exits":mutiple_exits,
+            "trailing_stop":trailing_stop,
+            "extra":extra,
+            "open_date":self.current_time,
+            "close_date":None,
+            "status":"pending"
+        }
 
     def modify_order(self,order_ref,fields):
         pass
@@ -111,10 +142,10 @@ class Strategy():
 
     def _append_history_data(self,ohlc):
         new_ohlc_list =[ohlc.open,ohlc.high,ohlc.low,ohlc.close,ohlc.volume,ohlc.open_interest,ohlc.symbol]
-        self.history_data[ohlc.symbol].loc[pd.to_datetime(ohlc.date)] = new_ohlc_list
+        self._history_data[ohlc.symbol].loc[pd.to_datetime(ohlc.date)] = new_ohlc_list
 
     # preload data before strategy start
     def _preload_data(self,symbol,df):
-        self.history_data[symbol] = df
+        self._history_data[symbol] = df
 
    

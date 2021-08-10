@@ -1,7 +1,8 @@
 ---
 name: AAPL                              # symbol name
 point: 0.01                             # point value
-commission: 0                           # commission in points
+tick_size: 0.01                         # tick_size
+commission: 0                           # commission in currency
 slippage: 0                             # slippage in points
 margin_rate: 1                          # margin rate 0.05 = 5%
 minimum_tp_sl: 3                        # minimum gap in points between entry price and tpsl price
