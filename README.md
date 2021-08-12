@@ -6,4 +6,8 @@ http://www.xtradernotebook.com/2021/08/05/%e4%bb%8e%e9%9b%b6%e5%bc%80%e5%a7%8b%e
 python 3.6.8
 
 The tools might need:       
-Microsoft Visual C++ Build Tools(https://visualstudio.microsoft.com/visual-cpp-build-tools/)        
+Microsoft Visual C++ Build Tools(https://visualstudio.microsoft.com/visual-cpp-build-tools/)       
+
+# Existing Problems     
+-   Takes too much time in generating fake ticks
+
