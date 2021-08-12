@@ -21,6 +21,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
         self.ohlc = {}
     def register_strategy(self,strategy):
         self.strategy = strategy
+        self.strategy._set_mode("backtest")
 
     def start(self):
         if self.strategy is None:
@@ -81,6 +82,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
                     if last_min_str == date_str:
                         # if this is the last min of backtesting, then close all position
                         self.strategy.close_all_position()
+                        self.strategy.withdraw_pending_orders()
                     else:
                         # otherwise hand to the strategy logic
                         self.strategy.handle_tick(tick)
@@ -99,12 +101,17 @@ class Scheduler(modules.common.scheduler.Scheduler):
                             "volume":new_bar.volume,
                             "open_interest":new_bar.open_interest
                         }
-                        self.strategy.handle_bar(new_bar_dict)
+                        if last_min_str != date_str:
+                            self.strategy.handle_bar(new_bar_dict)
                         # handle to strategy internal fuc to deal with order handling, calculations and etc
                         self.strategy._round_check_after(tick)
                 pbar.update(1) 
         pbar.close()
         logging.info("Start collecting backtest results.")
+        print(self.strategy.order_manager._orders)
+        print(self.strategy.order_manager._orders_history)
+        print(self.strategy.order_manager.position.current_position)
+        print(self.strategy.order_manager.position.history_position)
         logging.info("Congratulation!! Hope you find a Holy Grail.")
 
         

@@ -35,6 +35,9 @@ def generate_fake_ticks(symbol,date,row):
         point =  symbol_conf["point"]
         i = 0
         for price in prices:
+            is_gap = False
+            if i == 0:
+                is_gap = True
             if i == count - 1:
                 volume = row["volume"] - int(row["volume"] / count) * i
             tick = {
@@ -62,7 +65,8 @@ def generate_fake_ticks(symbol,date,row):
                 "bid_4":price - 3 * point,
                 "bid_4_volume":1,
                 "bid_5":price - 4 * point,
-                "bid_5_volume":1
+                "bid_5_volume":1,
+                "is_gap" : is_gap
             }
             result.append(tick)
             i = i + 1

@@ -4,7 +4,7 @@ sys.path.append(os.path.join(os.getcwd().split('xtraderbacktest')[0],'xtraderbac
 import modules.other.logg
 import logging 
 
-import modules.common.position 
+import modules.common.order_manager 
 import modules.price_engine.ohlc 
 from abc import ABC, abstractmethod
 import pandas as pd
@@ -18,14 +18,17 @@ class Strategy():
         self.context = pars
         self.context.pop("custom",None)
         self.context["init_cash"] = self.context["cash"]
-        self.position = modules.common.position.Position(self.context["cash"])
-        self._pending_orders = []
         self.current_time = None
         self.current_tick = {}
         self._custom_chart = {}
         self._history_data = {}
         self._ohlc_counter = {}
         self._ohlc_counter_1m = {}
+        self._mode = None
+
+    def _set_mode(self,mode):
+        self._mode = mode
+        self.order_manager = modules.common.order_manager.OrderManager(self.context["cash"],self.context["untradable_period"],self._mode,self.context["reverse_mode"])
 
     # Handle Tick
     @abstractmethod
@@ -39,28 +42,49 @@ class Strategy():
         logging.debug(bar)
         pass
     
-
-    def open_order(self, symbol, order_type,  volume, direction, limit_price = 0, tp = 0, sl = 0, mutiple_exits = None, trailing_stop = None, extra = None):
+    '''
+    mutiple_exits = [
+        {
+            'tp':110,
+            'sl':0,
+        },
+        {
+            'tp':112,
+            'sl':500,
+        }
+    ]
+    # sl_price: initial stop loss price
+    # gap: how far away the current price is from current trailing stop loss price in points to trigger moving stop loss
+    # ratio: new sl = previous_sl + gap * ratio. If the stop loss is triggered to move stop loss
+    trailing_sl = {
+        'sl_price':4540,
+        'gap':100,
+        'ratio':0.5
+    }
+    '''
+    def open_order(self, symbol, order_type,  volume, direction, limit_price = 0, tp = 0, sl = 0, expiration = 0, mutiple_exits = None, trailing_sl = None, extra = None):
         price = self.current_tick[symbol]
         if order_type == "limit":
             if direction == "long":
-                if price < limit_price:
+                if price["ask_1"] < limit_price:
                     order_type = "market"  
             else:
-                if price > limit_price:
+                if price["bid_1"] > limit_price:
                     order_type = "market"    
         elif order_type == "stop":
             if direction == "long":
-                if price > limit_price:
+                if price["ask_1"] > limit_price:
                     order_type = "market"
             else:
-                if price < limit_price:
+                if price["bid_1"] < limit_price:
                     order_type = "market"
+
         if sl !=0 and order_type == "market":
-            if price <= sl and direction == "long":
+            if price["bid_1"] <= sl and direction == "long":
                 return None
-            if price >= sl and direction == "short":
+            if price["ask_1"] >= sl and direction == "short":
                 return None
+
         if sl !=0 and order_type != "market":
             price = limit_price
             if price <= sl and direction == "long":
@@ -68,9 +92,9 @@ class Strategy():
             if price >= sl and direction == "short":
                 return None
         if tp !=0 and order_type == "market":
-            if price >= tp and direction == "long":
+            if price["bid_1"] >= tp and direction == "long":
                 return None
-            if price <= tp and direction == "short":
+            if price["ask_1"] <= tp and direction == "short":
                 return None
         if tp !=0 and order_type != "market":
             price = limit_price
@@ -78,11 +102,15 @@ class Strategy():
                 return None
             if price <= tp and direction == "short":
                 return None
+
+        if trailing_sl is not None:
+            trailing_sl["base_line"] = trailing_sl["sl_price"]
+
         order_ref = self._generarate_orderref()
         order = {
             "order_ref":order_ref,
             "symbol":symbol,
-            "order_type":order_type,
+            "order_type":order_type,                            # "market","limit","stop"
             "volume":volume,
             "filled":0,
             "direction":direction,
@@ -90,23 +118,30 @@ class Strategy():
             "tp":tp,
             "sl":sl,
             "mutiple_exits":mutiple_exits,
-            "trailing_stop":trailing_stop,
+            "trailing_sl":trailing_sl,
             "extra":extra,
-            "open_date":self.current_time,
+            "create_date":self.current_time,
+            "open_date":None,
             "close_date":None,
-            "status":"pending_open",                            # "pending_open","opening","open_filled","pending_close","closing","close_filled"
+            "expiration":expiration,
+            "status":"pending_open",                            # "pending_open","sending_open","opening","open_filled","sending_close","closing","close_filled","delete"
             "open_price":0,
+            "open_filled_price":0,
             "close_price":0,
+            "close_filled_price":0,
             "commission":0,
-            "margin":0
+            "margin":0,
+            "profit":0
         }
-        self._pending_orders.append(order)
+        self.order_manager._append_to_orders(order)
+
 
     def modify_order(self,order_ref,fields):
         pass
     
     def close_order(self, order_ref):
-        pass
+        self.order_manager._close_or_delete(self.current_tick,order_ref)
+        
     
     def send_notification(self,message):
         pass
@@ -129,12 +164,39 @@ class Strategy():
     def get_pending_order_list(self,direction = None,action = None):
         pass
 
-    def withdraw_pending_orders(self,direction = None,order_ref = None,action = None):
-        pass
+    def withdraw_pending_orders(self,direction = None,order_refs = None):
+        delete_list = []
+        for order in self.order_manager._orders:
+            if order["status"] == "pending_open":
+                condi_1 = True
+                condi_2 = True
+                if direction is not None:
+                    if order["direction"] != direction:
+                        condi_1 = False
+                if order_refs is not None:
+                    if order["order_ref"]  not in order_refs:
+                        condi_2 = False    
+                if all([condi_1,condi_2]):
+                    delete_list.append(order["order_ref"])
+        for order_ref in delete_list:
+            self.close_order(order_ref)
     
     def close_all_position(self,direction = None,symbol = None):
-        pass
-    
+        close_list = []
+        for order in self.order_manager._orders:
+            if order["status"] == "open_filled":
+                condi_1 = True
+                condi_2 = True
+                if direction is not None:
+                    if order["direction"] != direction:
+                        condi_1 = False
+                if symbol is not None:
+                    if order["symbol"] != symbol:
+                        condi_2 = False    
+                if all([condi_1,condi_2]):
+                    close_list.append(order["order_ref"])
+        for order_ref in close_list:
+            self.close_order(order_ref)
     #  chart_name (point top-triangle bot-triangle bar) for linear
     def create_chart(self,chart_name,chart_type='linear',base_color = 'black',window='default',y_name = "y",size = 5):
         pass
@@ -147,20 +209,25 @@ class Strategy():
 
     def _set_current_time(self,current_time):
         self.current_time = current_time
-    
-    # process pending orders
-    def _process_pending_order(self,tick):
-        pass
 
-    # is_open: whehter is open tick. Prevent gap
-    def _round_check_before(self,tick,is_open = False):
+    # process position to see if there is order should be trigger 
+    def _process_order_manager(self,tick):
+        self.order_manager._round_check(tick)
+        self.order_manager._check_sending_order(tick)
+        # if it is in backtest mode then filled the order which are opening or closing immediately
+        if self._mode == "backtest":
+            self.order_manager._filled_all_ing_orders(tick)
+
+    
+    def _round_check_before(self,tick):
         self._set_current_time(tick["date"])
         self.current_tick[tick["symbol"]] = tick
-        self._process_pending_order(tick)
-
-    # 
+        self._process_order_manager(tick)
+        
+    
     def _round_check_after(self,tick):
-        self._process_pending_order(tick)
+        self._process_order_manager(tick)
+
         if tick["symbol"] not in self._ohlc_counter.keys():
             self._ohlc_counter[tick["symbol"]] = modules.price_engine.ohlc.OHLCCounter(tick["symbol"],self.context["period"])
             self._ohlc_counter_1m[tick["symbol"]] = modules.price_engine.ohlc.OHLCCounter(tick["symbol"],"1m")
