@@ -66,6 +66,7 @@ class Position():
         result = new_position.copy()
         result.pop("direction")
         return result
+
     def _update_cash(self):
         self.cash = self.deposit - self.margin  + self.float_pnl
     
@@ -99,6 +100,7 @@ class Position():
                     "profit":profit,
                     "status":"close_filled"
                 }
+                self.deposit = self.deposit + profit
                 self.history_position[index].update(update)
                 result = self.history_position[index].copy()
                 result.pop("direction")
@@ -144,6 +146,31 @@ class Position():
         result.pop("direction")
         return result
 
+    def _update_profit(self,tick):
+        result = []
+        contract_size = all_products_info[tick["symbol"]]["contract_size"]
+        float_pnl = 0
+        margin = 0
+        for index, position in enumerate(self.current_position):
+            if position["symbol"] == tick["symbol"]:
+                if position["direction"] == "short":
+                    profit = 0 - (tick["ask_1"] - position["open_filled_price"] ) * position["filled"] * contract_size
+                else:
+                    profit = (tick["bid_1"] - position["open_filled_price"] ) *  position["filled"]  * contract_size
+                self.current_position[index].update({"profit":profit})
+                position["profit"] = profit
+                p = position.copy()
+                p.pop("direction")
+                result.append(p)
+            float_pnl = float_pnl + position["profit"] 
+            margin = margin + position["margin"] 
+        self.float_pnl = float_pnl
+        self.margin = margin
+        self._update_cash()
+        self.float_fund[tick["date"]] = self.cash
+        self.closed_fund[tick["date"]] = self.deposit
+        return result
+
     def get_total_current_volume(self,symbol):
         volume = 0
         for item in self.orders:
@@ -151,4 +178,7 @@ class Position():
                 volume = volume + item["current_volume"]
         return volume
     def get_margin_rate(self):
-        return self.margin / (self.cash - self.margin )
+        result = 0
+        if self.margin!=0:
+            result = (self.cash - self.margin ) / self.margin
+        return result

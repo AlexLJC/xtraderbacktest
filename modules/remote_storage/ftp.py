@@ -54,6 +54,7 @@ def file_write(file_name,file_path,content):
     ftp = ftplib.FTP()
     ftp.connect(FTP_CONFIG["host"],FTP_CONFIG["port"])
     ftp.login(FTP_CONFIG["user"],FTP_CONFIG["password"])
+    _chdir(ftp,file_path)
     # Write to local cache then upload
     try:
         with open( temp_cache_path + file_name, "w") as f:

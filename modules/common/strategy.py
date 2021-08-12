@@ -6,6 +6,7 @@ import logging
 
 import modules.common.order_manager 
 import modules.price_engine.ohlc 
+import modules.price_engine.price_period_converter as price_period_converter
 from abc import ABC, abstractmethod
 import pandas as pd
 import uuid
@@ -137,7 +138,13 @@ class Strategy():
 
 
     def modify_order(self,order_ref,fields):
-        pass
+        unwanted = set(["profit","margin","commission","close_filled_price","close_price","open_filled_price","open_price","status","close_date","open_date","create_date","filled"]) 
+        for unwanted_key in unwanted: del fields[unwanted_key]
+        for index, order in enumerate(self.order_manager._orders):
+            if order["order_ref"] == order_ref:
+                if order["status"] == "pending_open" or order["status"] == "open_filled":
+                    self.order_manager._orders[index].update(fields)
+        
     
     def close_order(self, order_ref):
         self.order_manager._close_or_delete(self.current_tick,order_ref)
@@ -146,23 +153,71 @@ class Strategy():
     def send_notification(self,message):
         pass
     
-    def get_bars(self,symbol,start_date_str,end_date_str,period):
-        pass
+    def get_bars(self,symbol,count,period,end_date_str = None):
+        result = None
+        if symbol in self._history_data.keys():
+            df = self._history_data[symbol].copy()
+            df = price_period_converter.convert(df,period)
+            if end_date_str is not None:
+                df = df[(df.index <= pd.to_datetime(end_date_str))].copy()
+            result = df[0-count:-1].copy()
+        return result
+
+        
     
     def get_bars_newest(self,symbol,period):
-        pass
+        return self.get_bars(symbol,1,period)
 
-    def get_cash(self):
-        pass
+    def get_risk_info(self):
+        result = {
+            "cash":self.order_manager.position.cash,
+            "deposit":self.order_manager.position.deposit,
+            "margin":self.order_manager.position.margin,
+            "float_pnl":self.order_manager.position.float_pnl,
+            "margin_rate":self.order_manager.position.get_margin_rate()
+        }
+        if self._mode == "backtest" and self.context["reverse_mode"] == "enable":
+            result = {
+                "cash":self.order_manager.reverse_position.cash,
+                "deposit":self.order_manager.reverse_position.deposit,
+                "margin":self.order_manager.reverse_position.margin,
+                "float_pnl":self.order_manager.reverse_position.float_pnl,
+                "margin_rate":self.order_manager.reverse_position.get_margin_rate()
+            }
+        return result
     
-    def get_current_position(self,direction=None,symbol = None):
-        pass
+    def get_current_position(self,order_refs=None,direction=None,symbol = None):
+        result = []
+        for order in self.order_manager._orders:
+            if order["status"] == "open_filled":
+                condi_1 = True
+                if direction is not None:
+                    if order["direction"] != direction:
+                        condi_1 = False
+                condi_2 = True
+                if order_refs is not None:
+                    if order["order_ref"] not in order_refs:
+                        condi_2 = False
+                condi_3 = True
+                if order_refs is not None:
+                    if order["symbol"] != symbol:
+                        condi_3 = False
+                if all([condi_1,condi_2,condi_3]):
+                    result.append(order)
+        return result
     
-    def get_current_position_by_ref(self,order_ref):
-        pass
 
-    def get_pending_order_list(self,direction = None,action = None):
-        pass
+    def get_pending_order_list(self,direction = None):
+        result = []
+        for order in self.order_manager._orders:
+            if order["status"] == "pending_open":
+                condi_1 = True
+                if direction is not None:
+                    if order["direction"] != direction:
+                        condi_1 = False
+                if all([condi_1]):
+                    result.append(order)
+        return result
 
     def withdraw_pending_orders(self,direction = None,order_refs = None):
         delete_list = []
@@ -248,4 +303,7 @@ class Strategy():
     def _preload_data(self,symbol,df):
         self._history_data[symbol] = df
 
-   
+    # update the profit in the current position
+    def _update_position(self):
+        for symbol in self.current_tick.keys():
+            self.order_manager._update_profit(self.current_tick[symbol])

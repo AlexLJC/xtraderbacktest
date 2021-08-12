@@ -9,6 +9,9 @@ import logging
 import modules.price_engine.price_loader as price_loader
 import modules.other.sys_conf_loader as sys_conf_loader
 import modules.price_engine.ticks_generater as ticks_generater
+import modules.price_engine.price_period_converter as price_period_converter
+import modules.other.date_converter as date_converter
+import modules.backtest.save_backtest_result as save_backtest_result
 import pandas as pd
 from tqdm import tqdm
 
@@ -54,8 +57,9 @@ class Scheduler(modules.common.scheduler.Scheduler):
                 df = self.ohlc[symbol].copy()
                 # get the dataframe gonna backtest
                 df = df[(df.index >= pd.to_datetime(fr)) & (df.index <= pd.to_datetime(to))].copy()
-                with tqdm(total=len(df.index)) as pbar:
-                    for date, row in df.iterrows():
+                fake_tick_df = price_period_converter.convert(df,date_converter.convert_period_to_int(self.strategy.context["backtest_graininess"]))
+                with tqdm(total=len(fake_tick_df.index)) as pbar:
+                    for date, row in fake_tick_df.iterrows():
                         date_str = str(date)
                         if date_str not in ticks.keys():
                             ticks[date_str] = []
@@ -105,13 +109,24 @@ class Scheduler(modules.common.scheduler.Scheduler):
                             self.strategy.handle_bar(new_bar_dict)
                         # handle to strategy internal fuc to deal with order handling, calculations and etc
                         self.strategy._round_check_after(tick)
+                        self.strategy._update_position()
                 pbar.update(1) 
         pbar.close()
         logging.info("Start collecting backtest results.")
-        print(self.strategy.order_manager._orders)
-        print(self.strategy.order_manager._orders_history)
-        print(self.strategy.order_manager.position.current_position)
-        print(self.strategy.order_manager.position.history_position)
-        logging.info("Congratulation!! Hope you find a Holy Grail.")
+        pars = self.strategy.context
+        pars["custom"] = self.strategy.pars
+        backtest_result = {
+            "pars":pars,
+            "orders":self.strategy.order_manager._orders_history,
+            "positions":self.strategy.order_manager.position.history_position,
+            "reverse_position":self.strategy.order_manager.position.history_position,
+            "closed_fund":self.strategy.order_manager.position.closed_fund,
+            "float_fund":self.strategy.order_manager.position.float_fund,
+            "reverse_closed_fund":self.strategy.order_manager.position.closed_fund,
+            "reverse_float_fund":self.strategy.order_manager.position.float_fund,
+        }
+        save_backtest_result.save_result(backtest_result)
+
+        logging.info("Congratulation!! The backtest finished. Hope you find The Holy Grail.")
 
         

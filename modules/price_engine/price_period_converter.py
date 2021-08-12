@@ -1,3 +1,8 @@
+import os
+import sys
+sys.path.append(os.path.join(os.getcwd().split('xtraderbacktest')[0],'xtraderbacktest'))
+
+import modules.other.date_converter as date_converter
 import pandas as pd
 '''
 It is used for convert minor period's price data to major period's price data.
@@ -8,6 +13,8 @@ mode - normal or cn_future
 def convert(df, to_tf,mode="normal"):
     _df = df.copy()
     from_tf = 1
+    if type(to_tf) == type("1m"):
+        to_tf = date_converter.convert_period_to_int(to_tf)
     if to_tf == 1440:
         # Chinese future market is a little bit tricky
         if mode == "cn_future":
@@ -26,7 +33,7 @@ def convert(df, to_tf,mode="normal"):
             }
         _df.fillna(0, inplace = True) 
         _df = _df.resample(str(to_tf)+'T', closed='left', label='left').agg(ohlc_dict).dropna()
-    result__df = _df
+    result__df = _df.copy()
     return result__df
 
 if __name__ == '__main__':

@@ -14,9 +14,8 @@ class Bot(modules.common.strategy.Strategy):
 
     # Handle Tick
     def handle_tick(self, tick):
-        #print(tick)
         if self.first_time:
-            self.open_order(tick["symbol"],"market",1,"long",limit_price=0, tp=248.10 ,sl=0,expiration =0,mutiple_exits = None,trailing_sl = None,extra = None)
+            self.open_order(tick["symbol"],"market",1,"long",limit_price=0, tp=0 ,sl=0,expiration =0,mutiple_exits = None,trailing_sl = None,extra = None)
             self.open_order(tick["symbol"],"limit",1,"long",limit_price=100, tp=248.10 ,sl=0,expiration =0,mutiple_exits = None,trailing_sl = None,extra = None)
         self.first_time = False
         pass
@@ -25,6 +24,7 @@ class Bot(modules.common.strategy.Strategy):
     def handle_bar(self, bar):
         #logging.info("new bar "+bar["date"])
         #logging.info("current_time " + self.current_time)
+        #print(self.get_risk_info())
         pass
 
 if __name__ == "__main__":

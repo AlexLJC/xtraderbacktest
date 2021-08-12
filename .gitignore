@@ -134,3 +134,4 @@ dmypy.json
 .vscode/
 *system_conf.yaml
 __cache__/
+/data/backtest_results/*/
