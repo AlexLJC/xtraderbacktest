@@ -27,7 +27,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
         self.strategy = None
         self.ohlc = {}
         self.tick_queue = queue.Queue()
-
+        self.stop_by_error = False
     def register_strategy(self,strategy):
         self.strategy = strategy
         self.strategy._set_mode("backtest")
@@ -56,6 +56,8 @@ class Scheduler(modules.common.scheduler.Scheduler):
                 # sort the temp ticks
                 for date_str in temp_ticks.keys():
                     temp_ticks[date_str] = sorted(temp_ticks[date_str], key=lambda k: k['date']) 
+                if self.stop_by_error is True:
+                    break
                 # put into queue
                 for date_str in temp_ticks.keys():
                     for item in temp_ticks[date_str]:
@@ -68,44 +70,59 @@ class Scheduler(modules.common.scheduler.Scheduler):
         # loop ticks
         logging.info("Start running backtest.")
         with tqdm(total=total_ticks,desc="Tick Looper") as loop_tick_bar:
-            tick = {"start":"start"}
-            last_min_str = last_min_str[0:-3]
-            while("end" not in tick.keys()):
-                while(self.tick_queue.empty()):
-                    time.sleep(0.2) 
-                tick = self.tick_queue.get()
-                if "end" not in tick.keys():
-                    date_str = tick["date"][0:-3]
-                    # handle to strategy internal fuc to deal with basic info, such as datetime
-                    self.strategy._round_check_before(tick)
-                    if last_min_str == date_str:
-                        # if this is the last min of backtesting, then close all position
-                        self.strategy.close_all_position()
-                        self.strategy.withdraw_pending_orders()
-                    else:
-                        # otherwise hand to the strategy logic
-                        self.strategy.handle_tick(tick)
-                    # handle to strategy internal fuc to deal with order handling, calculations and etc
-                    new_bar = self.strategy._round_check_after(tick)
-                    # if there is a new bar for the timeframe specified by strategy
-                    if new_bar is not None:
-                        # handle it to the strategy's logic to process new bar
-                        new_bar_dict = {
-                            "open":new_bar.open,
-                            "high":new_bar.high,
-                            "close":new_bar.close,
-                            "low":new_bar.low,
-                            "date":new_bar.date,
-                            "symbol":new_bar.symbol,
-                            "volume":new_bar.volume,
-                            "open_interest":new_bar.open_interest
-                        }
-                        if last_min_str != date_str:
-                            self.strategy.handle_bar(new_bar_dict)
+            try:
+                tick = {"start":"start"}
+                last_min_str = last_min_str[0:-3]
+                while("end" not in tick.keys()):
+                    while(self.tick_queue.empty()):
+                        time.sleep(0.2) 
+                    tick = self.tick_queue.get()
+                    if "end" not in tick.keys():
+                        date_str = tick["date"][0:-3]
+                        # handle to strategy internal fuc to deal with basic info, such as datetime
+                        self.strategy._round_check_before(tick)
+                        if last_min_str == date_str:
+                            # if this is the last min of backtesting, then close all position
+                            self.strategy.close_all_position()
+                            self.strategy.withdraw_pending_orders()
+                        else:
+                            # otherwise hand to the strategy logic
+                            try:
+                                self.strategy.handle_tick(tick)
+                            except Exception as e:
+                                self.stop_by_error = True
+                                logging.error("Error in handle tick.")
+                                logging.exception(e)
                         # handle to strategy internal fuc to deal with order handling, calculations and etc
-                        self.strategy._round_check_after(tick)
-                        self.strategy._update_position()
-                    loop_tick_bar.update(1) 
+                        new_bar = self.strategy._round_check_after(tick)
+                        # if there is a new bar for the timeframe specified by strategy
+                        if new_bar is not None:
+                            # handle it to the strategy's logic to process new bar
+                            new_bar_dict = {
+                                "open":new_bar.open,
+                                "high":new_bar.high,
+                                "close":new_bar.close,
+                                "low":new_bar.low,
+                                "date":new_bar.date,
+                                "symbol":new_bar.symbol,
+                                "volume":new_bar.volume,
+                                "open_interest":new_bar.open_interest
+                            }
+                            if last_min_str != date_str:
+                                try:
+                                    self.strategy.handle_bar(new_bar_dict)
+                                except Exception as e:
+                                    self.stop_by_error = True
+                                    logging.error("Error in handle bar.")
+                                    logging.exception(e)
+                            # handle to strategy internal fuc to deal with order handling, calculations and etc
+                            self.strategy._round_check_after(tick)
+                            self.strategy._update_position()
+                        loop_tick_bar.update(1) 
+            except Exception as e:
+                self.stop_by_error = True
+                logging.error("Internal Error.")
+                logging.exception(e)
         loop_tick_bar.close()
 
     def start(self):
@@ -154,7 +171,11 @@ class Scheduler(modules.common.scheduler.Scheduler):
         strategy_t.start()
         strategy_t.join()
 
+        if self.stop_by_error is True:
+            logging.error("Scheduler was stopped by error.")
+            return 
         logging.info("Start collecting backtest results.")
+        
         pars = self.strategy.context
         pars["custom"] = self.strategy.pars
         backtest_result = {
