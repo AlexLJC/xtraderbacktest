@@ -9,5 +9,6 @@ The tools might need:
 Microsoft Visual C++ Build Tools(https://visualstudio.microsoft.com/visual-cpp-build-tools/)       
 
 # Existing Problems     
--   Takes too much time in generating fake ticks
+-   Takes too much time in generating fake ticks.    
+-   Fake ticks take too much memory.
 

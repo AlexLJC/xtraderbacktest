@@ -66,6 +66,10 @@ backtest_conf:                                # the configuration of backtest mo
     is_on: false                              # on = true or off = false
     type: s3                                  # the location type
     path: /cache/backtest_results/            # the location path
+  tick_mode:                                  # the tick mode
+    is_fake: true                             # using fake ticks
+    real:                                     # real ticks configuration
+      location: /data/ticks/                  # real ticks location
 timezone: US/Eastern                          # time zone of the system(for display correct backtest result)
 timeformat: "%Y-%m-%d %H:%M:%S"               # time format
 logger:                                       # the logger configuration

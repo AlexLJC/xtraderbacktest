@@ -5,26 +5,33 @@ import modules.other.logg
 import logging 
 import modules.common.strategy
 import modules.other.sys_conf_loader as sys_conf_loader
-
+import modules.common.technical_indicators as ti
 class Bot(modules.common.strategy.Strategy):
     def __init__(self,pars):
         super(Bot,self).__init__(pars)
-        self.first_time = True
+        
     
 
     # Handle Tick
     def handle_tick(self, tick):
-        if self.first_time:
-            self.open_order(tick["symbol"],"market",1,"long",limit_price=0, tp=0 ,sl=0,expiration =0,mutiple_exits = None,trailing_sl = None,extra = None)
-            self.open_order(tick["symbol"],"limit",1,"long",limit_price=100, tp=248.10 ,sl=0,expiration =0,mutiple_exits = None,trailing_sl = None,extra = None)
-        self.first_time = False
+        
         pass
 
     # Handle Bar
     def handle_bar(self, bar):
         #logging.info("new bar "+bar["date"])
         #logging.info("current_time " + self.current_time)
-        #print(self.get_risk_info())
+        df = self.get_bars(bar["symbol"],30,self.context["period"])
+        ma_fast = ti.MA(df,self.pars["ma_fast"]).iloc[-1]
+        ma_slow = ti.MA(df,self.pars["ma_slow"]).iloc[-1]
+        if ma_fast > ma_slow:
+            if len(self.get_current_position(direction="long")) ==0:
+                self.open_order(bar["symbol"],"market",self.pars["lots"],"long")
+            self.close_all_position(direction="short")
+        elif ma_fast < ma_slow:
+            if len(self.get_current_position(direction="short")) ==0:
+                self.open_order(bar["symbol"],"market",self.pars["lots"],"short")
+            self.close_all_position(direction="long")
         pass
 
 if __name__ == "__main__":

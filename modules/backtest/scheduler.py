@@ -12,8 +12,12 @@ import modules.price_engine.ticks_generater as ticks_generater
 import modules.price_engine.price_period_converter as price_period_converter
 import modules.other.date_converter as date_converter
 import modules.backtest.save_backtest_result as save_backtest_result
+import modules.backtest.backtest_result_analyse as backtest_result_analyse
 import pandas as pd
 from tqdm import tqdm
+import queue
+import threading
+import time
 
 TIMESTAMP_FORMAT=sys_conf_loader.get_sys_conf()["timeformat"]
 class Scheduler(modules.common.scheduler.Scheduler):
@@ -22,65 +26,56 @@ class Scheduler(modules.common.scheduler.Scheduler):
         self.real_tick = real_tick
         self.strategy = None
         self.ohlc = {}
+        self.tick_queue = queue.Queue()
+
     def register_strategy(self,strategy):
         self.strategy = strategy
         self.strategy._set_mode("backtest")
 
-    def start(self):
-        if self.strategy is None:
-            logging.error("There is no registered strategy.")
-            return 
-        # get all symbols that the backtest need.
-        symbols = self.strategy.context["symbols"]
-        # get the time from and to
-        fr = self.strategy.context["start_date"]
-        to = self.strategy.context["end_date"]
-        # get the data from price engine and save it in the dictionary of ohlc
-        logging.info("Loding data...")
-        with tqdm(total=len(symbols)) as pbar:
-            for symbol in symbols:
-                pre_load_mins = sys_conf_loader.get_sys_conf()["backtest_conf"]["price_preload"]
-                fr_load = (datetime.datetime.strptime(fr,TIMESTAMP_FORMAT) - datetime.timedelta(minutes=pre_load_mins)).strftime(TIMESTAMP_FORMAT)
-                self.ohlc[symbol] = price_loader.load_price(symbol,fr_load,to,"backtest")
-                pbar.update(1)
-        pbar.close()
-        ticks = {}
-        if self.real_tick is True:
-            # get ticks
-            # TBD
-            pass
-        else:
-            # generate fake ticks
-            logging.info("Processing data before running backtest.")
-            for symbol in self.ohlc.keys():
-                logging.info("Processing " + symbol + ".")
-                df = self.ohlc[symbol].copy()
-                # get the dataframe gonna backtest
-                df = df[(df.index >= pd.to_datetime(fr)) & (df.index <= pd.to_datetime(to))].copy()
-                fake_tick_df = price_period_converter.convert(df,date_converter.convert_period_to_int(self.strategy.context["backtest_graininess"]))
-                with tqdm(total=len(fake_tick_df.index)) as pbar:
-                    for date, row in fake_tick_df.iterrows():
-                        date_str = str(date)
-                        if date_str not in ticks.keys():
-                            ticks[date_str] = []
-                        fake_ticks = ticks_generater.generate_fake_ticks(symbol,date,row)
-                        ticks[date_str].extend(fake_ticks)
-                        pbar.update(1)
-                pbar.close()
-            # sort the fake ticks
-            for date_str in ticks.keys():
-                ticks[date_str] = sorted(ticks[date_str], key=lambda k: k['date']) 
-        # preload the dataframe into strategy
+    def generate_queue(self,fr,to):
+        # generate fake ticks
+        logging.info("Processing data before running backtest.")
+        # Get the set of date_list first
+        date_set = set()
         for symbol in self.ohlc.keys():
             df = self.ohlc[symbol].copy()
-            df = df[(df.index < pd.to_datetime(fr))].copy()
-            self.strategy._preload_data(symbol,df)
+            df = df[(df.index >= pd.to_datetime(fr)) & (df.index <= pd.to_datetime(to))].copy()
+            date_set.update(pd.to_datetime(df.index.values).tolist())
+        date_set = sorted(date_set)
+        with tqdm(total=len(date_set),desc="Tick Generator") as process_tick_bar:
+            for date in date_set:
+                temp_ticks = {}
+                for symbol in self.ohlc.keys():
+                    if date in self.ohlc[symbol].index:
+                        date_str = str(date)
+                        if date_str not in temp_ticks.keys():
+                            temp_ticks[date_str] = []
+                        row = self.ohlc[symbol].loc[date]
+                        fake_ticks = ticks_generater.generate_fake_ticks(symbol,date,row)
+                        temp_ticks[date_str].extend(fake_ticks)
+                # sort the temp ticks
+                for date_str in temp_ticks.keys():
+                    temp_ticks[date_str] = sorted(temp_ticks[date_str], key=lambda k: k['date']) 
+                # put into queue
+                for date_str in temp_ticks.keys():
+                    for item in temp_ticks[date_str]:
+                        self.tick_queue.put(item)
+                process_tick_bar.update(1)
+        process_tick_bar.close()
+        self.tick_queue.put({"end":"end"})
+
+    def loop_ticks(self,last_min_str,total_ticks):
         # loop ticks
         logging.info("Start running backtest.")
-        last_min_str = list(ticks.keys())[-1]
-        with tqdm(total=len(ticks.keys())) as pbar:
-            for date_str in ticks.keys():
-                for tick in ticks[date_str]:
+        with tqdm(total=total_ticks,desc="Tick Looper") as loop_tick_bar:
+            tick = {"start":"start"}
+            last_min_str = last_min_str[0:-3]
+            while("end" not in tick.keys()):
+                while(self.tick_queue.empty()):
+                    time.sleep(0.2) 
+                tick = self.tick_queue.get()
+                if "end" not in tick.keys():
+                    date_str = tick["date"][0:-3]
                     # handle to strategy internal fuc to deal with basic info, such as datetime
                     self.strategy._round_check_before(tick)
                     if last_min_str == date_str:
@@ -110,8 +105,55 @@ class Scheduler(modules.common.scheduler.Scheduler):
                         # handle to strategy internal fuc to deal with order handling, calculations and etc
                         self.strategy._round_check_after(tick)
                         self.strategy._update_position()
-                pbar.update(1) 
+                    loop_tick_bar.update(1) 
+        loop_tick_bar.close()
+
+    def start(self):
+        if self.strategy is None:
+            logging.error("There is no registered strategy.")
+            return 
+        # get all symbols that the backtest need.
+        symbols = self.strategy.context["symbols"]
+        # get the time from and to
+        fr = self.strategy.context["start_date"]
+        to = self.strategy.context["end_date"]
+        # get the data from price engine and save it in the dictionary of ohlc
+        logging.info("Loding data...")
+        with tqdm(total=len(symbols)) as pbar:
+            for symbol in symbols:
+                pre_load_mins = sys_conf_loader.get_sys_conf()["backtest_conf"]["price_preload"]
+                fr_load = (datetime.datetime.strptime(fr,TIMESTAMP_FORMAT) - datetime.timedelta(minutes=pre_load_mins)).strftime(TIMESTAMP_FORMAT)
+                self.ohlc[symbol] = price_loader.load_price(symbol,fr_load,to,"backtest")
+                pbar.update(1)
         pbar.close()
+        
+        
+        if self.real_tick is True:
+            # get ticks
+            # TBD
+            pass
+        else:
+            tick_t = threading.Thread(target = self.generate_queue,args=(fr,to))
+            tick_t.start()
+        # preload the dataframe into strategy
+        for symbol in self.ohlc.keys():
+            df = self.ohlc[symbol].copy()
+            df = df[(df.index < pd.to_datetime(fr))].copy()
+            self.strategy._preload_data(symbol,df)
+        
+        # start tick processing thread
+        date_set = set()
+        for symbol in self.ohlc.keys():
+            df = self.ohlc[symbol].copy()
+            df = df[(df.index >= pd.to_datetime(fr)) & (df.index <= pd.to_datetime(to))].copy()
+            date_set.update(pd.to_datetime(df.index.values).tolist())
+        date_set = sorted(date_set)
+        last_min_str = date_set[-1].strftime('%Y-%m-%d %H:%M:%S')
+        total_ticks = len(date_set) * len(self.ohlc.keys()) * 4
+        strategy_t = threading.Thread(target = self.loop_ticks,args=(last_min_str,total_ticks))
+        strategy_t.start()
+        strategy_t.join()
+
         logging.info("Start collecting backtest results.")
         pars = self.strategy.context
         pars["custom"] = self.strategy.pars
@@ -125,6 +167,9 @@ class Scheduler(modules.common.scheduler.Scheduler):
             "reverse_closed_fund":self.strategy.order_manager.position.closed_fund,
             "reverse_float_fund":self.strategy.order_manager.position.float_fund,
         }
+        position_analyser = backtest_result_analyse.TradeBook(self.strategy.order_manager.position.history_position)
+        backtest_result["summary"] = position_analyser.summary()
+
         save_backtest_result.save_result(backtest_result)
 
         logging.info("Congratulation!! The backtest finished. Hope you find The Holy Grail.")
