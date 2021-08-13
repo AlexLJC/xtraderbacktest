@@ -40,7 +40,7 @@ Here is how to run the demo strategy.
 
 ## Basic Start    
 ### Step 1      
-Put the 1min price data in the folder /data/price/SYMBOL_NAME.txt.  
+Put the 1min price data in the folder /data/price/SYMBOL_NAME.csv.  
 The 1min price data should be in this format:  
 date, open,high,low,close,volume,open_interest(optional)
 ```

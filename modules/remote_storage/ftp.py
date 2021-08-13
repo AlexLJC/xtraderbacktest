@@ -163,7 +163,7 @@ def _ch_dir_rec(ftp, descending_path_split):
 
 if __name__ == '__main__':
     #print("FTP Configs",FTP_CONFIG)
-    #print(json_read("test.txt","/test/test2/"))
+    #print(json_read("test.csv","/test/test2/"))
     file_write("test.txt","/test/test2/",json.dumps({"f":1}))
     print("Expect True, Result ",file_check_exist("test.txt","/test/test2/"))
     print("Expect False, Result ",file_check_exist("test2.txt","/test/test2/"))
