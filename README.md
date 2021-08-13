@@ -7,6 +7,22 @@ python 3.6.8 in 64bit
 
 The tools might need:       
 Microsoft Visual C++ Build Tools(https://visualstudio.microsoft.com/visual-cpp-build-tools/)       
+# Features  
+-   Data feeds from local files.
+    -   Safe fake ticks generate
+    -   Real ticks supported. 
+-   Multiple instruments supported.
+-   Custom trailing stop loss.
+-   Multiple take profit and stop loss.     
+-   Backtest evaluation.
+-   Tick driven backtest.   
+-   Gap detection and avoid invaid orders.
+-   Suitable for instruments: stocks,cfd,index,commodity, cryto and custom symbols. 
+-   Slippage, commission simulation.
+-   Distribute nodes for optimizing parameters.(ongoing)
+-   Indicator calculate accelerate.(ongoing) 
+-   Multiple timeframe supported.(ongoing)
+-   Live data feed and trading with.(ongoing)
 
 # How to Start      
 ##  Quick Start   
