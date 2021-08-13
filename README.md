@@ -20,6 +20,7 @@ Microsoft Visual C++ Build Tools(https://visualstudio.microsoft.com/visual-cpp-b
 -   Gap detection and avoid invaid orders.
 -   Suitable for instruments: stocks,cfd,index,commodity, cryto and custom symbols. 
 -   Slippage, commission simulation.
+-   Parameters Optimization.    
 -   Distribute nodes for optimizing parameters.(ongoing)
 -   Indicator calculate accelerate.(ongoing) 
 -   Multiple timeframe supported.(ongoing)
