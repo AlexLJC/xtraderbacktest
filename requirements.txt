@@ -8,3 +8,4 @@ pika==1.2.0
 docker==5.0.0
 pyyaml==5.4.1
 tqdm==4.62.0 
+tablib=3.0.0
