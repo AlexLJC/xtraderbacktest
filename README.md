@@ -18,7 +18,7 @@ Here is how to run the demo strategy.
 -   Cd /bots
 -   python demo_strategy.py
 
-## Full Introduction    
+## Basic Start    
 ### Step 1      
 Put the 1min price data in the folder /data/price/SYMBOL_NAME.txt.  
 The 1min price data should be in this format:  
