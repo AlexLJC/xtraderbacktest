@@ -1,7 +1,7 @@
 # xtraderbacktest
 This project is a backtest system for trading algo.   
 Personal Blog: http://www.xtradernotebook.com/   
-<a href="stargazers">★</a>Star it if you like and keep tracking the updates.
+Star it if you like and keep tracking the updates.
 
 # Requirements      
 python 3.6.8 in 64bit
