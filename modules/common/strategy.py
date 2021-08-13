@@ -307,3 +307,5 @@ class Strategy():
     def _update_position(self):
         for symbol in self.current_tick.keys():
             self.order_manager._update_profit(self.current_tick[symbol])
+
+            

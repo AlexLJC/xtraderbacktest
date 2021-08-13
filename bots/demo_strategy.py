@@ -41,3 +41,4 @@ if __name__ == "__main__":
     scheduler = modules.backtest.scheduler.Scheduler("backtest")
     scheduler.register_strategy(backtest)
     scheduler.start()
+    
