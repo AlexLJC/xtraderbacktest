@@ -12,6 +12,7 @@ Microsoft Visual C++ Build Tools(https://visualstudio.microsoft.com/visual-cpp-b
     -   Safe fake ticks generate
     -   Real ticks supported. 
 -   Multiple instruments supported.
+-   Reverse logic by one click.
 -   Custom trailing stop loss.
 -   Multiple take profit and stop loss.     
 -   Backtest evaluation.
