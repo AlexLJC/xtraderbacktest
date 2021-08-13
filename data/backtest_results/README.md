@@ -1,1 +1,0 @@
-The backtest results are gonna save here locally.

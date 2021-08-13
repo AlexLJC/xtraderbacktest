@@ -1,5 +1,5 @@
 # xtraderbacktest
-This project is a personal backtest system for trading strategy.
+This project is a backtest system for trading algo.
 http://www.xtradernotebook.com/
 
 # Requirements      
@@ -15,6 +15,8 @@ Microsoft Visual C++ Build Tools(https://visualstudio.microsoft.com/visual-cpp-b
 -   Reverse logic by one click.
 -   Custom trailing stop loss.
 -   Multiple take profit and stop loss.     
+-   Upload backtest result to remote storage.
+-   Two level caching.
 -   Backtest evaluation.
 -   Tick driven backtest.   
 -   Gap detection and avoid invaid orders.

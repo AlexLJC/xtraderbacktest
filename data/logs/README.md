@@ -1,1 +1,0 @@
-This folder is for storing the local logs for debuging and tracing.

@@ -76,6 +76,14 @@ def file_check_exist(file_name,file_path):
             return True
     return False
 
+def csv_read(file_name,file_path,abs_path):
+    # TBD
+    pass
+
+def csv_write(file_name,file_path,list_of_dict):
+    # TBD
+    pass
+
 if __name__ == '__main__':
     print("OSS Configs",OSS_CONFIG)
     

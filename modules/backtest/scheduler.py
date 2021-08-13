@@ -13,6 +13,7 @@ import modules.price_engine.price_period_converter as price_period_converter
 import modules.other.date_converter as date_converter
 import modules.backtest.save_backtest_result as save_backtest_result
 import modules.backtest.backtest_result_analyse as backtest_result_analyse
+
 import pandas as pd
 from tqdm import tqdm
 import queue
@@ -21,9 +22,9 @@ import time
 
 TIMESTAMP_FORMAT=sys_conf_loader.get_sys_conf()["timeformat"]
 class Scheduler(modules.common.scheduler.Scheduler):
-    def __init__(self,mode,real_tick = False):
+    def __init__(self,mode):
         self.mode = mode
-        self.real_tick = real_tick
+        self.fake_tick = sys_conf_loader.get_sys_conf()["backtest_conf"]["tick_mode"]["is_fake"]
         self.strategy = None
         self.ohlc = {}
         self.tick_queue = queue.Queue()
@@ -145,8 +146,8 @@ class Scheduler(modules.common.scheduler.Scheduler):
         pbar.close()
         
         
-        if self.real_tick is True:
-            # get ticks
+        if self.fake_tick is False:
+            # get real ticks
             # TBD
             pass
         else:

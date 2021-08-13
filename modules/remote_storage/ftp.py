@@ -160,7 +160,13 @@ def _ch_dir_rec(ftp, descending_path_split):
         ftp.cwd(next_level_directory)
     _ch_dir_rec(ftp,descending_path_split)
 
+def csv_read(file_name,file_path,abs_path):
+    # TBD
+    pass
 
+def csv_write(file_name,file_path,list_of_dict):
+    # TBD
+    pass
 if __name__ == '__main__':
     #print("FTP Configs",FTP_CONFIG)
     #print(json_read("test.csv","/test/test2/"))

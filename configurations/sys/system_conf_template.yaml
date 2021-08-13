@@ -62,6 +62,10 @@ backtest_conf:                                # the configuration of backtest mo
     is_on: false                              # on = true or off = false
     type: ftp                                 # the location type
     path: /cache/prices/                      # the location path
+  tick_remote_cache:                          # the configuration of remote cache of tick data temp files
+    is_on: false                              # on = true or off = false
+    type: ftp                                 # the location type
+    path: /cache/ticks/                       # the location path
   backtest_result_remote:                     # the configuration of backtest result  files
     is_on: false                              # on = true or off = false
     type: s3                                  # the location type
