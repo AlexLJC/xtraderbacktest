@@ -130,7 +130,6 @@ dmypy.json
 
 
 # Personal
-*.csv
 .vscode/
 *system_conf.yaml
 __cache__/
