@@ -1,0 +1,114 @@
+<html>
+    <head>
+        <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+        <script type="text/javascript">
+            function load(backtest_result){
+                const chart = LightweightCharts.createChart(document.body, 
+                    { 
+                        width: window.innerWidth,
+                        height: window.innerHeight/2,
+                        timeScale: {
+                            timeVisible: true,
+                            borderColor: '#D1D4DC',
+                        },
+                        rightPriceScale: {
+                            borderColor: '#D1D4DC',
+                        },
+                        layout: {
+                            backgroundColor: '#ffffff',
+                            textColor: '#000',
+                        },
+                        grid: {
+                            horzLines: {
+                                color: '#F0F3FA',
+                            },
+                            vertLines: {
+                                color: '#F0F3FA',
+                            },
+                        },
+                        
+                    } 
+                   
+                    
+                );
+                chart.applyOptions({
+                    watermark: {
+                        color: 'rgba(11, 94, 29, 0.4)',
+                        visible: true,
+                        text: 'Backtest Evaluation',
+                        fontSize: 24,
+                        horzAlign: 'left',
+                        vertAlign: 'bottom',
+                    },
+                });
+                
+                
+                for(var symbol in backtest_result["price_data"]){
+                    var candlestickSeries = chart.addCandlestickSeries(
+                        {
+                            upColor: 'rgb(38,166,154)',
+                            downColor: 'rgb(255,82,82)',
+                            wickUpColor: 'rgb(38,166,154)',
+                            wickDownColor: 'rgb(255,82,82)',
+                            borderVisible: false,
+                      }
+                    );
+                    data_list = [];
+                    for(var bar_index in backtest_result["price_data"][symbol]){
+                        bar = backtest_result["price_data"][symbol][bar_index];
+                        data_list.push({ time: bar["timestamp"], open: bar["open"], high: bar["high"], low: bar["low"], close: bar["close"]});
+                    }
+                    // set data
+                    candlestickSeries.setData(data_list);
+                    // load the order for it
+                    var markers_orders = [];
+                    for(var position_index in backtest_result["positions"]){
+                        position = backtest_result["positions"][position_index];
+                        if(position["symbol"] == symbol){
+                            if(position["direction"] == "long"){
+                                markers_orders.push({ time: position["open_timestamp"], position: 'belowBar', color: '#2196F3', shape: 'arrowUp', text: 'Long@ ' + Math.floor(position["open_filled_price"])});
+                                markers_orders.push({ time: position["close_timestamp"], position: 'aboveBar', color: '#e91e63', shape: 'arrowDown', text: 'Short@ ' + Math.floor(position["close_filled_price"])});
+                            }
+                            else if (position["direction"] == "short"){
+                                markers_orders.push({ time: position["open_timestamp"], position: 'aboveBar', color: '#e91e63', shape: 'arrowDown', text: 'Short@ ' + Math.floor(position["open_filled_price"])});
+                                markers_orders.push({ time: position["close_timestamp"], position: 'belowBar', color: '#2196F3', shape: 'arrowUp', text: 'Long@ ' + Math.floor(position["close_filled_price"])});
+                            }
+                        }
+                        
+                    }
+                    candlestickSeries.setMarkers(markers_orders);
+                }
+                
+            }
+        
+        </script>
+        <script type="text/javascript">
+        
+            function importFile(){
+                var selectedFile = document.getElementById("files").files[0];
+                var name = selectedFile.name;
+                var size = selectedFile.size;
+                console.log("Loading File Name " +name+" File Size " + size + " bytes");
+            
+                var reader = new FileReader();
+                reader.readAsText(selectedFile);
+            
+                reader.onload = function(){
+                    var backtest_result = JSON.parse(this.result);
+                    console.log("File content in json.");
+                    console.log(backtest_result);
+                    load(backtest_result);
+                };
+            }
+        </script>
+    </head>
+    <body>
+        <div>
+            <p>Choose your backtest result. <input type="file" id="files" onchange="importFile();"/></p>
+            
+        </div>
+    </body>
+</html>
+
+
+

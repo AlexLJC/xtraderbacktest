@@ -20,6 +20,7 @@ from tqdm import tqdm
 import queue
 import threading
 import time
+import numpy as np
 
 TIMESTAMP_FORMAT=sys_conf_loader.get_sys_conf()["timeformat"]
 class Scheduler(modules.common.scheduler.Scheduler):
@@ -204,7 +205,14 @@ class Scheduler(modules.common.scheduler.Scheduler):
         }
         position_analyser = backtest_result_analyse.TradeBook(self.strategy.order_manager.position.history_position)
         backtest_result["summary"] = position_analyser.summary()
-
+        backtest_result["price_data"] = {}
+        for symbol in self.ohlc.keys():
+            df = self.ohlc[symbol].copy()
+            df = df.reset_index()
+            df['timestamp'] = df['date'].values.astype(np.int64) // 10 ** 9
+            df['date'] = df["date"].dt.strftime("%Y-%m-%d %H:%M:%S")
+            backtest_result["price_data"][symbol] = df.to_dict('records')
+            
         save_backtest_result.save_result(backtest_result)
 
         logging.info("Congratulation!! The backtest finished. Hope you find The Holy Grail.")

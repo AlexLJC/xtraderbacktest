@@ -4,7 +4,9 @@ sys.path.append(os.path.join(os.getcwd().split('xtraderbacktest')[0],'xtraderbac
 import modules.other.logg
 import logging 
 import modules.other.sys_conf_loader as sys_conf_loader
-
+import time
+import datetime
+import pandas as pd 
 
 all_products_info = sys_conf_loader.get_all_products_info()
 class Position():
@@ -54,8 +56,10 @@ class Position():
             "close_filled_price":0,
             "direction":direction,
             "open_date":current_date,
+            "open_timestamp": int(pd.Timestamp(datetime.datetime.strptime(current_date, "%Y-%m-%d %H:%M:%S")).timestamp()),#int(time.mktime(datetime.datetime.strptime(current_date, "%Y-%m-%d %H:%M:%S").timetuple())),
             "profit":0,
             "close_date":None,
+            "close_timestamp":None,
             "commission":commission,
             "status":"opening",
             "margin":margin
@@ -135,6 +139,7 @@ class Position():
             close_price = price
         position["close_price"] = close_price
         position["close_date"] = tick["date"]
+        position["close_timestamp"] = int(pd.Timestamp(datetime.datetime.strptime(position["close_date"], "%Y-%m-%d %H:%M:%S")).timestamp())
         position["status"] = "closing"
         if position["direction"] == "short":
             profit = 0 - (close_price - position["open_filled_price"] ) * position["filled"] * contract_size
