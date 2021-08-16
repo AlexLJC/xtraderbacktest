@@ -13,6 +13,7 @@ import modules.price_engine.price_period_converter as price_period_converter
 import modules.other.date_converter as date_converter
 import modules.backtest.save_backtest_result as save_backtest_result
 import modules.backtest.backtest_result_analyse as backtest_result_analyse
+import modules.price_engine.tick_loader as tick_loader
 
 import pandas as pd
 from tqdm import tqdm
@@ -33,7 +34,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
         self.strategy = strategy
         self.strategy._set_mode("backtest")
 
-    def generate_queue(self,fr,to):
+    def _generate_queue(self,fr,to):
         # generate fake ticks
         logging.info("Processing data before running backtest.")
         # Get the set of date_list first
@@ -67,7 +68,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
         process_tick_bar.close()
         self.tick_queue.put({"end":"end"})
 
-    def loop_ticks(self,last_min_str,total_ticks):
+    def _loop_ticks(self,last_min_str,total_ticks):
         # loop ticks
         logging.info("Start running backtest.")
         with tqdm(total=total_ticks,desc="Tick Looper") as loop_tick_bar:
@@ -126,6 +127,13 @@ class Scheduler(modules.common.scheduler.Scheduler):
                 logging.exception(e)
         loop_tick_bar.close()
 
+    def _send_real_ticks(self,real_ticks):
+        with tqdm(total=len(real_ticks),desc="Tick Sender") as loop_tick_bar:
+            for tick in real_ticks:
+                self.tick_queue.put(tick)
+                loop_tick_bar.update(1) 
+        loop_tick_bar.close()
+        self.tick_queue.put({"end":"end"})
     def start(self):
         if self.strategy is None:
             logging.error("There is no registered strategy.")
@@ -148,10 +156,15 @@ class Scheduler(modules.common.scheduler.Scheduler):
         
         if self.fake_tick is False:
             # get real ticks
-            # TBD
-            pass
+            real_ticks = []
+            for symbol in self.ohlc.keys():
+                real_ticks.extend(tick_loader.load_ticks(symbol,fr,to))
+            # sort the real_ticks
+            real_ticks = sorted(real_ticks, key=lambda k: k['date'])
+            tick_t = threading.Thread(target = self._send_real_ticks,args=(real_ticks,))
+            tick_t.start()
         else:
-            tick_t = threading.Thread(target = self.generate_queue,args=(fr,to))
+            tick_t = threading.Thread(target = self._generate_queue,args=(fr,to))
             tick_t.start()
         # preload the dataframe into strategy
         for symbol in self.ohlc.keys():
@@ -168,7 +181,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
         date_set = sorted(date_set)
         last_min_str = date_set[-1].strftime('%Y-%m-%d %H:%M:%S')
         total_ticks = len(date_set) * len(self.ohlc.keys()) * 4
-        strategy_t = threading.Thread(target = self.loop_ticks,args=(last_min_str,total_ticks))
+        strategy_t = threading.Thread(target = self._loop_ticks,args=(last_min_str,total_ticks))
         strategy_t.start()
         strategy_t.join()
 

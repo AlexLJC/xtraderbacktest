@@ -25,7 +25,7 @@ def load_ticks(symbol,fr,to):
 def _load_tick_backtest(symbol,fr,to):
     # First construct the cache file name
     # The file name should be in this format XAUUSD_2020-01-02-01-01-00_2020-01-02-02-23-59_price.pickle
-    file_name = symbol + '_' + str(fr).replace(':','-').replace(' ','-') + '_' + str(to).replace(':','-').replace(' ','-')  + "_tick.csv"
+    file_name = symbol + '_' + str(fr).replace(':','-').replace(' ','-') + '_' + str(to).replace(':','-').replace(' ','-')  + "_tick.pickle"
     # Then check whether it is in the cache
     file_path_dir = sys_conf_loader.get_sys_path() + "/data/__cache__/"
     # if the __cache__ folder does not exist then create it
@@ -46,12 +46,13 @@ def _load_tick_backtest(symbol,fr,to):
     if sys.platform.startswith('linux') == False:
         abs_path = abs_path.replace('/','\\')
 
-    result = []
+    result = None
     # if there is cache file then load it locally
     if os.path.isfile(abs_path) is True:
         # read it form local file 
         logging.info('Loding file ' + file_name + ' Locally')
-        # TBD
+        df = pd.read_pickle(abs_path)
+        result = df.T.to_dict().values()
 
     else:
         # Otherwise try to load it from remote storage if the plugin is on
@@ -61,51 +62,53 @@ def _load_tick_backtest(symbol,fr,to):
             file_path_remote = sys_conf["backtest_conf"]["tick_remote_cache"]["path"]
             if remote_stroage_type == "s3":
                 import modules.remote_storage.s3 as s3
-                result = s3.csv_read(file_name,file_path_remote,abs_path)
+                df = s3.dataframe_read(file_name,file_path_remote,abs_path)
             elif remote_stroage_type == "oss":
                 import modules.remote_storage.oss as oss
-                result = oss.csv_read(file_name,file_path_remote,abs_path)
+                df = oss.dataframe_read(file_name,file_path_remote,abs_path)
             elif remote_stroage_type == "ftp":
                 import modules.remote_storage.ftp as ftp
-                result = ftp.csv_read(file_name,file_path_remote,abs_path)
+                df = ftp.dataframe_read(file_name,file_path_remote,abs_path)
+            if df is not None:
+                result = df.T.to_dict().values()
     if result is None:
         # if the remote storage does not have the cache then load it from the local price storage.
-        result = _load_local_tick_storage(symbol,fr,to)
+        result,df = _load_local_tick_storage(symbol,fr,to)
         # Save it to cache
-        # TBD
+        df.to_pickle(abs_path)
 
         # post it into remote storage
         if(sys_conf["backtest_conf"]["tick_remote_cache"]["is_on"] == True):
             remote_stroage_type = sys_conf["backtest_conf"]["tick_remote_cache"]["type"]
             file_path_remote = sys_conf["backtest_conf"]["tick_remote_cache"]["path"]
             if remote_stroage_type == "s3":
-                s3.csv_write(file_name,file_path_remote,result)
+                s3.dataframe_write(file_name,file_path_remote,df)
             elif remote_stroage_type == "oss":
-                oss.csv_write(file_name,file_path_remote,result)
+                oss.dataframe_write(file_name,file_path_remote,df)
                 pass
             elif remote_stroage_type == "ftp":
-                ftp.csv_write(file_name,file_path_remote,result)
+                ftp.dataframe_write(file_name,file_path_remote,df)
                 pass
     return result
 
 def _load_local_tick_storage(symbol,fr,to):
-    # abs_project_path = sys_conf_loader.get_sys_path() 
-    # price_folder = abs_project_path + "/data/ticks/"
-    # abs_location  = price_folder + symbol + ".csv"
-    # if sys.platform.startswith('linux') == False:
-    #     abs_location = abs_location.replace('/','\\')
-    # df = pd.read_csv(abs_location,names=["date","open","high","low","close","volume","open_interest"]).fillna(0)
-    # df["date"] = pd.to_datetime(df["date"])
-    # df = df.set_index('date')
-    # df["symbol"] = symbol
-    # result = df[(df.index >= pd.to_datetime(fr)) & (df.index <= pd.to_datetime(to))].copy()
-    # TBD
-    return None
+    abs_project_path = sys_conf_loader.get_sys_path() 
+    price_folder = abs_project_path + "/data/ticks/"
+    abs_location  = price_folder + symbol + ".csv"
+    if sys.platform.startswith('linux') == False:
+        abs_location = abs_location.replace('/','\\')
+    df = pd.read_csv(abs_location).fillna(0)
+    df["date"] = pd.to_datetime(df["date"])
+    df["symbol"] = symbol
+    result = df[(df["date"] >= pd.to_datetime(fr)) & (df["date"] <= pd.to_datetime(to))].copy()
+    result["date"] = result["date"].dt.strftime("%Y-%m-%d %H:%M:%S")
+    result_dict = result.T.to_dict().values()
+    return result_dict,result
 
 
 if __name__ == '__main__':
     import modules.other.logg 
     import logging
-    #print(_load_local_price_storage("AAPL","2019-02-22 09:41:00","2019-02-15 10:03:00"))
-    print(load_price("AAPL","2019-02-22 09:41:00","2019-02-15 10:03:00","backtest"))
+    #print(_load_local_tick_storage("AAPL","2019-10-28 09:41:00","2019-10-28 10:03:00"))
+    print(load_ticks("AAPL","2019-10-28 09:41:00","2019-10-28 10:03:00"))
     pass
