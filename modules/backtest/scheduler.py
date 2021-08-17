@@ -120,6 +120,10 @@ class Scheduler(modules.common.scheduler.Scheduler):
                                         self.stop_by_error = True
                                         logging.error("Error in handle bar.")
                                         logging.exception(e)
+                                if last_min_str == date_str:
+                                    # if this is the last min of backtesting, then close all position
+                                    self.strategy.close_all_position()
+                                    self.strategy.withdraw_pending_orders()
                                 # handle to strategy internal fuc to deal with order handling, calculations and etc
                                 self.strategy._round_check_before(tick)
                                 self.strategy._update_position()

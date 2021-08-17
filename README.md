@@ -26,7 +26,9 @@ Microsoft Visual C++ Build Tools(https://visualstudio.microsoft.com/visual-cpp-b
 -   Custom untradable periods.  
 -   Tablib supported.   
 -   Multiple and custom timeframe supported(seconds,mins,days).
--   Absolute no future data usage
+-   Absolute no future data usage.
+-   Draw custom chart for analysis usage.
+-   News supported.(ongoing)
 -   Distribute nodes for optimizing parameters.(ongoing)
 -   Indicator calculate accelerate.(ongoing) 
 -   Live data feed and trading with.(ongoing)
@@ -177,6 +179,10 @@ if __name__ == "__main__":
     
 ```
 Then run this (strategy).py in the folder /bots/. And you can find the backtest result in the folder /data/backtest_results/ after finish backtesting.
+
+### Step 5    
+Analyse the backtest result.    
+Open /modules/backtest/evaluation/backtest_evaluation.html and choose the backtest result as the file to open, after that the result should be shown on page.
 # Existing Problems     
 -   ~~Takes too much time in generating fake ticks.~~   
 -   ~~Fake ticks take too much memory.~~

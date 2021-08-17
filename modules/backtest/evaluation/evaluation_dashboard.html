@@ -1,0 +1,339 @@
+<html lang= "en" style= "height: auto;">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Evaluation Dashboard</title>
+
+        <!-- Google Font: Source Sans Pro -->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+        <!-- Font Awesome Icons -->
+        <link rel="stylesheet" href="template_used/plugins/fontawesome-free/css/all.min.css">
+        <!-- overlayScrollbars -->
+        <link rel="stylesheet" href="template_used/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
+        <!-- Theme style -->
+        <link rel="stylesheet" href="template_used/dist/css/adminlte.min.css">
+        <link rel="stylesheet" href="template_used/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+        <link rel="stylesheet" href="template_used/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+        <link rel="stylesheet" href="template_used/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+        <!-- DataTables -->
+        <link rel="stylesheet" href="template_used/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">    
+        <link rel="stylesheet" href="template_used/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+        <link rel="stylesheet" href="template_used/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+        
+        <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.18.3/dist/bootstrap-table.min.css">
+
+        <script src="js/load_data.js"></script>
+        <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+        <!-- jQuery -->
+        <script src="template_used/plugins/jquery/jquery.min.js"></script>
+        <!-- Bootstrap 4 -->
+        <script src="template_used/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <!-- DataTables  & Plugins -->
+        <script src="template_used/plugins/datatables/jquery.dataTables.min.js"></script>
+        <script src="template_used/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+        <script src="template_used/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+        <script src="template_used/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+        <script src="template_used/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+        <script src="template_used/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+        <script src="template_used/plugins/jszip/jszip.min.js"></script>
+        <script src="template_used/plugins/pdfmake/pdfmake.min.js"></script>
+        <script src="template_used/plugins/pdfmake/vfs_fonts.js"></script>
+        <script src="template_used/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+        <script src="template_used/plugins/datatables-buttons/js/buttons.print.min.js"></script>
+        <script src="template_used/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
+        <script src="template_used/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+        <script>
+            $(function () {
+              $("#example1").DataTable({
+                "responsive": true, "lengthChange": false, "autoWidth": false,
+                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+              }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+            });
+          </script>
+
+    </head>
+    <body class="hold-transition dark-mode sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
+        <div class="wrapper">
+            <div class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0">Evaluation Dashboard</h1>
+                    </div><!-- /.col -->
+                    <div class="col-sm-6">
+                        <div class = "breadcrumb float-sm-right">
+                           <input type="file" id="files" onchange="importFile();" class="btn btn-block btn-primary"/>
+                        </div>
+                    </div><!-- /.col -->
+                    </div><!-- /.row -->
+                </div><!-- /.container-fluid -->
+            </div>
+            <div class= "row" style="margin:20px">
+                <div class= "col-md-12">
+                    <div id="candle_chart_holder" >
+                    </div>    
+                </div>    
+            </div>    
+            <div class= "row" style="margin:20px">
+                <div class= "col-sm-3">
+                    <div class = "small-box bg-success">
+                        <div class="inner">
+                            <h3 id="win_rate">0<sup style="font-size: 20px">%</sup></h3>
+                            <p>Win Rate</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-stats-bars"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class= "col-sm-3">
+                    <div class = "small-box bg-success">
+                        <div class="inner">
+                            <h3 id="long_win_rate">0<sup style="font-size: 20px">%</sup></h3>
+                            <p>Long Win Rate</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-stats-bars"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class= "col-sm-3">
+                    <div class = "small-box bg-success">
+                        <div class="inner">
+                            <h3 id="short_win_rate">0<sup style="font-size: 20px">%</sup></h3>
+                            <p>Short Win Rate</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-stats-bars"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class= "col-sm-3">
+                    <div class = "small-box bg-success">
+                        <div class="inner">
+                            <h3 id="profit_drawdown">0<sup style="font-size: 20px">%</sup></h3>
+                            <p>Profit/Drawdown</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-stats-bars"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class= "row" style="margin:20px">
+                <div class= "col-sm-3">
+                    <div class = "small-box bg-info">
+                        <div class="inner">
+                            <h3 id="total_trades">0</h3>
+                            <p>Total Trades</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-stats-bars"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class= "col-sm-3">
+                    <div class = "small-box bg-info">
+                        <div class="inner">
+                            <h3 id="long_trades">0</h3>
+                            <p>Long Trades</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-stats-bars"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class= "col-sm-3">
+                    <div class = "small-box bg-info">
+                        <div class="inner">
+                            <h3 id="short_trades">0</h3>
+                            <p>Short Trades</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-stats-bars"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class= "col-sm-3">
+                    <div class = "small-box bg-info">
+                        <div class="inner">
+                            <h3 id="total_orders">0</h3>
+                            <p>Total Orders</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-stats-bars"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class= "row" style="margin:20px">
+                <div class= "col-sm-3">
+                    <div class = "small-box bg-danger">
+                        <div class="inner">
+                            <h3 id="total_profits">0</h3>
+                            <p>Total Profits</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-stats-bars"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class= "col-sm-3">
+                    <div class = "small-box bg-danger">
+                        <div class="inner">
+                            <h3 id="long_profits">0</h3>
+                            <p>Long Profits</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-stats-bars"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class= "col-sm-3">
+                    <div class = "small-box bg-danger">
+                        <div class="inner">
+                            <h3 id="short_profits">0</h3>
+                            <p>Short Profits</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-stats-bars"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class= "row" style="margin:20px">
+                <div class= "col-sm-3">
+                    <div class = "small-box bg-success">
+                        <div class="inner">
+                            <h3 id="avg_profit">0</h3>
+                            <p>Avg Profit</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-stats-bars"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class= "col-sm-3">
+                    <div class = "small-box bg-success">
+                        <div class="inner">
+                            <h3 id="avg_win">0</h3>
+                            <p>Avg Win</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-stats-bars"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class= "col-sm-3">
+                    <div class = "small-box bg-success">
+                        <div class="inner">
+                            <h3 id="avg_loss">0</h3>
+                            <p>Avg Loss</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-stats-bars"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class= "col-sm-3">
+                    <div class = "small-box bg-success">
+                        <div class="inner">
+                            <h3 id="avg_win_avg_loss">0</h3>
+                            <p>Avg Win/Avg Loss</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-stats-bars"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class= "row" style="margin:20px">
+                <div class= "col-sm-3">
+                    <div class = "small-box bg-success">
+                        <div class="inner">
+                            <h3 id="max_win">0</h3>
+                            <p>Max Win</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-stats-bars"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class= "col-sm-3">
+                    <div class = "small-box bg-success">
+                        <div class="inner">
+                            <h3 id="max_loss">0</h3>
+                            <p>Max Loss</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-stats-bars"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class= "col-sm-3">
+                    <div class = "small-box bg-success">
+                        <div class="inner">
+                            <h3 id="max_rise_up">0</h3>
+                            <p>Max Rise Up</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-stats-bars"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class= "col-sm-3">
+                    <div class = "small-box bg-success">
+                        <div class="inner">
+                            <h3 id="max_draw_down">0</h3>
+                            <p>Max Draw Down</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-stats-bars"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class= "row" style="margin:20px">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                          <h3 class="card-title">Order Table</h3>
+                        </div>
+                        <!-- /.card-header -->
+                        <div class="card-body">
+                          <table id="example1" class="table table-bordered table-striped dataTable dtr-inline" role="grid" data-toggle="table" data-pagination="true" data-side-pagination="client" data-page-size="30" >
+                            <thead>
+                            <tr>
+                              <th>Order Ref</th>
+                              <th>Direction</th>
+                              <th>Open Date</th>
+                              <th>Open Price</th>
+                              <th>Close Date</th>
+                              <th>Close Price</th>
+                              <th>Profit</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                              <td>Trident</td>
+                              <td>Trident</td>
+                              <td>Internet
+                                Explorer 4.0
+                              </td>
+                              <td>Win 95+</td>
+                              <td> 4</td>
+                              <td>X</td>
+                              <td>X</td>
+                            </tr>
+                            </tbody>
+                            
+                          </table>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

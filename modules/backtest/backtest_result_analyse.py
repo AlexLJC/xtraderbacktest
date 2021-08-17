@@ -28,19 +28,27 @@ class TradeBook():
         result["total_short_profit"] = short_profit.sum()
         result["total_profit"] =result["total_long_profit"] + result["total_short_profit"]
 
+        # avg
+        result["avg_profit"] = result["total_profit"] / result["total_trades"]
+        result["avg_win"] = (overall_profit > 0).mean()
+        result["avg_loss"] = (overall_profit < 0).mean()
+        result["avg_win/avg_loss"] = result["avg_win"]  / result["avg_loss"]
+
         # win rate
         result["long_win_trades"] = int((long_profit > 0).sum())
         result["short_win_trades"] = int((short_profit > 0).sum())
-        result["long_win_rates"] = result["long_win_trades"] / result["total_trades"] if result["total_trades"] !=0 else 0
-        result["short_win_rates"] = result["short_win_trades"] / result["total_trades"] if result["total_trades"] !=0 else 0
+        result["long_win_rates"] = result["long_win_trades"] / result["total_long_trades"] if result["total_trades"] !=0 else 0
+        result["short_win_rates"] = result["short_win_trades"] / result["total_short_trades"] if result["total_trades"] !=0 else 0
+        result["win_rate"] = (result["long_win_trades"] + result["short_win_trades"]) / result["total_trades"] if result["total_trades"] !=0 else 0
 
+        # max and min
         result["max_long_loss"] = long_profit.min()
         result["max_short_loss"] = short_profit.min()
         result["max_loss"] = overall_profit.min()
 
-        result["max_long_profit"] = long_profit.min()
-        result["max_short_profit"] = short_profit.min()
-        result["max_profit"] = overall_profit.min()
+        result["max_long_profit"] = long_profit.max()
+        result["max_short_profit"] = short_profit.max()
+        result["max_profit"] = overall_profit.max()
         
         def cct(y):
             return y * (y.groupby((y != y.shift()).cumsum()).cumcount() + 1)
@@ -61,10 +69,8 @@ class TradeBook():
         def max_cont_trend(pnl, direc):
             cum_pnl = pnl.cumsum()
             no_eq = cum_pnl[cum_pnl != cum_pnl.shift(1)]
-
             if direc == "drawdown":
-                local_max = no_eq.head(1).append(no_eq[(no_eq > no_eq.shift(1)) & (no_eq > no_eq.shift(-1))]).append(
-                    no_eq.tail(1))
+                local_max = no_eq.head(1).append(no_eq[(no_eq > no_eq.shift(1)) & (no_eq > no_eq.shift(-1))]).append(no_eq.tail(1))
                 if len(local_max) == 0:
                     return "No enough trade"
                 local_max_after_min = {}
@@ -73,13 +79,12 @@ class TradeBook():
                 return (pd.Series(local_max_after_min) - local_max).min()
 
             elif direc == "riseup":
-                local_min = no_eq.head(1).append(no_eq[(no_eq < no_eq.shift(1)) & (no_eq < no_eq.shift(-1))]).append(
-                    no_eq.tail(1))
+                local_min = no_eq.head(1).append(no_eq[(no_eq < no_eq.shift(1)) & (no_eq < no_eq.shift(-1))]).append(no_eq.tail(1))
                 if len(local_min) == 0:
                     return "No enough trade"
                 local_min_after_max = {}
                 for index, value in local_min.iteritems():
-                    local_min_after_max[index] = no_eq[index:].min()
+                    local_min_after_max[index] = no_eq[index:].max()
                 return (pd.Series(local_min_after_max) - local_min).max()
 
         # max rise up
