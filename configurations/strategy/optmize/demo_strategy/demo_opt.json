@@ -1,13 +1,6 @@
 {
-    "strategy_name":"demo",
+    "strategy_file":"demo_strategy.py",
     "opt_ranges":{
-        "symbols":{
-            "type":"list",
-            "values":[
-                ["AAPL"],
-                ["XAUUSD","XAGUSD"]
-            ]
-        },
         "ma_fast":{
             "type":"range",
             "values":[10,1,25]
@@ -20,9 +13,12 @@
     "opt_rules": [
         ["ma_fast","<","ma_slow"]
     ],
+    "symbols":[
+        ["AAPL"]
+    ],
     "fix_input":{
         "account_id":"demo_account",
-        "period":"5m",
+        "period":["5m","10m"],
         "backtest_graininess":"5m",
         "platform":"IB",
         "start_date": "2019-10-28 08:47:00",

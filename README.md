@@ -93,7 +93,7 @@ Put the strategy's parameters in the folder /configurations/strategy/single/(str
 ```
 {
     "account_id":"demo_account",
-    "period":"5m",
+    "period":["5m","10m"],
     "backtest_graininess":"5m",
     "symbols":["AAPL"],
     "platform":"IB",
