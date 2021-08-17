@@ -25,7 +25,7 @@ Microsoft Visual C++ Build Tools(https://visualstudio.microsoft.com/visual-cpp-b
 -   Parameters Optimization.    
 -   Custom untradable periods.  
 -   Tablib supported.   
--   Multiple timeframe supported.
+-   Multiple and custom timeframe supported(seconds,mins,days).
 -   Absolute no future data usage
 -   Distribute nodes for optimizing parameters.(ongoing)
 -   Indicator calculate accelerate.(ongoing) 
