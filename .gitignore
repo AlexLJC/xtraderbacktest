@@ -135,3 +135,9 @@ dmypy.json
 __cache__/
 /data/backtest_results/*/
 *.csv
+
+/configurations/strategy/optmize/*
+!/configurations/strategy/optmize/demo_strategy/
+/configurations/strategy/optmize/demo_strategy/*
+!/configurations/strategy/optmize/demo_strategy/AAPL_opt.json
+!/configurations/strategy/optmize/demo_strategy/demo_opt.json
