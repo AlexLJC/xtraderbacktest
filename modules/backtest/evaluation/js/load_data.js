@@ -65,12 +65,12 @@ function load(backtest_result,file_name){
             position = backtest_result["positions"][position_index];
             if(position["symbol"] == symbol){
                 if(position["direction"] == "long"){
-                    markers_orders.push({ time: position["open_timestamp"], position: 'belowBar', color: '#2196F3', shape: 'arrowUp', text: 'Long@ ' + position["open_filled_price"]});
-                    markers_orders.push({ time: position["close_timestamp"], position: 'aboveBar', color: '#e91e63', shape: 'arrowDown', text: 'Short@ ' + position["close_filled_price"]});
+                    markers_orders.push({ time: position["open_timestamp"], position: 'belowBar', color: '#2196F3', shape: 'arrowUp', text: 'Long@ ' + position["open_filled_price"].toFixed(5) });
+                    markers_orders.push({ time: position["close_timestamp"], position: 'aboveBar', color: '#e91e63', shape: 'arrowDown', text: 'Short@ ' + position["close_filled_price"].toFixed(5)});
                 }
                 else if (position["direction"] == "short"){
-                    markers_orders.push({ time: position["open_timestamp"], position: 'aboveBar', color: '#e91e63', shape: 'arrowDown', text: 'Short@ ' + position["open_filled_price"]});
-                    markers_orders.push({ time: position["close_timestamp"], position: 'belowBar', color: '#2196F3', shape: 'arrowUp', text: 'Long@ ' + position["close_filled_price"]});
+                    markers_orders.push({ time: position["open_timestamp"], position: 'aboveBar', color: '#e91e63', shape: 'arrowDown', text: 'Short@ ' + position["open_filled_price"].toFixed(5)});
+                    markers_orders.push({ time: position["close_timestamp"], position: 'belowBar', color: '#2196F3', shape: 'arrowUp', text: 'Long@ ' + position["close_filled_price"].toFixed(5)});
                 }
             }
             

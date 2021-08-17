@@ -182,7 +182,12 @@ Then run this (strategy).py in the folder /bots/. And you can find the backtest 
 
 ### Step 5    
 Analyse the backtest result.    
-Open /modules/backtest/evaluation/backtest_evaluation.html and choose the backtest result as the file to open, after that the result should be shown on page.
+Open /modules/backtest/evaluation/evaluation_dashboard.html and choose the backtest result as the file to open, after that the result should be shown on page.
+
+Template Result
+![Template Result](doc/image/backtest_result_template.png?raw=true "Title")
+
+
 # Existing Problems     
 -   ~~Takes too much time in generating fake ticks.~~   
 -   ~~Fake ticks take too much memory.~~

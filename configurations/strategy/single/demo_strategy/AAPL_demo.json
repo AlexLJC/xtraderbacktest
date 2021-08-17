@@ -1,6 +1,6 @@
 {
     "account_id":"demo_account",
-    "period":["5m","10m"],
+    "period":["10m"],
     "backtest_graininess":"5m",
     "symbols":["AAPL"],
     "platform":"IB",
