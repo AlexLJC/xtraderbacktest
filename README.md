@@ -141,10 +141,10 @@ class Bot(modules.common.strategy.Strategy):
         pass
 
     # Handle Bar
-    def handle_bar(self, bar):
+    def handle_bar(self, bar,period):
         #logging.info("new bar "+bar["date"])
         #logging.info("current_time " + self.current_time)
-        df = self.get_bars(bar["symbol"],30,self.context["period"])
+        df = self.get_bars(bar["symbol"],30,period)
         ma_fast = ti.MA(df,self.pars["ma_fast"]).iloc[-1]
         ma_slow = ti.MA(df,self.pars["ma_slow"]).iloc[-1]
         if ma_fast > ma_slow:
