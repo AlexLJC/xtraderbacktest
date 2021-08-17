@@ -22,7 +22,7 @@
         
         <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.18.3/dist/bootstrap-table.min.css">
 
-        <script src="js/load_data.js"></script>
+        
         <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
         <!-- jQuery -->
         <script src="template_used/plugins/jquery/jquery.min.js"></script>
@@ -42,14 +42,8 @@
         <script src="template_used/plugins/datatables-buttons/js/buttons.print.min.js"></script>
         <script src="template_used/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
         <script src="template_used/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-        <script>
-            $(function () {
-              $("#example1").DataTable({
-                "responsive": true, "lengthChange": false, "autoWidth": false,
-                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
-              }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-            });
-          </script>
+        
+        <script src="js/load_data.js"></script>
 
     </head>
     <body class="hold-transition dark-mode sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
@@ -302,38 +296,37 @@
                         </div>
                         <!-- /.card-header -->
                         <div class="card-body">
-                          <table id="example1" class="table table-bordered table-striped dataTable dtr-inline" role="grid" data-toggle="table" data-pagination="true" data-side-pagination="client" data-page-size="30" >
-                            <thead>
-                            <tr>
-                              <th>Order Ref</th>
-                              <th>Direction</th>
-                              <th>Open Date</th>
-                              <th>Open Price</th>
-                              <th>Close Date</th>
-                              <th>Close Price</th>
-                              <th>Profit</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                              <td>Trident</td>
-                              <td>Trident</td>
-                              <td>Internet
-                                Explorer 4.0
-                              </td>
-                              <td>Win 95+</td>
-                              <td> 4</td>
-                              <td>X</td>
-                              <td>X</td>
-                            </tr>
-                            </tbody>
                             
-                          </table>
+                                <table id="order_table" class="table table-bordered table-striped">
+                                    <thead>
+                                    <tr role="row">
+                                        <th>Order Ref</th>
+                                        <th>Direction</th>
+                                        <th>Open Date</th>
+                                        <th>Open Price</th>
+                                        <th>Close Date</th>
+                                        <th>Close Price</th>
+                                        <th>Profit</th>
+                                    </tr>
+                                    </thead>
+                                    <!-- <tbody>
+                                    </tbody> -->
+                                
+                                </table>
+                            
                         </div>
                         <!-- /.card-body -->
                     </div>
                 </div>
             </div>
         </div>
+        <!-- <script>
+            $(function () {
+              $("#order_table").DataTable({
+                "responsive": true, "lengthChange": false, "autoWidth": false,"paging": true,
+                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+              }).buttons().container().appendTo('#order_table_wrapper .col-md-6:eq(0)');
+            });
+        </script> -->
     </body>
 </html>

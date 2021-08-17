@@ -97,25 +97,43 @@ function load(backtest_result,file_name){
     document.getElementById("max_loss").innerHTML = backtest_result["summary"]["max_loss"].toFixed(2);
     document.getElementById("max_rise_up").innerHTML = backtest_result["summary"]["overall_max_rise_up"].toFixed(2);
     document.getElementById("max_draw_down").innerHTML = backtest_result["summary"]["max_draw_down"].toFixed(2);
-    order_table = document.getElementById("example1");
+    order_table = document.getElementById("order_table");
     // Clear tab;e
     var row_count = order_table.rows.length;
     for (var i = 1; i < row_count; i++) {
         order_table.deleteRow(1);
     }
-    var i = 0;
-    for(var order in backtest_result["orders"]){
-        var row = order_table.insertRow(i);
-        var cell1 = row.insertCell(0);
-        var cell2 = row.insertCell(1);
-        var cell3 = row.insertCell(2);
-        var cell4 = row.insertCell(3);
-        var cell5 = row.insertCell(4);
-        var cell6 = row.insertCell(5);
-        var cell7 = row.insertCell(6);
-        cell1.innerHTML = "order" + i;
-        i++;
+    var table_data = [];
+    for(var order_index in backtest_result["orders"]){
+        order = backtest_result["orders"][order_index]
+        var t = {
+           "Order Ref":order["order_ref"],
+           "Direction":order["direction"],
+           "Open Date":order["open_date"] ,
+           "Open Price":order["open_filled_price"].toFixed(5) ,
+           "Close Date":order["close_date"] ,
+           "Close Price":order["close_filled_price"].toFixed(5) ,
+           "Profit":order["profit"] 
+        };
+        table_data.push(t);
     }
+    var $table = $('#order_table');
+    $(function () {
+        $('#order_table').DataTable({
+            data: table_data,
+            aoColumns: [
+                { mData: "Order Ref" },
+                { mData: "Direction" },
+                { mData: "Open Date" },
+                { mData: "Open Price" },
+                { mData: "Close Date" },
+                { mData: "Close Price" },
+                { mData: "Profit" }
+            ],
+            "responsive": true, "lengthChange": false, "autoWidth": false,"paging": true,
+            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+        }).buttons().container().appendTo('#order_table_wrapper .col-md-6:eq(0)');
+    });
 }
 
 // Import file
@@ -135,3 +153,4 @@ function importFile(){
         load(backtest_result,name);
     };
 }
+
