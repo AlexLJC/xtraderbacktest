@@ -18,9 +18,8 @@
     ],
     "fix_input":{
         "account_id":"demo_account",
-        "period":"5m",
+        "period":["5m","10m"],
         "backtest_graininess":"5m",
-        "symbols":["AAPL"],
         "platform":"IB",
         "start_date": "2019-10-28 08:47:00",
         "end_date": "2019-10-29 19:59:00",

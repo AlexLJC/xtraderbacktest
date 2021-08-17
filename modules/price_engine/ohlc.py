@@ -15,7 +15,7 @@ TIMESTAMP_FORMAT_FOR_CALCULATION = "%Y%m%d%H%M"
 
 ## Class
 class OHLC:
-    def __init__(self,price,timestamp,symbol,volume,open_interest):
+    def __init__(self,price,timestamp,symbol,volume,open_interest,period):
         # body of the constructor
         self.open=price
         self.high=price
@@ -25,7 +25,8 @@ class OHLC:
         self.symbol = symbol
         self.volume = volume
         self.open_interest = open_interest
-    
+        self.period=period
+
     def get_date(self):
         return self.date
     
@@ -49,6 +50,7 @@ class OHLCCounter():
         self.symbol=symbol
         self.latest_date=None
         self.full_flag=False 
+        self.period=period
         self.interval = date_converter.convert_period_to_int(period)
         self.period_len = period_len
 
@@ -72,7 +74,7 @@ class OHLCCounter():
         # If it is first tick
         if self.latest_date is None: 
             self.latest_date = ohlc_time_str
-            ohlc = OHLC(price,ohlc_time_str,self.symbol,volume,open_insterest)
+            ohlc = OHLC(price,ohlc_time_str,self.symbol,volume,open_insterest,self.period)
             self.ohlc_queue.put(ohlc)
             self.ohlc_queue_length = self.ohlc_queue.qsize()
             
@@ -90,7 +92,7 @@ class OHLCCounter():
                 if self.ohlc_queue_length >= self.period_len:
                     self.full_flag=True
                     result = self.ohlc_queue.get() ## Remove the first item
-                ohlc = OHLC(price,ohlc_time_str,self.symbol,volume,open_insterest)
+                ohlc = OHLC(price,ohlc_time_str,self.symbol,volume,open_insterest,self.period)
                 self.ohlc_queue.put(ohlc)
                 self.ohlc_queue_length = self.ohlc_queue.qsize()
                 self.latest_date = ohlc_time_str

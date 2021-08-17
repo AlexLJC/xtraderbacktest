@@ -97,30 +97,32 @@ class Scheduler(modules.common.scheduler.Scheduler):
                                 logging.error("Error in handle tick.")
                                 logging.exception(e)
                         # handle to strategy internal fuc to deal with order handling, calculations and etc
-                        new_bar = self.strategy._round_check_after(tick)
+                        new_bars = self.strategy._round_check_after(tick)
                         # if there is a new bar for the timeframe specified by strategy
-                        if new_bar is not None:
-                            # handle it to the strategy's logic to process new bar
-                            new_bar_dict = {
-                                "open":new_bar.open,
-                                "high":new_bar.high,
-                                "close":new_bar.close,
-                                "low":new_bar.low,
-                                "date":new_bar.date,
-                                "symbol":new_bar.symbol,
-                                "volume":new_bar.volume,
-                                "open_interest":new_bar.open_interest
-                            }
-                            if last_min_str != date_str:
-                                try:
-                                    self.strategy.handle_bar(new_bar_dict)
-                                except Exception as e:
-                                    self.stop_by_error = True
-                                    logging.error("Error in handle bar.")
-                                    logging.exception(e)
-                            # handle to strategy internal fuc to deal with order handling, calculations and etc
-                            self.strategy._round_check_after(tick)
-                            self.strategy._update_position()
+                        if len(new_bars) > 0 :
+                            for new_bar in new_bars:
+                                # handle it to the strategy's logic to process new bar
+                                new_bar_dict = {
+                                    "open":new_bar.open,
+                                    "high":new_bar.high,
+                                    "close":new_bar.close,
+                                    "low":new_bar.low,
+                                    "date":new_bar.date,
+                                    "symbol":new_bar.symbol,
+                                    "volume":new_bar.volume,
+                                    "open_interest":new_bar.open_interest,
+                                    "period":new_bar.period,
+                                }
+                                if last_min_str != date_str:
+                                    try:
+                                        self.strategy.handle_bar(new_bar_dict,new_bar_dict["period"])
+                                    except Exception as e:
+                                        self.stop_by_error = True
+                                        logging.error("Error in handle bar.")
+                                        logging.exception(e)
+                                # handle to strategy internal fuc to deal with order handling, calculations and etc
+                                self.strategy._round_check_before(tick)
+                                self.strategy._update_position()
                         loop_tick_bar.update(1) 
             except Exception as e:
                 self.stop_by_error = True

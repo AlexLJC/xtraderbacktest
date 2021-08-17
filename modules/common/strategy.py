@@ -23,7 +23,7 @@ class Strategy():
         self.current_tick = {}
         self._custom_chart = {}
         self._history_data = {}
-        self._ohlc_counter = {}
+        self._ohlc_counter_dict = {}
         self._ohlc_counter_1m = {}
         self._mode = None
 
@@ -38,7 +38,7 @@ class Strategy():
 
     # Handle Bar
     @abstractmethod
-    def handle_bar(self, bar):
+    def handle_bar(self, bar, period):
         
         logging.debug(bar)
         pass
@@ -283,14 +283,21 @@ class Strategy():
     def _round_check_after(self,tick):
         self._process_order_manager(tick)
 
-        if tick["symbol"] not in self._ohlc_counter.keys():
-            self._ohlc_counter[tick["symbol"]] = modules.price_engine.ohlc.OHLCCounter(tick["symbol"],self.context["period"])
+        if tick["symbol"] not in self._ohlc_counter_1m.keys():
+            for period in self.context["period"]:
+                if period not in self._ohlc_counter_dict.keys():
+                    self._ohlc_counter_dict[period] = {}
+                self._ohlc_counter_dict[period][tick["symbol"]] = modules.price_engine.ohlc.OHLCCounter(tick["symbol"],period)
             self._ohlc_counter_1m[tick["symbol"]] = modules.price_engine.ohlc.OHLCCounter(tick["symbol"],"1m")
-        result = self._ohlc_counter[tick["symbol"]].update(tick["last_price"],tick["date"],tick["volume"],tick["open_interest"])
+        results = []
+        for period in self.context["period"]:
+            result = self._ohlc_counter_dict[period][tick["symbol"]].update(tick["last_price"],tick["date"],tick["volume"],tick["open_interest"])
+            if result is not None:
+                results.append(result)
         new_bar_1m = self._ohlc_counter_1m[tick["symbol"]].update(tick["last_price"],tick["date"],tick["volume"],tick["open_interest"])
         if new_bar_1m is not None:
             self._append_history_data(new_bar_1m)
-        return result
+        return results
 
     def _append_history_data(self,ohlc):
         new_ohlc_list =[ohlc.open,ohlc.high,ohlc.low,ohlc.close,ohlc.volume,ohlc.open_interest,ohlc.symbol]
