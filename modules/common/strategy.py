@@ -7,6 +7,7 @@ import logging
 import modules.common.order_manager 
 import modules.price_engine.ohlc 
 import modules.price_engine.price_period_converter as price_period_converter
+import modules.other.sys_conf_loader as sys_conf_loader
 from abc import ABC, abstractmethod
 import pandas as pd
 import uuid
@@ -26,7 +27,7 @@ class Strategy():
         self._ohlc_counter_dict = {}
         self._ohlc_counter_1m = {}
         self._mode = None
-
+        self._max_df_len = sys_conf_loader.get_sys_conf()["bot"]["data_history_max_len"]
     def _set_mode(self,mode):
         self._mode = mode
         self.order_manager = modules.common.order_manager.OrderManager(self.context["cash"],self.context["untradable_period"],self._mode,self.context["reverse_mode"])
@@ -302,7 +303,10 @@ class Strategy():
     def _append_history_data(self,ohlc):
         new_ohlc_list =[ohlc.open,ohlc.high,ohlc.low,ohlc.close,ohlc.volume,ohlc.open_interest,ohlc.symbol]
         self._history_data[ohlc.symbol].loc[pd.to_datetime(ohlc.date)] = new_ohlc_list
-
+        # Cut the unnecesary dataframe into 
+        while self._history_data[ohlc.symbol].shape[0] > self._max_df_len:
+            self._history_data[ohlc.symbol] = self._history_data[ohlc.symbol].iloc[1: , :]
+            
     def _generarate_orderref(self):
         strategy_name_code = self.context["strategy_name_code"]
         return strategy_name_code + ":"+ str(uuid.uuid4())
