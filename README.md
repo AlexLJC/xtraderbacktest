@@ -1,6 +1,5 @@
 # xtraderbacktest
 This project is a backtest system for trading algo.   
-Personal Blog: http://www.xtradernotebook.com/   
 Star it if you like and keep tracking the updates.
 
 # Requirements      
