@@ -84,4 +84,4 @@ logger:                                       # the logger configuration
   error: true                                 # record error
   critical: true                              # record critical
 bot:                                          # general configuration of bot
-  data_history_max_len: 1000                  # maximum of 1min dataframe loaded into bots, narrow it down if you want to save ram 
+  data_history_max_len: 1000                  # maximum of 1min dataframe loaded into bots, narrow it down if you want to save memory 
