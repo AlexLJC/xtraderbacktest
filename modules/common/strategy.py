@@ -157,7 +157,7 @@ class Strategy():
     def get_bars(self,symbol,count,period,end_date_str = None):
         result = None
         if symbol in self._history_data.keys():
-            df = self._history_data[symbol].copy()
+            df = self._history_data[symbol].copy(deep = True)
             df = price_period_converter.convert(df,period)
             if end_date_str is not None:
                 df = df[(df.index <= pd.to_datetime(end_date_str))].copy()
@@ -306,7 +306,7 @@ class Strategy():
         # Cut the unnecesary dataframe into 
         while self._history_data[ohlc.symbol].shape[0] > self._max_df_len:
             self._history_data[ohlc.symbol] = self._history_data[ohlc.symbol].iloc[1: , :]
-            
+
     def _generarate_orderref(self):
         strategy_name_code = self.context["strategy_name_code"]
         return strategy_name_code + ":"+ str(uuid.uuid4())
