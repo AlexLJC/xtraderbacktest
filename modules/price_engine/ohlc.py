@@ -51,7 +51,7 @@ class OHLCCounter():
         self.latest_date=None
         self.full_flag=False 
         self.period=period
-        self.interval = date_converter.convert_period_to_int(period)
+        self.interval = date_converter.convert_period_to_seconds(period)
         self.period_len = period_len
 
     #  Convert timestamp to index of ohlc  output should be in this format"%Y-%m-%d %H:%M"
@@ -59,7 +59,7 @@ class OHLCCounter():
         timestamp_input = timestamp_input
         date_current= datetime.datetime.strptime(timestamp_input,TIMESTAMP_FORMAT)
         int_time_now = date_current.timestamp()
-        int_time_period = int_time_now - int_time_now % (self.interval*60)
+        int_time_period = int_time_now - int_time_now % (self.interval)
         obj_time_period = datetime.datetime.fromtimestamp(int_time_period)
         time_current_str=obj_time_period.strftime(TIMESTAMP_OHLC)
         return time_current_str

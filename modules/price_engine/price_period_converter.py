@@ -13,8 +13,13 @@ mode - normal or cn_future
 def convert(df, to_tf,mode="normal"):
     _df = df.copy()
     from_tf = 1
+    
     if type(to_tf) == type("1m"):
-        to_tf = date_converter.convert_period_to_int(to_tf)
+        if "s" in to_tf:
+            # Excluse second bars transformation
+            to_tf = 1
+        else:
+            to_tf = date_converter.convert_period_to_int(to_tf)
     if to_tf == 1440:
         # Chinese future market is a little bit tricky
         if mode == "cn_future":

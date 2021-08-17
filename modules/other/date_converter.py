@@ -24,3 +24,16 @@ def convert_period_to_int(period):
         return 1440
     else:
         return None
+
+'''
+Convert period string to numbers in min. Supoorted seconds
+'''
+def convert_period_to_seconds(period):
+    if "s" in period:
+        return int(period.split('s')[0])
+    elif "m" in period:
+        return int(period.split('m')[0]) * 60
+    elif "d" in period:
+        return int(period.split('d')[0]) * 1440 * 60
+    else:
+        return None
