@@ -49,7 +49,8 @@ class TradeBook():
         result["max_long_profit"] = long_profit.max()
         result["max_short_profit"] = short_profit.max()
         result["max_profit"] = overall_profit.max()
-        
+        #print(overall_profit,overall_profit.max())
+        #exit(0)
         def cct(y):
             return y * (y.groupby((y != y.shift()).cumsum()).cumcount() + 1)
         pos_long_cct = cct(long_profit > 0)
