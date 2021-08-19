@@ -84,7 +84,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
                     tick = self.tick_queue.get()
                     if "end" not in tick.keys():
                         date_str = tick["date"][0:-3]
-                        if self._calendar_manager is None:
+                        if self._calendar_manager is None and self.strategy.context["calendar_event"] == "enable":
                             self._calendar_manager = modules.backtest.calendar_manager.CalendarManager(tick["date"])
                             calendar_event_list = self._calendar_manager.get_events()
                             self.strategy.calendar_list.extend(calendar_event_list)
@@ -104,7 +104,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
                                 logging.exception(e)
                         # handle to strategy internal fuc to deal with order handling, calculations and etc
                         new_bars,new_1m = self.strategy._round_check_after(tick)
-                        if new_1m:
+                        if new_1m and self.strategy.context["calendar_event"] == "enable":
                             calendar_event_list = self._calendar_manager.round_check(tick["date"])
                             if len(calendar_event_list) > 0:
                                 for event in calendar_event_list:

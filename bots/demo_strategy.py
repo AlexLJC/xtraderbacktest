@@ -36,7 +36,7 @@ class Bot(modules.common.strategy.Strategy):
     
     # Handle Event
     def handle_event(self, event):
-        #print(event)
+        #print(self.current_time,event)
         pass
 
 if __name__ == "__main__":

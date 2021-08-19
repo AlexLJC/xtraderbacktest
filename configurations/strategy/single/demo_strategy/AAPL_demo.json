@@ -9,6 +9,7 @@
     "strategy_name_code": "DM",
     "strategy_name": "demo",
     "reverse_mode":"enable",
+    "calendar_event":"enable",
     "cash":10000,
     "untradable_period":[
         {

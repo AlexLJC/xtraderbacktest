@@ -110,15 +110,16 @@ Put the strategy's parameters in the folder /configurations/strategy/single/(str
 ```
 {
     "account_id":"demo_account",
-    "period":["5m","10m"],
+    "period":["10m"],
     "backtest_graininess":"5m",
     "symbols":["AAPL"],
     "platform":"IB",
-    "start_date": "2019-10-28 08:47:00",
+    "start_date": "2019-10-25 08:47:00",
     "end_date": "2019-10-29 19:59:00",
     "strategy_name_code": "DM",
     "strategy_name": "demo",
     "reverse_mode":"enable",
+    "calendar_event":"enable",
     "cash":10000,
     "untradable_period":[
         {
