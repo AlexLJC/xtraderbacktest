@@ -97,6 +97,13 @@ class TradeBook():
         result["long_max_draw_down"] = max_cont_trend(long_profit, "drawdown")
         result["short_max_draw_down"] = max_cont_trend(short_profit, "drawdown")
         result["max_draw_down"] = max_cont_trend(overall_profit, "drawdown")
+
+        # cost of trade
+        commissions = self.close_trades_df["commission"]
+        swaps = self.close_trades_df["swap"]
+        result["commissions"] = float(commissions.sum())
+        result["swaps"] =  float(swaps.sum())
+
         if type(result["max_draw_down"]) is not str and result["max_draw_down"] < 0:
             result["profit/max_draw_down"] = -result["total_profit"] / result["max_draw_down"]
         return result

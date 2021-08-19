@@ -97,6 +97,8 @@ function load(backtest_result,file_name){
     document.getElementById("max_loss").innerHTML = backtest_result["summary"]["max_loss"].toFixed(2);
     document.getElementById("max_rise_up").innerHTML = backtest_result["summary"]["overall_max_rise_up"].toFixed(2);
     document.getElementById("max_draw_down").innerHTML = backtest_result["summary"]["max_draw_down"].toFixed(2);
+    document.getElementById("commissions").innerHTML = backtest_result["summary"]["commissions"].toFixed(2);
+    document.getElementById("swaps").innerHTML = backtest_result["summary"]["swaps"].toFixed(2);
     order_table = document.getElementById("order_table");
     // Clear tab;e
     var row_count = order_table.rows.length;

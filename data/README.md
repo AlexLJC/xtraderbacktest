@@ -24,3 +24,6 @@ the market you watch.
 
 It could be in other format, while the interface of processing data is implemeted 
 in the ways you need.
+
+#   calendar    
+Fort mat should be as same as template file 2012_12_22.csv.

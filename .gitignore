@@ -133,6 +133,7 @@ dmypy.json
 *system_conf.yaml
 __cache__/
 /data/backtest_results/*/
+/data/web_crawler/*/
 *.csv
 
 /configurations/strategy/optmize/*
@@ -140,3 +141,5 @@ __cache__/
 /configurations/strategy/optmize/demo_strategy/*
 !/configurations/strategy/optmize/demo_strategy/AAPL_opt.json
 !/configurations/strategy/optmize/demo_strategy/demo_opt.json
+
+!/data/calendar/2012_12_22.csv

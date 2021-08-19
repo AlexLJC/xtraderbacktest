@@ -276,4 +276,13 @@ class OrderManager():
                 if order["order_ref"] == order_update["order_ref"]:
                     self._orders[index].update(order_update)
 
-    
+    def _round_check_after_day(self,week_day):
+        # update swaps
+        update_list = self.position._swaps_add(week_day)
+        if self._mode == "backtest" and self._is_reverse == "enable":
+            update_list = self.reverse_position._swaps_add(week_day)
+        
+        for order_update in update_list:
+            for index, order in enumerate(self._orders):
+                if order["order_ref"] == order_update["order_ref"]:
+                    self._orders[index].update(order_update)

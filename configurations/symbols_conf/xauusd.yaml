@@ -10,7 +10,11 @@ spread: 5                               # the spread(between ask and bid) in poi
 type: forex                             # symbol type
 exchange: None                          # the trading exchange
 t+0: true                               # whether is t+0
-swaps:  -5.0                            # the swaps in points
+swaps:                                  # the swaps in points
+  long: -2
+  short: -3
+  triple_day: 0                         # 0-Monday 6-Sunday
+minimum_lots: 1                         # minimum lot
 trade_session:                          # tradable session
   sunday: []
   monday:                               # the template of multiple tradable session in one day

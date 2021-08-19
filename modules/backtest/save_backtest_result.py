@@ -15,7 +15,7 @@ def save_result(backtest_result):
     locak_path = local_dir + "/" + file_name
     if sys.platform.startswith('linux') == False:
         locak_path = locak_path.replace('/','\\')
-
+    print(backtest_result["summary"])
     with open(locak_path, 'w', encoding='utf-8') as f:
         #json.dump(backtest_result, f,ensure_ascii=False, indent=4)
         json.dump(backtest_result, f,ensure_ascii=False)

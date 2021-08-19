@@ -127,6 +127,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
                                 # handle to strategy internal fuc to deal with order handling, calculations and etc
                                 self.strategy._round_check_before(tick)
                                 self.strategy._update_position()
+                            self.strategy._round_check_after_day(tick)
                         loop_tick_bar.update(1) 
             except Exception as e:
                 self.stop_by_error = True

@@ -1,3 +1,4 @@
+from datetime import datetime
 import os
 import sys
 sys.path.append(os.path.join(os.getcwd().split('xtraderbacktest')[0],'xtraderbacktest'))
@@ -11,6 +12,7 @@ import modules.other.sys_conf_loader as sys_conf_loader
 from abc import ABC, abstractmethod
 import pandas as pd
 import uuid
+
 
 class Strategy():
     def __init__(self,pars):
@@ -28,6 +30,8 @@ class Strategy():
         self._ohlc_counter_1m = {}
         self._mode = None
         self._max_df_len = sys_conf_loader.get_sys_conf()["bot"]["data_history_max_len"]
+        self._current_day = ""
+        self._all_product_info = sys_conf_loader.get_all_products_info()
     def _set_mode(self,mode):
         self._mode = mode
         self.order_manager = modules.common.order_manager.OrderManager(self.context["cash"],self.context["untradable_period"],self._mode,self.context["reverse_mode"])
@@ -105,6 +109,9 @@ class Strategy():
             if price <= tp and direction == "short":
                 return None
 
+        if volume < self._all_product_info[symbol]["minimum_lots"]:
+            return None
+
         if trailing_sl is not None:
             trailing_sl["base_line"] = trailing_sl["sl_price"]
 
@@ -133,10 +140,12 @@ class Strategy():
             "close_filled_price":0,
             "commission":0,
             "margin":0,
-            "profit":0
+            "profit":0,
+            "swap":0
         }
         self.order_manager._append_to_orders(order)
 
+        return order
 
     def modify_order(self,order_ref,fields):
         unwanted = set(["profit","margin","commission","close_filled_price","close_price","open_filled_price","open_price","status","close_date","open_date","create_date","filled"]) 
@@ -279,7 +288,16 @@ class Strategy():
         self._set_current_time(tick["date"])
         self.current_tick[tick["symbol"]] = tick
         self._process_order_manager(tick)
-        
+
+    def _round_check_after_day(self,tick):
+        if self._current_day == "":
+            self._current_day = tick["date"][0:10]
+        if tick["date"][0:10] !=  self._current_day:
+            # new day
+            self._current_day = tick["date"][0:10]
+            week_day = datetime.strptime(self._current_day,"%Y-%m-%d").weekday()
+            self.order_manager._round_check_after_day(week_day) 
+            
     
     def _round_check_after(self,tick):
         self._process_order_manager(tick)

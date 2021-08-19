@@ -44,7 +44,7 @@ class Position():
         
 
         margin = open_price * volume * margin_rate * contract_size
-        commission = all_products_info[symbol]["commission"]
+        commission = 0 - all_products_info[symbol]["commission"]
         new_position = {
             "order_ref":order_ref,
             "volume":volume,
@@ -62,6 +62,7 @@ class Position():
             "close_timestamp":None,
             "commission":commission,
             "status":"opening",
+            "swap":0,
             "margin":margin
         }
         self.current_position.append(new_position)
@@ -176,6 +177,25 @@ class Position():
         self.closed_fund[tick["date"]] = self.deposit
         return result
 
+    def _swaps_add(self,week_day):
+        results = []
+        for index, position in enumerate(self.current_position):
+            symbol = position["symbol"]
+            direction = position["direction"]
+            swap = all_products_info[symbol]["swaps"][direction] *  all_products_info[symbol]["point"] * all_products_info[symbol]["contract_size"]
+            is_triple = False
+            if week_day == all_products_info[symbol]["swaps"]["triple_day"]:
+                is_triple = True
+            if is_triple:
+                swap = swap*3
+            swap_total = position["swap"] + swap
+            self.current_position[index].update({"swap":swap_total})
+            position["swap"] = swap_total
+            p = position.copy()
+            p.pop("direction")
+            results.append(p)
+        return results
+        
     def get_total_current_volume(self,symbol):
         volume = 0
         for item in self.orders:
