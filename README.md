@@ -27,7 +27,9 @@ Microsoft Visual C++ Build Tools(https://visualstudio.microsoft.com/visual-cpp-b
 -   Multiple and custom timeframe supported(seconds,mins,days).
 -   Absolute no future data usage.
 -   Draw custom chart for analysis usage.
--   News and calendar supported.(ongoing)
+-   Market Event supported.  
+      -   Calendar Event
+      -   News Event(ongoing)
 -   Distribute nodes for optimizing parameters.(ongoing)
 -   Indicator calculate accelerate.(ongoing) 
 -   Live data feed and trading with.(ongoing)
