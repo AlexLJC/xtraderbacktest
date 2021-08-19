@@ -69,7 +69,7 @@ Here is the stock AAPL template.
 name: AAPL                              # symbol name
 point: 0.01                             # point value
 tick_size: 0.01                         # tick_size
-commission: 0                           # commission in currency
+commission: 0.1                         # commission in currency
 slippage: 0                             # slippage in points
 margin_rate: 1                          # margin rate 0.05 = 5%
 minimum_tp_sl: 3                        # minimum gap in points between entry price and tpsl price
@@ -78,7 +78,11 @@ spread: 5                               # the spread(between ask and bid) in poi
 type: stock                             # symbol type
 exchange: None                          # the trading exchange
 t+0: true                               # whether is t+0
-swaps:  0                               # the swaps in points
+swaps:                                  # the swaps in points
+  long: -2
+  short: -3
+  triple_day: 0                         # 0-Monday 6-Sunday
+minimum_lots: 1                         # minimum lot
 trade_session:                          # tradable session
   sunday: []
   monday:                               # the template of multiple tradable session in one day
