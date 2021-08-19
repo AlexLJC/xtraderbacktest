@@ -6,6 +6,7 @@ import logging
 import modules.other.sys_conf_loader as sys_conf_loader
 import modules.common.position 
 import modules.other.check_is_tradable as check_is_tradable
+import datetime 
 
 all_products_info = sys_conf_loader.get_all_products_info()
 class OrderManager():
@@ -77,21 +78,33 @@ class OrderManager():
             return result
         # Market Order
         should_open = False
-        if order["order_type"] == "market": 
-            should_open = True
-        elif order["order_type"] == "limit":
-            if order["direction"] == "long" and tick["ask_1"] <= order["limit_price"] :
+        should_delete = False
+        if order["order_type"] != "market":
+            if order["expiration"]!=0:
+                current_date = datetime.datetime.strptime(tick["date"],"%Y-%m-%d %H:%M:%S")
+                expire_date = datetime.datetime.strptime(order["create_date"],"%Y-%m-%d %H:%M:%S") + datetime.timedelta(seconds= order["expiration"])
+                if current_date > expire_date:
+                    should_delete = True
+        if should_delete is False:
+            if order["order_type"] == "market": 
                 should_open = True
-            elif order["direction"] == "short" and tick["bid_1"] >= order["limit_price"]:
-                should_open = True
-        elif order["order_type"] == "stop":
-            if order["direction"] == "long" and tick["ask_1"] >= order["limit_price"] :
-                should_open = True
-            elif order["direction"] == "short" and tick["bid_1"] <= order["limit_price"]:
-                should_open = True
-        if should_open:
+            elif order["order_type"] == "limit":
+                if order["direction"] == "long" and tick["ask_1"] <= order["limit_price"] :
+                    should_open = True
+                elif order["direction"] == "short" and tick["bid_1"] >= order["limit_price"]:
+                    should_open = True
+            elif order["order_type"] == "stop":
+                if order["direction"] == "long" and tick["ask_1"] >= order["limit_price"] :
+                    should_open = True
+                elif order["direction"] == "short" and tick["bid_1"] <= order["limit_price"]:
+                    should_open = True
+            if should_open:
+                result = order
+                result["status"] = "sending_open"
+        else:
+            self._close_or_delete(tick,order["order_ref"])
             result = order
-            result["status"] = "sending_open"
+            result["status"] = "delete"
         return result 
     
     def _round_check_open_filled(self,tick,order):
