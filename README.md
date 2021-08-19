@@ -11,7 +11,7 @@ Microsoft Visual C++ Build Tools(https://visualstudio.microsoft.com/visual-cpp-b
 -   Data feeds from local files.
     -   Safe fake ticks generate
     -   Real ticks supported. 
--   Multiple instruments supported.
+-   Multiple instruments supported, stocks,cfd,index,commodity, cryto and custom symbols.
 -   Reverse logic by one click.
 -   Custom trailing stop loss.
 -   Multiple take profit and stop loss.     
@@ -20,15 +20,14 @@ Microsoft Visual C++ Build Tools(https://visualstudio.microsoft.com/visual-cpp-b
 -   Backtest evaluation.
 -   Tick driven backtest.   
 -   Gap detection and avoid invaid orders.
--   Suitable for instruments: stocks,cfd,index,commodity, cryto and custom symbols. 
--   Slippage, commission simulation.
+-   Slippage, commission, swaps simulation.
 -   Parameters Optimization.    
 -   Custom untradable periods.  
 -   Tablib supported.   
 -   Multiple and custom timeframe supported(seconds,mins,days).
 -   Absolute no future data usage.
 -   Draw custom chart for analysis usage.
--   News supported.(ongoing)
+-   News and calendar supported.(ongoing)
 -   Distribute nodes for optimizing parameters.(ongoing)
 -   Indicator calculate accelerate.(ongoing) 
 -   Live data feed and trading with.(ongoing)
