@@ -189,7 +189,7 @@ Analyse the backtest result.
 Open /modules/backtest/evaluation/evaluation_dashboard.html and choose the backtest result as the file to open, after that the result should be shown on page.
 
 Template Result
-![Template Result](doc/image/backtest_result_template.png?raw=true "Title")
+![Template Result](doc/image/2021_08_19.png?raw=true "Title")
 
 
 # Existing Problems     
