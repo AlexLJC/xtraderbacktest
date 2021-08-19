@@ -21,7 +21,7 @@ class CalendarManager():
         file_path = sys_conf_loader.linux_windows_path_convert(file_path)
         files_list = os.listdir(file_path)
         result = None
-        with tqdm(total=len(files_list),desc="Calendar Loader") as bar:
+        with tqdm(total=len(files_list)+1,desc="Calendar Loader") as bar:
             for file_name in files_list:
                 if ".csv" in file_name:
                     df = pd.read_csv(file_path+file_name)
@@ -30,12 +30,14 @@ class CalendarManager():
                     else:
                         result = pd.concat([result,df],ignore_index=True)
                 bar.update(1)
-        bar.close()
-        result = result[["date","country","name","actual","previous","consensus","forecast"]]
-        result["date"].fillna(method='ffill',inplace=True)
-        #result["date"] = pd.to_datetime(result["date"])
-        result = result.sort_values(by=['date'])
-        result = result.reindex()
+        
+            result = result[["date","country","name","actual","previous","consensus","forecast"]]
+            result["date"].fillna(method='ffill',inplace=True)
+            #result["date"] = pd.to_datetime(result["date"])
+            result = result.sort_values(by=['date'])
+            result = result.reindex()
+            bar.update(1)
+            bar.close()
         return result
 
     # Return the events updated

@@ -36,6 +36,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
     def register_strategy(self,strategy):
         self.strategy = strategy
         self.strategy._set_mode("backtest")
+        self.strategy.init()
 
     def _generate_queue(self,fr,to):
         # generate fake ticks
@@ -226,6 +227,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
             "float_fund":self.strategy.order_manager.position.float_fund,
             "reverse_closed_fund":self.strategy.order_manager.reverse_position.closed_fund,
             "reverse_float_fund":self.strategy.order_manager.reverse_position.float_fund,
+            "custom_chart":self.strategy._custom_charts,
         }
         if pars["reverse_mode"] == "enable":
             position_analyser = backtest_result_analyse.TradeBook(self.strategy.order_manager.reverse_position.history_position)

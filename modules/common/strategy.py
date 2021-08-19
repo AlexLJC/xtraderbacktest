@@ -24,7 +24,7 @@ class Strategy():
         self.context["init_cash"] = self.context["cash"]
         self.current_time = None
         self.current_tick = {}
-        self._custom_chart = {}
+        self._custom_charts = {}
         self._history_data = {}
         self._ohlc_counter_dict = {}
         self._ohlc_counter_1m = {}
@@ -36,6 +36,11 @@ class Strategy():
     def _set_mode(self,mode):
         self._mode = mode
         self.order_manager = modules.common.order_manager.OrderManager(self.context["cash"],self.context["untradable_period"],self._mode,self.context["reverse_mode"])
+
+    # Init
+    @abstractmethod
+    def init(self):
+        pass
 
     # Handle Tick
     @abstractmethod
@@ -284,9 +289,38 @@ class Strategy():
             self.close_order(order_ref)
     #  chart_name (point top-triangle bot-triangle bar) for linear
     def create_chart(self,chart_name,chart_type='linear',base_color = 'black',window='default',y_name = "y",size = 5):
-        pass
+        if self._mode != "backtest":
+            return False
+        new_chart = {}
+        if chart_name in self._custom_charts.keys():
+            logging.error('chart ' + chart_name+' already exist')
+            return False
+        new_chart["type"] = chart_type
+        new_chart["base_color"] = base_color    
+        new_chart["window"] = window
+        new_chart["y_name"] = y_name
+        new_chart["symbol_size"] = size
+        new_chart["data"] = []
+        self._custom_charts[chart_name] = new_chart
+        return True
+
     def draw_chart(self,chart_name,y,x=None,shape='point',point_color='black'):
-        pass
+        if self._mode != "backtest":
+            return 
+        if chart_name in self._custom_charts.keys():
+            new_data = {}
+            if x is None:
+                new_data['x'] = self.current_time
+            else:
+                new_data['x'] = x
+            if y is None:
+                return 
+            new_data['y'] = y
+            new_data['shape'] = shape
+            new_data['point_color'] = point_color
+            self._custom_charts[chart_name]["data"].append(new_data)
+        else:
+            logging.error('chart ' + chart_name + ' not exist')
 
      # Send Order
     def _send_order(self,order):

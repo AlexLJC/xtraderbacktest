@@ -9,8 +9,11 @@ import modules.common.technical_indicators as ti
 class Bot(modules.common.strategy.Strategy):
     def __init__(self,pars):
         super(Bot,self).__init__(pars)
-
-    
+        
+    # Init
+    def init(self):
+        self.create_chart("ma_fast")
+        self.create_chart("ma_slow")
 
     # Handle Tick
     def handle_tick(self, tick):
@@ -24,6 +27,8 @@ class Bot(modules.common.strategy.Strategy):
         df = self.get_bars(bar["symbol"],30,period)
         ma_fast = ti.MA(df,self.pars["ma_fast"]).iloc[-1]
         ma_slow = ti.MA(df,self.pars["ma_slow"]).iloc[-1]
+        self.draw_chart("ma_fast",ma_fast)
+        self.draw_chart("ma_slow",ma_slow)
         if ma_fast > ma_slow:
             if len(self.get_current_position(direction="long")) ==0:
                 self.open_order(bar["symbol"],"market",self.pars["lots"],"long")
