@@ -16,6 +16,11 @@ def get_sys_path():
         result = result.replace('/','\\')
     return result
 
+def linux_windows_path_convert(path):
+    if sys.platform.startswith('linux') == False:
+        path = path.replace('/','\\')
+    return path
+
 '''
 Read the configurations which are in json format
 '''

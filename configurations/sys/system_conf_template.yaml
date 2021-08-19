@@ -74,6 +74,10 @@ backtest_conf:                                # the configuration of backtest mo
     is_fake: true                             # using fake ticks
     real:                                     # real ticks configuration
       location: /data/ticks/                  # real ticks location
+  calendar:                                   # the configuration of calendar for backtest
+    location: /data/calendar/                 # the location of calendar events
+    type: local                               # choose the folder's location: local,s3,ftp...  
+    delay: 60                                 # delay seconds for simulation    
 timezone: US/Eastern                          # time zone of the system(for display correct backtest result)
 timeformat: "%Y-%m-%d %H:%M:%S"               # time format
 logger:                                       # the logger configuration

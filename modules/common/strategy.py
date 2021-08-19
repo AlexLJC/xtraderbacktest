@@ -32,6 +32,7 @@ class Strategy():
         self._max_df_len = sys_conf_loader.get_sys_conf()["bot"]["data_history_max_len"]
         self._current_day = ""
         self._all_product_info = sys_conf_loader.get_all_products_info()
+        self.calendar_list = []
     def _set_mode(self,mode):
         self._mode = mode
         self.order_manager = modules.common.order_manager.OrderManager(self.context["cash"],self.context["untradable_period"],self._mode,self.context["reverse_mode"])
@@ -48,6 +49,25 @@ class Strategy():
         logging.debug(bar)
         pass
     
+    # Handle Events: Calendar Events, News
+    '''
+    event_template = {
+        "type": "calendar",
+        "body":{
+            "date":"2021-07-01 11:30:00",
+            "country":"US",
+            "name":"Challenger Job Cuts JUN",
+            "actual":"20.476K",
+            "previous":"24.586K",
+            "consensus":None,
+            "forecast":"30K"
+        }
+    }
+    '''
+    @abstractmethod
+    def handle_event(self, event):
+        pass
+
     '''
     mutiple_exits = [
         {
@@ -314,9 +334,11 @@ class Strategy():
             if result is not None:
                 results.append(result)
         new_bar_1m = self._ohlc_counter_1m[tick["symbol"]].update(tick["last_price"],tick["date"],tick["volume"],tick["open_interest"])
+        new_1m = False
         if new_bar_1m is not None:
             self._append_history_data(new_bar_1m)
-        return results
+            new_1m = True
+        return results,new_1m
 
     def _append_history_data(self,ohlc):
         new_ohlc_list =[ohlc.open,ohlc.high,ohlc.low,ohlc.close,ohlc.volume,ohlc.open_interest,ohlc.symbol]

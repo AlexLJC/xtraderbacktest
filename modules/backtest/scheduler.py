@@ -14,6 +14,7 @@ import modules.other.date_converter as date_converter
 import modules.backtest.save_backtest_result as save_backtest_result
 import modules.backtest.backtest_result_analyse as backtest_result_analyse
 import modules.price_engine.tick_loader as tick_loader
+import modules.backtest.calendar_manager 
 
 import pandas as pd
 from tqdm import tqdm
@@ -31,6 +32,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
         self.ohlc = {}
         self.tick_queue = queue.Queue()
         self.stop_by_error = False
+        self._calendar_manager = None
     def register_strategy(self,strategy):
         self.strategy = strategy
         self.strategy._set_mode("backtest")
@@ -82,6 +84,10 @@ class Scheduler(modules.common.scheduler.Scheduler):
                     tick = self.tick_queue.get()
                     if "end" not in tick.keys():
                         date_str = tick["date"][0:-3]
+                        if self._calendar_manager is None:
+                            self._calendar_manager = modules.backtest.calendar_manager.CalendarManager(tick["date"])
+                            calendar_event_list = self._calendar_manager.get_events()
+                            self.strategy.calendar_list.extend(calendar_event_list)
                         # handle to strategy internal fuc to deal with basic info, such as datetime
                         self.strategy._round_check_before(tick)
                         if last_min_str == date_str:
@@ -97,7 +103,18 @@ class Scheduler(modules.common.scheduler.Scheduler):
                                 logging.error("Error in handle tick.")
                                 logging.exception(e)
                         # handle to strategy internal fuc to deal with order handling, calculations and etc
-                        new_bars = self.strategy._round_check_after(tick)
+                        new_bars,new_1m = self.strategy._round_check_after(tick)
+                        if new_1m:
+                            calendar_event_list = self._calendar_manager.round_check(tick["date"])
+                            if len(calendar_event_list) > 0:
+                                for event in calendar_event_list:
+                                    e = {
+                                        "type": "calendar",
+                                        "body":event
+                                    }
+                                    self.strategy.handle_event(e)
+                                self.strategy.calendar_list.extend(calendar_event_list)
+
                         # if there is a new bar for the timeframe specified by strategy
                         if len(new_bars) > 0 :
                             for new_bar in new_bars:
