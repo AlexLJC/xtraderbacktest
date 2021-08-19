@@ -9,7 +9,7 @@ import modules.common.technical_indicators as ti
 class Bot(modules.common.strategy.Strategy):
     def __init__(self,pars):
         super(Bot,self).__init__(pars)
-        
+
     
 
     # Handle Tick
@@ -32,6 +32,11 @@ class Bot(modules.common.strategy.Strategy):
             if len(self.get_current_position(direction="short")) ==0:
                 self.open_order(bar["symbol"],"market",self.pars["lots"],"short")
             self.close_all_position(direction="long")
+        pass
+    
+    # Handle Event
+    def handle_event(self, event):
+        #print(event)
         pass
 
 if __name__ == "__main__":
