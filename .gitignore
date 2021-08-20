@@ -145,3 +145,5 @@ __cache__/
 !/data/calendar/2012_12_22.csv
 /configurations/symbols_report/*.xml
 !/configurations/symbols_report/AAPL.xml
+
+/data/demo_scanner/*/
