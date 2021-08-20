@@ -1,5 +1,5 @@
 # xtraderbacktest
-This project is a backtest system for trading algo.   
+This project is a trading system for trading algo. It includes backtest, market scan and live trading features.
 Star it if you like and keep tracking the updates.
 
 # Requirements      
