@@ -3,6 +3,7 @@ import os
 import sys
 import json
 import yaml
+import xmltodict
 
 '''
 Here I use a trick that all scripts run in this python projects start with a same path 
@@ -47,6 +48,28 @@ def read_configs_yaml(file_name,file_path):
         file.close()
     return results
 
+def _xml2dict(file_name):
+    file_object = open(file_name,encoding = 'utf-8')                                                                                                            
+    try:
+        all_the_xmlStr = file_object.read()
+    finally:
+        file_object.close()
+    #xml To dict 
+    convertedDict = xmltodict.parse(all_the_xmlStr)
+    return convertedDict
+'''
+Read the configurations which are in xml format
+'''
+def read_configs_xml(file_name,file_path):
+    result = None
+    if sys.platform.startswith('linux') == False:
+        file_path = file_path.replace('/','\\')
+    path = get_sys_path() + file_path + file_name
+    if sys.platform.startswith('linux') == False:
+        path = path.replace('/','\\')
+    result = _xml2dict(path)
+    return result
+
 '''
 Short cut for get all products info
 '''
@@ -75,6 +98,22 @@ def get_product_info(symbol):
             break
     json_obj = read_configs_yaml(file_,file_path) 
     result = json_obj
+    return result
+
+'''
+Short cut for get all products reports
+'''
+def get_all_products_report():
+    file_list = []
+    file_path = "/configurations/symbols_report/"
+    for filename in os.listdir(get_sys_path()+ file_path):
+        if filename.endswith(".xml") : 
+            file_list.append(filename)
+        continue
+    result = {}
+    for file_name in file_list:
+        json_obj = read_configs_xml(file_name,file_path) 
+        result[file_name.replace('.xml','')] = json_obj
     return result
 
 '''

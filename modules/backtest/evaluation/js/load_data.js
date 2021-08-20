@@ -2,47 +2,48 @@
 function load(backtest_result,file_name){
     candle_chart_holder = document.getElementById("candle_chart_holder");
     candle_chart_holder.innerHTML = "";
-    var chart = LightweightCharts.createChart(candle_chart_holder, 
-        { 
-            width: candle_chart_holder.offsetWidth,
-            height: window.innerHeight/2 ,
-            timeScale: {
-                timeVisible: true,
-                borderColor: '#D1D4DC',
-            },
-            rightPriceScale: {
-                borderColor: '#D1D4DC',
-            },
-            layout: {
-                backgroundColor: '#ffffff',
-                textColor: '#000',
-            },
-            grid: {
-                horzLines: {
-                    color: '#F0F3FA',
-                },
-                vertLines: {
-                    color: '#F0F3FA',
-                },
-            },
-            
-        } 
-       
-        
-    );
-    chart.applyOptions({
-        watermark: {
-            color: 'rgba(11, 94, 29, 0.4)',
-            visible: true,
-            text: 'Backtest Evaluation ' + file_name,
-            fontSize: 24,
-            horzAlign: 'left',
-            vertAlign: 'bottom',
-        },
-    });
+    
     
     
     for(var symbol in backtest_result["price_data"]){
+        var chart = LightweightCharts.createChart(candle_chart_holder, 
+            { 
+                width: candle_chart_holder.offsetWidth,
+                height: window.innerHeight/2 ,
+                timeScale: {
+                    timeVisible: true,
+                    borderColor: '#D1D4DC',
+                },
+                rightPriceScale: {
+                    borderColor: '#D1D4DC',
+                },
+                layout: {
+                    backgroundColor: '#ffffff',
+                    textColor: '#000',
+                },
+                grid: {
+                    horzLines: {
+                        color: '#F0F3FA',
+                    },
+                    vertLines: {
+                        color: '#F0F3FA',
+                    },
+                },
+                
+            } 
+           
+            
+        );
+        chart.applyOptions({
+            watermark: {
+                color: 'rgba(11, 94, 29, 0.4)',
+                visible: true,
+                text: 'Backtest Evaluation ' + file_name,
+                fontSize: 24,
+                horzAlign: 'left',
+                vertAlign: 'bottom',
+            },
+        });
         var candlestickSeries = chart.addCandlestickSeries(
             {
                 upColor: 'rgb(38,166,154)',
@@ -76,7 +77,12 @@ function load(backtest_result,file_name){
             
         }
         candlestickSeries.setMarkers(markers_orders);
+
+        // Custom Chart
     }
+
+
+
     
     document.getElementById("win_rate").innerHTML = Math.floor(backtest_result["summary"]["win_rate"] * 100).toString(10) + '<sup style="font-size: 20px">%</sup>';
     document.getElementById("long_win_rate").innerHTML = Math.floor(backtest_result["summary"]["long_win_rates"] * 100).toString(10) + '<sup style="font-size: 20px">%</sup>';

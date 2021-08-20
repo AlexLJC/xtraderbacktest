@@ -1,0 +1,26 @@
+{
+    "account_id":"demo_account",
+    "period":["10m"],
+    "backtest_graininess":"5m",
+    "platform":"IB",
+    "start_date": "2019-10-25 08:47:00",
+    "end_date": "2019-10-29 19:59:00",
+    "strategy_name_code": "DM",
+    "strategy_name": "demo_scanner",
+    "reverse_mode":"enable",
+    "calendar_event":"enable",
+    "cash":10000,
+    "untradable_period":[
+        {
+            "start":"23:59:59",
+            "end":"23:59:59"
+        }
+    ],
+    "tag":"demo",
+    "custom":{
+        "price_larger_than": 100
+    },
+    "symbol_rules":{
+        "total_float":40000000
+    }
+}

@@ -143,3 +143,5 @@ __cache__/
 !/configurations/strategy/optmize/demo_strategy/demo_opt.json
 
 !/data/calendar/2012_12_22.csv
+/configurations/symbols_report/*.xml
+!/configurations/symbols_report/AAPL.xml

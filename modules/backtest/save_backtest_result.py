@@ -32,3 +32,16 @@ def save_result(backtest_result):
         elif remote_stroage_type == "ftp":
             import modules.remote_storage.ftp as ftp
             ftp.file_write(file_name,file_path_remote,json.dumps(backtest_result))
+
+def save_scanner_result(scanner_result,strategy_name):
+    local_dir = os.path.join(os.getcwd().split('xtraderbacktest')[0],'xtraderbacktest','data','scanner_results',strategy_name)
+    if not os.path.exists(local_dir):
+        os.makedirs(local_dir)
+    file_name = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f") + ".json"
+    locak_path = local_dir + "/" + file_name
+    if sys.platform.startswith('linux') == False:
+        locak_path = locak_path.replace('/','\\')
+    with open(locak_path, 'w', encoding='utf-8') as f:
+        #json.dump(backtest_result, f,ensure_ascii=False, indent=4)
+        json.dump(scanner_result, f,ensure_ascii=False)
+    f.close()

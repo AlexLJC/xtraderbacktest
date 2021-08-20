@@ -292,22 +292,29 @@ class Strategy():
         if self._mode != "backtest":
             return False
         new_chart = {}
-        if chart_name in self._custom_charts.keys():
-            logging.error('chart ' + chart_name+' already exist')
-            return False
-        new_chart["type"] = chart_type
-        new_chart["base_color"] = base_color    
-        new_chart["window"] = window
-        new_chart["y_name"] = y_name
-        new_chart["symbol_size"] = size
-        new_chart["data"] = []
-        self._custom_charts[chart_name] = new_chart
+
+        for symbol in self.context["symbols"]:
+            if symbol not in self._custom_charts.keys():
+                self._custom_charts[symbol] = {}
+
+            if chart_name in self._custom_charts[symbol].keys():
+                logging.error('chart ' + chart_name+' already exist')
+                return False
+            new_chart["type"] = chart_type
+            new_chart["base_color"] = base_color    
+            new_chart["window"] = window
+            new_chart["y_name"] = y_name
+            new_chart["symbol_size"] = size
+            new_chart["data"] = []
+            self._custom_charts[symbol][chart_name] = new_chart
         return True
 
-    def draw_chart(self,chart_name,y,x=None,shape='point',point_color='black'):
+    def draw_chart(self,chart_name,y,symbol,x=None,shape='point',point_color='black'):
         if self._mode != "backtest":
             return 
-        if chart_name in self._custom_charts.keys():
+        if symbol not in self._custom_charts.keys():
+            return 
+        if chart_name in self._custom_charts[symbol].keys():
             new_data = {}
             if x is None:
                 new_data['x'] = self.current_time
@@ -318,7 +325,7 @@ class Strategy():
             new_data['y'] = y
             new_data['shape'] = shape
             new_data['point_color'] = point_color
-            self._custom_charts[chart_name]["data"].append(new_data)
+            self._custom_charts[symbol][chart_name]["data"].append(new_data)
         else:
             logging.error('chart ' + chart_name + ' not exist')
 

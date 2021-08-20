@@ -27,3 +27,6 @@ in the ways you need.
 
 #   calendar    
 Fort mat should be as same as template file 2012_12_22.csv.
+
+#   scanner     
+There are the market scanner's data 

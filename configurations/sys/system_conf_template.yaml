@@ -78,6 +78,8 @@ backtest_conf:                                # the configuration of backtest mo
     location: /data/calendar/                 # the location of calendar events
     type: local                               # choose the folder's location: local,s3,ftp...  
     delay: 60                                 # delay seconds for simulation    
+  price_data_mode:                            # mode of storing prepared data
+    mode: ram                                 # ram - store in memory, would large memery but fast, disk - read from disk realtime, less memory but slow     
 timezone: US/Eastern                          # time zone of the system(for display correct backtest result)
 timeformat: "%Y-%m-%d %H:%M:%S"               # time format
 logger:                                       # the logger configuration

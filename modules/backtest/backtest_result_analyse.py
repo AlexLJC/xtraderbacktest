@@ -9,7 +9,8 @@ class TradeBook():
 
     def summary(self):
         result = {}
-
+        if int(len(self.close_trades_df))==0:
+            return result
         # total number of trades
         result["total_trades"] = int(len(self.close_trades_df))
         result["total_long_trades"] = int(len(self.close_trades_df[self.close_trades_df["direction"] == "long"]))

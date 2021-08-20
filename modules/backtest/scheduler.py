@@ -29,13 +29,14 @@ class Scheduler(modules.common.scheduler.Scheduler):
         self.mode = mode
         self.fake_tick = sys_conf_loader.get_sys_conf()["backtest_conf"]["tick_mode"]["is_fake"]
         self.strategy = None
-        self.ohlc = {}
         self.tick_queue = queue.Queue()
         self.stop_by_error = False
         self._calendar_manager = None
+
     def register_strategy(self,strategy):
         self.strategy = strategy
         self.strategy._set_mode("backtest")
+        self.ohlc = OHLCManager(mode = sys_conf_loader.get_sys_conf()["backtest_conf"]["price_data_mode"]["mode"],symbols = strategy.context["symbols"],fr = self.strategy.context["start_date"],to = self.strategy.context["end_date"])
         self.strategy.init()
 
     def _generate_queue(self,fr,to):
@@ -44,7 +45,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
         # Get the set of date_list first
         date_set = set()
         for symbol in self.ohlc.keys():
-            df = self.ohlc[symbol].copy()
+            df = self.ohlc.get(symbol).copy()
             df = df[(df.index >= pd.to_datetime(fr)) & (df.index <= pd.to_datetime(to))].copy()
             date_set.update(pd.to_datetime(df.index.values).tolist())
         date_set = sorted(date_set)
@@ -52,11 +53,11 @@ class Scheduler(modules.common.scheduler.Scheduler):
             for date in date_set:
                 temp_ticks = {}
                 for symbol in self.ohlc.keys():
-                    if date in self.ohlc[symbol].index:
+                    if date in self.ohlc.get(symbol).index:
                         date_str = str(date)
                         if date_str not in temp_ticks.keys():
                             temp_ticks[date_str] = []
-                        row = self.ohlc[symbol].loc[date]
+                        row = self.ohlc.get(symbol).loc[date]
                         fake_ticks = ticks_generater.generate_fake_ticks(symbol,date,row)
                         temp_ticks[date_str].extend(fake_ticks)
                 # sort the temp ticks
@@ -169,17 +170,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
         # get the time from and to
         fr = self.strategy.context["start_date"]
         to = self.strategy.context["end_date"]
-        # get the data from price engine and save it in the dictionary of ohlc
-        logging.info("Loding data...")
-        with tqdm(total=len(symbols)) as pbar:
-            for symbol in symbols:
-                pre_load_mins = sys_conf_loader.get_sys_conf()["backtest_conf"]["price_preload"]
-                fr_load = (datetime.datetime.strptime(fr,TIMESTAMP_FORMAT) - datetime.timedelta(minutes=pre_load_mins)).strftime(TIMESTAMP_FORMAT)
-                self.ohlc[symbol] = price_loader.load_price(symbol,fr_load,to,"backtest")
-                pbar.update(1)
-        pbar.close()
-        
-        
+
         if self.fake_tick is False:
             # get real ticks
             real_ticks = []
@@ -194,14 +185,14 @@ class Scheduler(modules.common.scheduler.Scheduler):
             tick_t.start()
         # preload the dataframe into strategy
         for symbol in self.ohlc.keys():
-            df = self.ohlc[symbol].copy()
+            df = self.ohlc.get(symbol).copy()
             df = df[(df.index < pd.to_datetime(fr))].copy()
             self.strategy._preload_data(symbol,df)
         
         # start tick processing thread
         date_set = set()
         for symbol in self.ohlc.keys():
-            df = self.ohlc[symbol].copy()
+            df = self.ohlc.get(symbol).copy()
             df = df[(df.index >= pd.to_datetime(fr)) & (df.index <= pd.to_datetime(to))].copy()
             date_set.update(pd.to_datetime(df.index.values).tolist())
         date_set = sorted(date_set)
@@ -214,6 +205,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
         if self.stop_by_error is True:
             logging.error("Scheduler was stopped by error.")
             return 
+        
         logging.info("Start collecting backtest results.")
         
         pars = self.strategy.context
@@ -236,7 +228,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
         backtest_result["summary"] = position_analyser.summary()
         backtest_result["price_data"] = {}
         for symbol in self.ohlc.keys():
-            df = self.ohlc[symbol].copy()
+            df = self.ohlc.get(symbol).copy()
             df = df.reset_index()
             df['timestamp'] = df['date'].values.astype(np.int64) // 10 ** 9
             df['date'] = df["date"].dt.strftime("%Y-%m-%d %H:%M:%S")
@@ -244,6 +236,45 @@ class Scheduler(modules.common.scheduler.Scheduler):
             
         save_backtest_result.save_result(backtest_result)
 
+        if self.mode == "scanner":
+            logging.info("Saving scanner result")
+            scanner_result = self.strategy.scanner_result
+            save_backtest_result.save_scanner_result(scanner_result,strategy_name=self.strategy.context["strategy_name"])
+
         logging.info("Congratulation!! The backtest finished. Hope you find The Holy Grail.")
 
-        
+
+class OHLCManager():
+    def __init__(self,mode,symbols,fr,to):
+        self._mode = mode
+        self._symbols = symbols
+        self._ohlc = {}
+        self._fr = fr
+        self._to = to
+        pre_load_mins = sys_conf_loader.get_sys_conf()["backtest_conf"]["price_preload"]
+        self._fr_load = (datetime.datetime.strptime(fr,TIMESTAMP_FORMAT) - datetime.timedelta(minutes=pre_load_mins)).strftime(TIMESTAMP_FORMAT)
+        if mode == "ram":
+            # Load All into 
+            logging.info("Loding data into RAM...")
+            with tqdm(total=len(symbols)) as pbar:
+                for symbol in symbols:
+                    self._ohlc[symbol] = price_loader.load_price(symbol,self._fr_load,self._to,"backtest")
+                    pbar.update(1)
+            pbar.close()
+
+    def keys(self):
+        return self._symbols
+    
+    def get(self,symbol):
+        if self._mode == "ram":
+            return self._ohlc[symbol]
+        elif self._mode == "disk":
+            if symbol in self._ohlc.keys():
+                df = self._ohlc[symbol]
+            else:
+                df = price_loader.load_price(symbol,self._fr_load,self._to,"backtest",False)
+                if len(self._ohlc.keys()) > 10:
+                    # pop one
+                    del self._ohlc[list(self._ohlc.keys())[0]]
+                self._ohlc[symbol] = df
+            return df 

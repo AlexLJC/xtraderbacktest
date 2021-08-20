@@ -154,11 +154,11 @@ class Position():
 
     def _update_profit(self,tick):
         result = []
-        contract_size = all_products_info[tick["symbol"]]["contract_size"]
         float_pnl = 0
         margin = 0
         for index, position in enumerate(self.current_position):
             if position["symbol"] == tick["symbol"]:
+                contract_size = all_products_info[tick["symbol"]]["contract_size"]
                 if position["direction"] == "short":
                     profit = 0 - (tick["ask_1"] - position["open_filled_price"] ) * position["filled"] * contract_size
                 else:

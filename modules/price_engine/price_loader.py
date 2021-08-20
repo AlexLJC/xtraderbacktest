@@ -18,15 +18,15 @@ fr = from what time in format %Y-%m-%d %H:%M:%S
 to = from what time in format %Y-%m-%d %H:%M:%S
 mode = live or backtest
 '''
-def load_price(symbol,fr,to,mode):
+def load_price(symbol,fr,to,mode,print_log = True):
     result = None
     if mode == "live":
         result = _load_price_live(symbol,fr,to)
     elif mode == "backtest":
-        result = _load_price_backtest(symbol,fr,to)
+        result = _load_price_backtest(symbol,fr,to,print_log)
     return result
 
-def _load_price_backtest(symbol,fr,to):
+def _load_price_backtest(symbol,fr,to,print_log = True):
     # First construct the cache file name
     # The file name should be in this format XAUUSD_2020-01-02-01-01-00_2020-01-02-02-23-59_price.pickle
     file_name = symbol + '_' + str(fr).replace(':','-').replace(' ','-') + '_' + str(to).replace(':','-').replace(' ','-')  + "_price.pickle"
@@ -54,7 +54,8 @@ def _load_price_backtest(symbol,fr,to):
     # if there is cache file then load it locally
     if os.path.isfile(abs_path) is True:
         # read it form local file 
-        logging.info('Loding file '+file_name + ' Locally')
+        if print_log:
+            logging.info('Loding file '+file_name + ' Locally')
         df = pd.read_pickle(abs_path)
         result =  df
     else:
