@@ -146,4 +146,4 @@ __cache__/
 /configurations/symbols_report/*.xml
 !/configurations/symbols_report/AAPL.xml
 
-/data/demo_scanner/*/
+/data/scanner_results/*/

@@ -12,6 +12,7 @@ Microsoft Visual C++ Build Tools(https://visualstudio.microsoft.com/visual-cpp-b
     -   Safe fake ticks generate
     -   Real ticks supported. 
 -   Multiple instruments supported, stocks,cfd,index,commodity, cryto and custom symbols.
+-   Custom market scanner
 -   Reverse logic by one click.
 -   Custom trailing stop loss.
 -   Multiple take profit and stop loss.     
@@ -193,7 +194,15 @@ Open /modules/backtest/evaluation/evaluation_dashboard.html and choose the backt
 Template Result
 ![Template Result](doc/image/2021_08_19.png?raw=true "Title")
 
+## Scanner Start    
+Important note
+-   Scanner can operate all the actions which normal backtest can, which means you can place order and get the backtest result.
+-   The data in price folder should be matched with symbols_conf and symbols_report configurations as well.   
+-   The symbols_rules function is necessary to be implemented in custom scanner as the system would use it filter the symbols first.
+-   The price_data_mode in /configuration/sys/system_conf.yaml should be turn to "disk" if you are scanning extrem large amount of symbols. Otherwise it might blow up the memory.
+-   The scanner result would be stored in /data/scanner_results.
 
+The template of scanner is shown in /scanners/demo_scanner.py
 # Existing Problems     
 -   ~~Takes too much time in generating fake ticks.~~   
 -   ~~Fake ticks take too much memory.~~
