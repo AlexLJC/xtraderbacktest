@@ -164,12 +164,13 @@ function load(backtest_result,file_name){
         order = backtest_result["orders"][order_index]
         var t = {
            "Order Ref":order["order_ref"],
+           "Symbol":order["symbol"],
            "Direction":order["direction"],
            "Open Date":order["open_date"] ,
            "Open Price":order["open_filled_price"].toFixed(5) ,
            "Close Date":order["close_date"] ,
            "Close Price":order["close_filled_price"].toFixed(5) ,
-           "Profit":order["profit"] 
+           "Profit":order["profit"].toFixed(5) 
         };
         table_data.push(t);
     }
@@ -179,6 +180,7 @@ function load(backtest_result,file_name){
             data: table_data,
             aoColumns: [
                 { mData: "Order Ref" },
+                { mData: "Symbol" },
                 { mData: "Direction" },
                 { mData: "Open Date" },
                 { mData: "Open Price" },
