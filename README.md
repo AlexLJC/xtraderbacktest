@@ -10,7 +10,7 @@ Microsoft Visual C++ Build Tools(https://visualstudio.microsoft.com/visual-cpp-b
 # Features  
 -   Data feeds from local files.
     -   Safe fake ticks generate
-    -   Real ticks supported. 
+    -   Real ticks supported. Multilevel price and volume. 
 -   Multiple instruments supported, stocks,cfd,index,commodity, cryto and custom symbols.
 -   Custom market scanner
 -   Reverse logic by one click.
