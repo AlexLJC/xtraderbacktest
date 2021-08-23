@@ -12,8 +12,8 @@ class Bot(modules.common.strategy.Strategy):
         
     # Init
     def init(self):
-        self.create_chart("ma_fast")
-        self.create_chart("ma_slow")
+        self.create_chart("ma_fast",size=3,base_color="blue")
+        self.create_chart("ma_slow",size=3,base_color="red")
 
     # Handle Tick
     def handle_tick(self, tick):

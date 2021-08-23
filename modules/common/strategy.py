@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime,timedelta
 import os
 import sys
 sys.path.append(os.path.join(os.getcwd().split('xtraderbacktest')[0],'xtraderbacktest'))
@@ -301,7 +301,7 @@ class Strategy():
                 logging.error('chart ' + chart_name+' already exist')
                 return False
             new_chart["type"] = chart_type
-            new_chart["base_color"] = base_color    
+            new_chart["base_color"] = sys_conf_loader.get_color_code(base_color)    
             new_chart["window"] = window
             new_chart["y_name"] = y_name
             new_chart["symbol_size"] = size
@@ -321,7 +321,9 @@ class Strategy():
             else:
                 new_data['x'] = x
             if y is None:
-                return 
+                return
+            timestamp =  (pd.to_datetime(new_data['x']) - datetime(1970, 1, 1)) / timedelta(seconds=1)
+            new_data['x_timestamp'] = timestamp
             new_data['y'] = y
             new_data['shape'] = shape
             new_data['point_color'] = point_color

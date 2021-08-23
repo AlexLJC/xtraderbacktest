@@ -121,7 +121,12 @@ Get system configurations
 '''
 def get_sys_conf():
     return read_configs_yaml("system_conf.yaml","/configurations/sys/")
-
+'''
+Get the code of color
+'''
+def get_color_code(color):
+    color_conf =  read_configs_yaml("color.yaml","/configurations/common/")
+    return color_conf[color]["code"]
 
 if __name__ == "__main__":
     print("System path",get_sys_path())
