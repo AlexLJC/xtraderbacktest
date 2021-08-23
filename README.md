@@ -195,7 +195,8 @@ Analyse the backtest result.
 Open /modules/backtest/evaluation/evaluation_dashboard.html and choose the backtest result as the file to open, after that the result should be shown on page.
 
 Template Result
-![Template Result](doc/image/2021_08_23.png?raw=true "Title")
+![Template Result](doc/image/2021_08_23.png?raw=true "Title")   
+Template Result of multiple Symbols(AMD + AAPL)
 ![Template Result2](doc/image/2021_08_23_2.png?raw=true "Title")
 
 ## Scanner Start    
