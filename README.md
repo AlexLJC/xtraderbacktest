@@ -196,6 +196,7 @@ Open /modules/backtest/evaluation/evaluation_dashboard.html and choose the backt
 
 Template Result
 ![Template Result](doc/image/2021_08_23.png?raw=true "Title")
+![Template Result2](doc/image/2021_08_23_2.png?raw=true "Title")
 
 ## Scanner Start    
 Important note
