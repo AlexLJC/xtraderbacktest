@@ -291,7 +291,7 @@ class Strategy():
     def create_chart(self,chart_name,chart_type='linear',base_color = 'black',window='default',y_name = "y",size = 5):
         if self._mode != "backtest":
             return False
-        new_chart = {}
+        
 
         for symbol in self.context["symbols"]:
             if symbol not in self._custom_charts.keys():
@@ -300,6 +300,7 @@ class Strategy():
             if chart_name in self._custom_charts[symbol].keys():
                 logging.error('chart ' + chart_name+' already exist')
                 return False
+            new_chart = {}
             new_chart["type"] = chart_type
             new_chart["base_color"] = sys_conf_loader.get_color_code(base_color)    
             new_chart["window"] = window
@@ -314,7 +315,7 @@ class Strategy():
             return 
         if symbol not in self._custom_charts.keys():
             return 
-        if chart_name in self._custom_charts[symbol].keys():
+        if chart_name in self._custom_charts[symbol].keys() and symbol in self._custom_charts.keys():
             new_data = {}
             if x is None:
                 new_data['x'] = self.current_time
@@ -327,7 +328,9 @@ class Strategy():
             new_data['y'] = y
             new_data['shape'] = shape
             new_data['point_color'] = point_color
-            self._custom_charts[symbol][chart_name]["data"].append(new_data)
+            # logging.info("symbol "+ str(symbol) + " chart_name "+  chart_name + " y "+ str(y))
+            self._custom_charts[symbol][chart_name]["data"].append(new_data.copy())
+            
         else:
             logging.error('chart ' + chart_name + ' not exist')
 
