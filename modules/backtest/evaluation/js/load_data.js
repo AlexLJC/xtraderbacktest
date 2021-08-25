@@ -93,9 +93,9 @@ function load(backtest_result,file_name){
         volume_data = [];
         for(var bar_index in backtest_result["price_data"][symbol]){
             bar = backtest_result["price_data"][symbol][bar_index];
-            color = 'rgba(0, 150, 136, 0.8)';
+            color = 'rgba(255,82,82, 0.8)';
             if(bar["close"] - bar["open"] > 0){
-                color = 'rgba(255,82,82, 0.8)';
+                color = 'rgba(0, 150, 136, 0.8)' ;
             }
             volume_data.push({ time: bar["timestamp"], value:bar["volume"],color:color});
         }
@@ -108,7 +108,7 @@ function load(backtest_result,file_name){
                 console.log("Rendering Custom_chart",symbol,custom_chart_key);
                 custom_chart = custom_charts[custom_chart_key]
                 console.log(custom_chart);
-                if(custom_chart["type"] == "linear"){
+                if(custom_chart["type"] == "linear" && custom_chart["window"] == "default"){
                     var line_chart = chart.addLineSeries({
                         color: custom_chart["base_color"],
                         lineWidth: custom_chart["symbol_size"],
