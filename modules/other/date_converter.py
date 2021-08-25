@@ -20,8 +20,8 @@ Convert period string to numbers in min
 def convert_period_to_int(period):
     if "m" in period:
         return int(period.split('m')[0])
-    elif period == "1d":
-        return 1440
+    elif "d" in period:
+        return int(period.split('d')[0]) * 1440
     else:
         return None
 

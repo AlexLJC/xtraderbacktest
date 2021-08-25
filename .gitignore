@@ -148,7 +148,10 @@ __cache__/
 
 /data/scanner_results/*/
 
-/bots/*/
+/bots/*
 !/bots/demo_strategy.py
-/scanners/*/
+/scanners/*
 !/scanners/demo_scanner.py
+
+/configurations/scanner/*
+!/configurations/scanner/demo.json
