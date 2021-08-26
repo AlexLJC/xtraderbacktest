@@ -28,7 +28,13 @@ def _convert_int_to_weekday(i):
 def check_market_is_tradable(timestamp_str,symbol):
     current_time_compare = datetime.datetime.strptime(timestamp_str,"%Y-%m-%d %H:%M:%S").time()
     weekday = _convert_int_to_weekday(datetime.datetime.strptime(timestamp_str,"%Y-%m-%d %H:%M:%S").weekday())
-    market_time_list = all_products_info[symbol]["trade_session"][weekday]
+
+    if symbol not in all_products_info.keys():
+        s_temp = "_" +symbol.split("_")[1]
+    else:
+        s_temp = symbol
+
+    market_time_list = all_products_info[s_temp]["trade_session"][weekday]
     if len(market_time_list) > 0:
         for item in market_time_list:
             start_time = item[0].split(":")

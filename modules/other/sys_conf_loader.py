@@ -42,6 +42,7 @@ def read_configs_yaml(file_name,file_path):
     results = None
     if sys.platform.startswith('linux') == False:
         file_path = file_path.replace('/','\\')
+    print("FFFFFFFFFFFFUCK",file_name)
     path = get_sys_path() + file_path + file_name
     with open(path, 'r',encoding='utf-8') as file:
         results = yaml.safe_load(file)

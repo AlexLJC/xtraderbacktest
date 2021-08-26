@@ -49,7 +49,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
             df = df[(df.index >= pd.to_datetime(fr)) & (df.index <= pd.to_datetime(to))].copy()
             date_set.update(pd.to_datetime(df.index.values).tolist())
         date_set = sorted(date_set)
-        with tqdm(total=len(date_set),desc="Tick Generator") as process_tick_bar:
+        with tqdm(total=len(date_set),desc="Tick Generator",colour ="green") as process_tick_bar:
             for date in date_set:
                 temp_ticks = {}
                 for symbol in self.ohlc.keys():
@@ -58,6 +58,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
                         if date_str not in temp_ticks.keys():
                             temp_ticks[date_str] = []
                         row = self.ohlc.get(symbol).loc[date]
+                        print("F2",symbol)
                         fake_ticks = ticks_generater.generate_fake_ticks(symbol,date,row)
                         temp_ticks[date_str].extend(fake_ticks)
                 # sort the temp ticks
@@ -76,7 +77,11 @@ class Scheduler(modules.common.scheduler.Scheduler):
     def _loop_ticks(self,last_min_str,total_ticks):
         # loop ticks
         logging.info("Start running backtest.")
-        with tqdm(total=total_ticks,desc="Tick Looper") as loop_tick_bar:
+        display_dict = {
+            "cash":self.strategy.order_manager.position.cash,
+            "float_pnl":self.strategy.order_manager.position.float_pnl
+        }
+        with tqdm(total=total_ticks,desc="Tick Looper", postfix = display_dict, colour="green") as loop_tick_bar:
             try:
                 tick = {"start":"start"}
                 last_min_str = last_min_str[0:-3]
@@ -148,6 +153,12 @@ class Scheduler(modules.common.scheduler.Scheduler):
                                 self.strategy._update_position()
                             self.strategy._round_check_after_day(tick)
                         loop_tick_bar.update(1) 
+                        display_dict = {
+                            "cash":self.strategy.order_manager.position.cash,
+                            "float_pnl":self.strategy.order_manager.position.float_pnl
+                        }
+                        loop_tick_bar.set_postfix(display_dict)
+
             except Exception as e:
                 self.stop_by_error = True
                 logging.error("Internal Error.")
@@ -155,7 +166,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
         loop_tick_bar.close()
 
     def _send_real_ticks(self,real_ticks):
-        with tqdm(total=len(real_ticks),desc="Tick Sender") as loop_tick_bar:
+        with tqdm(total=len(real_ticks),desc="Tick Sender",color="green") as loop_tick_bar:
             for tick in real_ticks:
                 self.tick_queue.put(tick)
                 loop_tick_bar.update(1) 
@@ -256,7 +267,7 @@ class OHLCManager():
         if mode == "ram":
             # Load All into 
             logging.info("Loding data into RAM...")
-            with tqdm(total=len(symbols)) as pbar:
+            with tqdm(total=len(symbols),color="green") as pbar:
                 for symbol in symbols:
                     self._ohlc[symbol] = price_loader.load_price(symbol,self._fr_load,self._to,"backtest")
                     pbar.update(1)

@@ -134,7 +134,12 @@ class Strategy():
             if price <= tp and direction == "short":
                 return None
 
-        if volume < self._all_product_info[symbol]["minimum_lots"]:
+        if symbol not in self._all_product_info.keys():
+            s_temp = "_" + symbol.split("_")[1]
+        else:
+            s_temp = symbol
+
+        if volume < self._all_product_info[s_temp]["minimum_lots"]:
             return None
 
         if trailing_sl is not None:

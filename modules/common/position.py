@@ -23,10 +23,14 @@ class Position():
     def _open_position(self,tick,order,direction):
         symbol = order["symbol"]
         direction = direction
-        contract_size = all_products_info[symbol]["contract_size"]
-        margin_rate = all_products_info[symbol]["margin_rate"]
-        slippage = all_products_info[symbol]["slippage"]
-        tick_size = all_products_info[symbol]["tick_size"]
+        if symbol not in all_products_info.keys():
+            s_temp = "_" + order["symbol"].split("_")[1]
+        else:
+            s_temp = symbol
+        contract_size = all_products_info[s_temp]["contract_size"]
+        margin_rate = all_products_info[s_temp]["margin_rate"]
+        slippage = all_products_info[s_temp]["slippage"]
+        tick_size = all_products_info[s_temp]["tick_size"]
         is_gap = tick["is_gap"]
         order_type = order["order_type"]
         volume = order["volume"]
@@ -44,7 +48,7 @@ class Position():
         
 
         margin = open_price * volume * margin_rate * contract_size
-        commission = 0 - all_products_info[symbol]["commission"]
+        commission = 0 - all_products_info[s_temp]["commission"]
         new_position = {
             "order_ref":order_ref,
             "volume":volume,
@@ -95,7 +99,12 @@ class Position():
         result = None
         for index, position in enumerate(self.history_position):
             if position["order_ref"] == order_ref:
-                contract_size = all_products_info[position["symbol"] ]["contract_size"]
+                if position["symbol"]  not in all_products_info.keys():
+                    s_temp = "_" + position["symbol"].split("_")[1]
+                else:
+                    s_temp = position["symbol"] 
+
+                contract_size = all_products_info[s_temp ]["contract_size"]
                 if position["direction"] == "short":
                     profit = 0 - (close_price - position["open_filled_price"] ) * position["filled"] * contract_size 
                 else:
@@ -124,11 +133,17 @@ class Position():
         self.current_position.remove(p)
 
         symbol = position["symbol"]
-        slippage = all_products_info[symbol]["slippage"]
-        tick_size = all_products_info[symbol]["tick_size"]
+
+        if symbol  not in all_products_info.keys():
+            s_temp = "_" + symbol.split("_")[1]
+        else:
+            s_temp = symbol
+
+        slippage = all_products_info[s_temp]["slippage"]
+        tick_size = all_products_info[s_temp]["tick_size"]
         order_ref = position["order_ref"]
         is_gap = tick["is_gap"]
-        contract_size = all_products_info[symbol]["contract_size"]
+        contract_size = all_products_info[s_temp]["contract_size"]
         # Recalculate the close_price 
         if position["direction"] == "long":
             close_price = tick["bid_1"] - slippage * tick_size 
@@ -158,7 +173,12 @@ class Position():
         margin = 0
         for index, position in enumerate(self.current_position):
             if position["symbol"] == tick["symbol"]:
-                contract_size = all_products_info[tick["symbol"]]["contract_size"]
+                if position["symbol"]  not in all_products_info.keys():
+                    s_temp = "_" + position["symbol"].split("_")[1]
+                else:
+                    s_temp = position["symbol"]
+
+                contract_size = all_products_info[s_temp]["contract_size"]
                 if position["direction"] == "short":
                     profit = 0 - (tick["ask_1"] - position["open_filled_price"] ) * position["filled"] * contract_size
                 else:
@@ -182,9 +202,15 @@ class Position():
         for index, position in enumerate(self.current_position):
             symbol = position["symbol"]
             direction = position["direction"]
-            swap = all_products_info[symbol]["swaps"][direction] *  all_products_info[symbol]["point"] * all_products_info[symbol]["contract_size"]
+
+            if symbol not in all_products_info.keys():
+                s_temp = "_" + symbol.split("_")[1]
+            else:
+                s_temp = symbol
+
+            swap = all_products_info[s_temp]["swaps"][direction] *  all_products_info[s_temp]["point"] * all_products_info[s_temp]["contract_size"]
             is_triple = False
-            if week_day == all_products_info[symbol]["swaps"]["triple_day"]:
+            if week_day == all_products_info[s_temp]["swaps"]["triple_day"]:
                 is_triple = True
             if is_triple:
                 swap = swap*3

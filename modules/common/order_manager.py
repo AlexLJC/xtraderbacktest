@@ -135,7 +135,10 @@ class OrderManager():
             should_close,close_price = self._check_should_tp_sl(tick,order,tp,sl)
             if should_close is False:
                 # check if meets the requirement of moving sl price
-                point = all_products_info[order["symbol"]]["point"]
+                if order["symbol"] in all_products_info.keys():
+                    point = all_products_info[order["symbol"]]["point"]
+                else:
+                    point = all_products_info["_" + order["symbol"].split("_")[1]]["point"]
                 if order["direction"] == "long":
                     if tick["bid_1"] >= (order['trailing_sl']["base_line"] + order['trailing_sl']["gap"] * point):
                         order['trailing_sl']["sl_price"] = order['trailing_sl']["sl_price"] + order['trailing_sl']["gap"] * point * order['trailing_sl']["ratio"]
