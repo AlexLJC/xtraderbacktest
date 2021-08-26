@@ -30,16 +30,16 @@ class TradeBook():
         result["total_profit"] =result["total_long_profit"] + result["total_short_profit"]
 
         # avg
-        result["avg_profit"] = result["total_profit"] / result["total_trades"]
+        result["avg_profit"] = result["total_profit"] / result["total_trades"] if result["total_trades"] !=0 else 0
         result["avg_win"] = (overall_profit > 0).mean()
         result["avg_loss"] = (overall_profit < 0).mean()
-        result["avg_win/avg_loss"] = result["avg_win"]  / result["avg_loss"]
+        result["avg_win/avg_loss"] = result["avg_win"]  / result["avg_loss"] if result["avg_loss"] !=0 else 0
 
         # win rate
         result["long_win_trades"] = int((long_profit > 0).sum())
         result["short_win_trades"] = int((short_profit > 0).sum())
-        result["long_win_rates"] = result["long_win_trades"] / result["total_long_trades"] if result["total_trades"] !=0 else 0
-        result["short_win_rates"] = result["short_win_trades"] / result["total_short_trades"] if result["total_trades"] !=0 else 0
+        result["long_win_rates"] = result["long_win_trades"] / result["total_long_trades"] if result["total_long_trades"] !=0 else 0
+        result["short_win_rates"] = result["short_win_trades"] / result["total_short_trades"] if result["total_short_trades"] !=0 else 0
         result["win_rate"] = (result["long_win_trades"] + result["short_win_trades"]) / result["total_trades"] if result["total_trades"] !=0 else 0
 
         # max and min

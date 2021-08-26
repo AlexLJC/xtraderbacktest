@@ -36,7 +36,8 @@ class Scheduler(modules.common.scheduler.Scheduler):
     def register_strategy(self,strategy):
         self.strategy = strategy
         self.strategy._set_mode("backtest")
-        self.ohlc = OHLCManager(mode = sys_conf_loader.get_sys_conf()["backtest_conf"]["price_data_mode"]["mode"],symbols = strategy.context["symbols"],fr = self.strategy.context["start_date"],to = self.strategy.context["end_date"])
+        self.backtest_graininess = self.strategy.context["backtest_graininess"]
+        self.ohlc = OHLCManager(mode = sys_conf_loader.get_sys_conf()["backtest_conf"]["price_data_mode"]["mode"],symbols = strategy.context["symbols"],fr = self.strategy.context["start_date"],to = self.strategy.context["end_date"],graininess=self.backtest_graininess)
         self.strategy.init()
 
     def _generate_queue(self,fr,to):
@@ -44,12 +45,20 @@ class Scheduler(modules.common.scheduler.Scheduler):
         logging.info("Processing data before running backtest.")
         # Get the set of date_list first
         date_set = set()
-        for symbol in self.ohlc.keys():
-            df = self.ohlc.get(symbol).copy()
-            df = df[(df.index >= pd.to_datetime(fr)) & (df.index <= pd.to_datetime(to))].copy()
-            date_set.update(pd.to_datetime(df.index.values).tolist())
+        with tqdm(total=len(self.ohlc.keys()),desc="Processing Data",colour ="green") as bar:
+            for symbol in self.ohlc.keys():
+                df = self.ohlc.get(symbol).copy()
+                df = df[(df.index >= pd.to_datetime(fr)) & (df.index <= pd.to_datetime(to))].copy()
+                date_set.update(pd.to_datetime(df.index.values).tolist())
+                bar.update(1)
+            bar.close()
+        # freq = date_converter.convert_period_to_seconds_pandas(self.backtest_graininess)
+        # per1 = pd.date_range(start =fr, end =to, freq = freq)
+        # for val in per1:
+        #     date_set.add(val)
         date_set = sorted(date_set)
-        with tqdm(total=len(date_set),desc="Tick Generator",colour ="green") as process_tick_bar:
+        logging.info("Symbol length "+ str(len(self.ohlc.keys())) + " Date Length " + str(len(date_set)))
+        with tqdm(total= len(date_set),desc="Tick Generator",colour ="green") as process_tick_bar:
             for date in date_set:
                 temp_ticks = {}
                 for symbol in self.ohlc.keys():
@@ -58,9 +67,11 @@ class Scheduler(modules.common.scheduler.Scheduler):
                         if date_str not in temp_ticks.keys():
                             temp_ticks[date_str] = []
                         row = self.ohlc.get(symbol).loc[date]
-                        print("F2",symbol)
                         fake_ticks = ticks_generater.generate_fake_ticks(symbol,date,row)
                         temp_ticks[date_str].extend(fake_ticks)
+                    else:
+                        #print(date,"not in self.ohlc.get(symbol).index")
+                        pass
                 # sort the temp ticks
                 for date_str in temp_ticks.keys():
                     temp_ticks[date_str] = sorted(temp_ticks[date_str], key=lambda k: k['date']) 
@@ -70,13 +81,14 @@ class Scheduler(modules.common.scheduler.Scheduler):
                 for date_str in temp_ticks.keys():
                     for item in temp_ticks[date_str]:
                         self.tick_queue.put(item)
+
                 process_tick_bar.update(1)
         process_tick_bar.close()
         self.tick_queue.put({"end":"end"})
 
-    def _loop_ticks(self,last_min_str,total_ticks):
+    def _loop_ticks(self,last_min,total_ticks):
         # loop ticks
-        logging.info("Start running backtest.")
+        logging.info("Start looping ticks.")
         display_dict = {
             "cash":self.strategy.order_manager.position.cash,
             "float_pnl":self.strategy.order_manager.position.float_pnl
@@ -84,34 +96,28 @@ class Scheduler(modules.common.scheduler.Scheduler):
         with tqdm(total=total_ticks,desc="Tick Looper", postfix = display_dict, colour="green") as loop_tick_bar:
             try:
                 tick = {"start":"start"}
-                last_min_str = last_min_str[0:-3]
+                last_ticks = {}
                 while("end" not in tick.keys()):
                     while(self.tick_queue.empty()):
                         time.sleep(0.2) 
                     tick = self.tick_queue.get()
                     if "end" not in tick.keys():
-                        date_str = tick["date"][0:-3]
+                        date_str = tick["date"][0:10]
                         if self._calendar_manager is None and self.strategy.context["calendar_event"] == "enable":
                             self._calendar_manager = modules.backtest.calendar_manager.CalendarManager(tick["date"])
                             calendar_event_list = self._calendar_manager.get_events()
                             self.strategy.calendar_list.extend(calendar_event_list)
                         # handle to strategy internal fuc to deal with basic info, such as datetime
                         self.strategy._round_check_before(tick)
-                        if last_min_str == date_str:
-                            # if this is the last min of backtesting, then close all position
-                            self.strategy.close_all_position()
-                            self.strategy.withdraw_pending_orders()
-                        else:
-                            # otherwise hand to the strategy logic
-                            try:
-                                self.strategy.handle_tick(tick)
-                            except Exception as e:
-                                self.stop_by_error = True
-                                logging.error("Error in handle tick.")
-                                logging.exception(e)
+                        try:
+                            self.strategy.handle_tick(tick)
+                        except Exception as e:
+                            self.stop_by_error = True
+                            logging.error("Error in handle tick.")
+                            logging.exception(e)
                         # handle to strategy internal fuc to deal with order handling, calculations and etc
-                        new_bars,new_1m = self.strategy._round_check_after(tick)
-                        if new_1m and self.strategy.context["calendar_event"] == "enable":
+                        new_bars,new_grainness = self.strategy._round_check_after(tick)
+                        if new_grainness and self.strategy.context["calendar_event"] == "enable":
                             calendar_event_list = self._calendar_manager.round_check(tick["date"])
                             if len(calendar_event_list) > 0:
                                 for event in calendar_event_list:
@@ -137,17 +143,14 @@ class Scheduler(modules.common.scheduler.Scheduler):
                                     "open_interest":new_bar.open_interest,
                                     "period":new_bar.period,
                                 }
-                                if last_min_str != date_str:
-                                    try:
-                                        self.strategy.handle_bar(new_bar_dict,new_bar_dict["period"])
-                                    except Exception as e:
-                                        self.stop_by_error = True
-                                        logging.error("Error in handle bar.")
-                                        logging.exception(e)
-                                if last_min_str == date_str:
-                                    # if this is the last min of backtesting, then close all position
-                                    self.strategy.close_all_position()
-                                    self.strategy.withdraw_pending_orders()
+                                
+                                try:
+                                    self.strategy.handle_bar(new_bar_dict,new_bar_dict["period"])
+                                except Exception as e:
+                                    self.stop_by_error = True
+                                    logging.error("Error in handle bar.")
+                                    logging.exception(e)
+                                
                                 # handle to strategy internal fuc to deal with order handling, calculations and etc
                                 self.strategy._round_check_before(tick)
                                 self.strategy._update_position()
@@ -158,7 +161,14 @@ class Scheduler(modules.common.scheduler.Scheduler):
                             "float_pnl":self.strategy.order_manager.position.float_pnl
                         }
                         loop_tick_bar.set_postfix(display_dict)
+                        last_ticks[tick["symbol"]] = tick
 
+
+                # when it comes to end
+                self.strategy.close_all_position()
+                self.strategy.withdraw_pending_orders()
+                for symbol in last_ticks.keys():
+                    self.strategy._round_check_after(last_ticks[symbol])
             except Exception as e:
                 self.stop_by_error = True
                 logging.error("Internal Error.")
@@ -173,6 +183,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
         loop_tick_bar.close()
         self.tick_queue.put({"end":"end"})
     def start(self):
+        logging.info("Backtest Start.")
         if self.strategy is None:
             logging.error("There is no registered strategy.")
             return 
@@ -195,11 +206,15 @@ class Scheduler(modules.common.scheduler.Scheduler):
             tick_t = threading.Thread(target = self._generate_queue,args=(fr,to))
             tick_t.start()
         # preload the dataframe into strategy
-        for symbol in self.ohlc.keys():
-            df = self.ohlc.get(symbol).copy()
-            df = df[(df.index < pd.to_datetime(fr))].copy()
-            self.strategy._preload_data(symbol,df)
-        
+        logging.info("Preloading ohlc into strategy")
+        with tqdm(total=len(self.ohlc.keys()),desc="Preloading ohlc",colour="green") as bar:
+            for symbol in self.ohlc.keys():
+                df = self.ohlc.get(symbol).copy()
+                df = df[(df.index < pd.to_datetime(fr))].copy()
+                self.strategy._preload_data(symbol,df)
+                bar.update(1)
+            bar.close()
+
         # start tick processing thread
         date_set = set()
         for symbol in self.ohlc.keys():
@@ -207,9 +222,16 @@ class Scheduler(modules.common.scheduler.Scheduler):
             df = df[(df.index >= pd.to_datetime(fr)) & (df.index <= pd.to_datetime(to))].copy()
             date_set.update(pd.to_datetime(df.index.values).tolist())
         date_set = sorted(date_set)
-        last_min_str = date_set[-1].strftime('%Y-%m-%d %H:%M:%S')
+        # print(date_set)
+        # date_set = set()
+        # freq = date_converter.convert_period_to_seconds_pandas(self.backtest_graininess)
+        # per1 = pd.date_range(start =fr, end =to, freq = freq)
+        # for val in per1:
+        #     date_set.add(val)
+        # date_set = sorted(date_set)
+        
         total_ticks = len(date_set) * len(self.ohlc.keys()) * 4
-        strategy_t = threading.Thread(target = self._loop_ticks,args=(last_min_str,total_ticks))
+        strategy_t = threading.Thread(target = self._loop_ticks,args=("123",total_ticks))
         strategy_t.start()
         strategy_t.join()
 
@@ -256,20 +278,23 @@ class Scheduler(modules.common.scheduler.Scheduler):
 
 
 class OHLCManager():
-    def __init__(self,mode,symbols,fr,to):
+    def __init__(self, mode, symbols, fr, to, graininess="1m"):
         self._mode = mode
         self._symbols = symbols
         self._ohlc = {}
         self._fr = fr
         self._to = to
+        self.graininess = graininess
         pre_load_mins = sys_conf_loader.get_sys_conf()["backtest_conf"]["price_preload"]
         self._fr_load = (datetime.datetime.strptime(fr,TIMESTAMP_FORMAT) - datetime.timedelta(minutes=pre_load_mins)).strftime(TIMESTAMP_FORMAT)
         if mode == "ram":
             # Load All into 
             logging.info("Loding data into RAM...")
-            with tqdm(total=len(symbols),color="green") as pbar:
+            with tqdm(total=len(symbols),colour="green") as pbar:
                 for symbol in symbols:
-                    self._ohlc[symbol] = price_loader.load_price(symbol,self._fr_load,self._to,"backtest")
+                    df = price_loader.load_price(symbol,self._fr_load,self._to,"backtest",print_log=False)
+                    df = price_period_converter.convert(df,self.graininess)
+                    self._ohlc[symbol] = df
                     pbar.update(1)
             pbar.close()
 
@@ -284,7 +309,8 @@ class OHLCManager():
                 df = self._ohlc[symbol]
             else:
                 df = price_loader.load_price(symbol,self._fr_load,self._to,"backtest",False)
-                if len(self._ohlc.keys()) > 10:
+                df = price_period_converter.convert(df,self.graininess)
+                if len(self._ohlc.keys()) > 9999:
                     # pop one
                     del self._ohlc[list(self._ohlc.keys())[0]]
                 self._ohlc[symbol] = df

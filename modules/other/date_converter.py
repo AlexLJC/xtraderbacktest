@@ -37,3 +37,16 @@ def convert_period_to_seconds(period):
         return int(period.split('d')[0]) * 1440 * 60
     else:
         return None
+
+'''
+Convert period string to numbers in min. Supoorted seconds
+'''
+def convert_period_to_seconds_pandas(period):
+    if "s" in period:
+        return str(int(period.split('s')[0])) + "S" 
+    elif "m" in period:
+        return period.split('m')[0] + "T" 
+    elif "d" in period:
+        return period.split('d')[0] + "D"
+    else:
+        return None

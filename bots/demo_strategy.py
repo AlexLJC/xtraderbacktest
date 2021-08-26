@@ -25,6 +25,7 @@ class Bot(modules.common.strategy.Strategy):
         #logging.info("new bar "+bar["date"])
         #logging.info("current_time " + self.current_time)
         df = self.get_bars(bar["symbol"],30,period)
+        #print(df)
         ma_fast = ti.MA(df,self.pars["ma_fast"]).iloc[-1]
         ma_slow = ti.MA(df,self.pars["ma_slow"]).iloc[-1]
         self.draw_chart("ma_fast",ma_fast,symbol = bar["symbol"])

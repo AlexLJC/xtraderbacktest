@@ -27,7 +27,7 @@ class Strategy():
         self._custom_charts = {}
         self._history_data = {}
         self._ohlc_counter_dict = {}
-        self._ohlc_counter_1m = {}
+        self._ohlc_counter_graininess = {}
         self._mode = None
         self._max_df_len = sys_conf_loader.get_sys_conf()["bot"]["data_history_max_len"]
         self._current_day = ""
@@ -373,23 +373,23 @@ class Strategy():
     def _round_check_after(self,tick):
         self._process_order_manager(tick)
 
-        if tick["symbol"] not in self._ohlc_counter_1m.keys():
+        if tick["symbol"] not in self._ohlc_counter_graininess.keys():
             for period in self.context["period"]:
                 if period not in self._ohlc_counter_dict.keys():
                     self._ohlc_counter_dict[period] = {}
                 self._ohlc_counter_dict[period][tick["symbol"]] = modules.price_engine.ohlc.OHLCCounter(tick["symbol"],period)
-            self._ohlc_counter_1m[tick["symbol"]] = modules.price_engine.ohlc.OHLCCounter(tick["symbol"],"1m")
+            self._ohlc_counter_graininess[tick["symbol"]] = modules.price_engine.ohlc.OHLCCounter(tick["symbol"],self.context["backtest_graininess"])
         results = []
         for period in self.context["period"]:
             result = self._ohlc_counter_dict[period][tick["symbol"]].update(tick["last_price"],tick["date"],tick["volume"],tick["open_interest"])
             if result is not None:
                 results.append(result)
-        new_bar_1m = self._ohlc_counter_1m[tick["symbol"]].update(tick["last_price"],tick["date"],tick["volume"],tick["open_interest"])
-        new_1m = False
-        if new_bar_1m is not None:
-            self._append_history_data(new_bar_1m)
-            new_1m = True
-        return results,new_1m
+        new_bar_grainness = self._ohlc_counter_graininess[tick["symbol"]].update(tick["last_price"],tick["date"],tick["volume"],tick["open_interest"])
+        new_grainness = False
+        if new_bar_grainness is not None:
+            self._append_history_data(new_bar_grainness)
+            new_grainness = True
+        return results,new_grainness
 
     def _append_history_data(self,ohlc):
         new_ohlc_list =[ohlc.open,ohlc.high,ohlc.low,ohlc.close,ohlc.volume,ohlc.open_interest,ohlc.symbol]

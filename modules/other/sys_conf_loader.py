@@ -42,7 +42,6 @@ def read_configs_yaml(file_name,file_path):
     results = None
     if sys.platform.startswith('linux') == False:
         file_path = file_path.replace('/','\\')
-    print("FFFFFFFFFFFFUCK",file_name)
     path = get_sys_path() + file_path + file_name
     with open(path, 'r',encoding='utf-8') as file:
         results = yaml.safe_load(file)
@@ -99,6 +98,13 @@ def get_product_info(symbol,use_common = False):
         if filename.endswith(".yaml") and filename.split('.yaml')[0] == symbol: 
             file_ = filename
             break
+    if len(file_) == 0:
+        for filename in os.listdir(get_sys_path()+ file_path):
+            s_temp = "_"+ symbol.split("_")[1] 
+            if filename.endswith(".yaml") and filename.split('.yaml')[0] == s_temp: 
+                file_ = filename
+                break
+
     json_obj = read_configs_yaml(file_,file_path) 
     result = json_obj
     return result

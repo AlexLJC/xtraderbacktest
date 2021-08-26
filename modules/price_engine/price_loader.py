@@ -56,7 +56,12 @@ def _load_price_backtest(symbol,fr,to,print_log = True):
         # read it form local file 
         if print_log:
             logging.info('Loding file '+file_name + ' Locally')
-        df = pd.read_pickle(abs_path)
+        df = None
+        try:
+            df = pd.read_pickle(abs_path)
+        except Exception as e:
+            logging.error('Loding file '+file_name + ' Locally Error')
+            logging.exception(e)
         result =  df
     else:
         # Otherwise try to load it from remote storage if the plugin is on

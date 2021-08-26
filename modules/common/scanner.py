@@ -5,6 +5,7 @@ sys.path.append(os.path.join(os.getcwd().split('xtraderbacktest')[0],'xtraderbac
 import modules.common.strategy
 from abc import ABC, abstractmethod
 import modules.other.sys_conf_loader as sys_conf_loader
+import tqdm
 
 class Scanner(modules.common.strategy.Strategy):
     def __init__(self,pars):
@@ -13,10 +14,14 @@ class Scanner(modules.common.strategy.Strategy):
         price_location = sys_conf_loader.get_sys_path() + "/data/price/"
         if sys.platform.startswith('linux') == False:
             price_location = price_location.replace('/','\\')
-    
-        for filename in os.listdir(price_location):
-            if filename.endswith(".csv") : 
-                all_symbols.append(filename.replace('.csv',''))
+
+        filenames = os.listdir(price_location)
+        with tqdm.tqdm(total=len(filenames),desc="All symbols Loader", colour="green") as bar:
+            for filename in filenames:
+                if filename.endswith(".csv") : 
+                    all_symbols.append(filename.replace('.csv',''))
+                bar.update(1)
+            bar.close()
                 
         symbols = self.symbols_rules(all_symbols,symbol_reports,pars["symbol_rules"])
         pars["symbols"] = symbols
