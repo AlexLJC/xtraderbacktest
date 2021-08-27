@@ -5,7 +5,7 @@ sys.path.append(os.path.join(os.getcwd().split('xtraderbacktest')[0],'xtraderbac
 import datetime
 import json
 import modules.other.sys_conf_loader as sys_conf_loader
-
+import simplejson
 
 def save_result(backtest_result):
     local_dir = os.path.join(os.getcwd().split('xtraderbacktest')[0],'xtraderbacktest','data','backtest_results',backtest_result["pars"]["strategy_name"])
@@ -43,5 +43,5 @@ def save_scanner_result(scanner_result,strategy_name):
         locak_path = locak_path.replace('/','\\')
     with open(locak_path, 'w', encoding='utf-8') as f:
         #json.dump(backtest_result, f,ensure_ascii=False, indent=4)
-        json.dump(scanner_result, f,ensure_ascii=False)
+        simplejson.dump(scanner_result, f,ignore_nan=True)
     f.close()

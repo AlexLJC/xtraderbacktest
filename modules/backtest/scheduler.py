@@ -46,7 +46,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
         logging.info("Processing data before running backtest.")
         # Get the set of date_list first
         date_set = set()
-        with tqdm(total=len(self.ohlc.keys()),desc="Processing Data",colour ="green", position=0, leave=True, ascii=True) as bar:
+        with tqdm(total=len(self.ohlc.keys()),desc="Processing Data",colour ="green",  ascii=True) as bar:
             for symbol in self.ohlc.keys():
                 df = self.ohlc.get(symbol).copy()
                 df = df[(df.index >= pd.to_datetime(fr)) & (df.index <= pd.to_datetime(to))].copy()
@@ -59,7 +59,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
         #     date_set.add(val)
         date_set = sorted(date_set)
         logging.info("Symbol length "+ str(len(self.ohlc.keys())) + " Date Length " + str(len(date_set)))
-        with tqdm(total= len(date_set),desc="Tick Generator",colour ="green",position=0, leave=True, ascii=True) as process_tick_bar:
+        with tqdm(total= len(date_set),desc="Tick Generator",colour ="green", ascii=True) as process_tick_bar:
             for date in date_set:
                 temp_ticks = {}
                 for symbol in self.ohlc.keys():
@@ -91,11 +91,11 @@ class Scheduler(modules.common.scheduler.Scheduler):
         # loop ticks
         logging.info("Start looping ticks.")
         display_dict = {
-            "cash":self.strategy.order_manager.position.cash,
-            "pnl":self.strategy.order_manager.position.float_pnl,
+            "cash":str(self.strategy.order_manager.position.cash),
+            "pnl":str(self.strategy.order_manager.position.float_pnl),
             "date":""
         }
-        with tqdm(total=total_ticks,desc="Tick Looper", postfix = display_dict, colour="green", position=0, leave=True, ascii=True) as loop_tick_bar:
+        with tqdm(total=total_ticks,desc="Tick Looper", postfix = display_dict, colour="green", ascii=True) as loop_tick_bar:
             try:
                 tick = {"start":"start"}
                 last_ticks = {}
@@ -159,8 +159,8 @@ class Scheduler(modules.common.scheduler.Scheduler):
                             self.strategy._round_check_after_day(tick)
                         loop_tick_bar.update(1) 
                         display_dict = {
-                            "cash":self.strategy.order_manager.position.cash,
-                            "pnl":self.strategy.order_manager.position.float_pnl,
+                            "cash":str(self.strategy.order_manager.position.cash),
+                            "pnl":str(self.strategy.order_manager.position.float_pnl),
                             "date":tick["date"]
                         }
                         loop_tick_bar.set_postfix(display_dict)
@@ -179,7 +179,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
         loop_tick_bar.close()
 
     def _send_real_ticks(self,real_ticks):
-        with tqdm(total=len(real_ticks),desc="Tick Sender",color="green", position=0, leave=True, ascii=True) as loop_tick_bar:
+        with tqdm(total=len(real_ticks),desc="Tick Sender",color="green",  ascii=True) as loop_tick_bar:
             for tick in real_ticks:
                 self.tick_queue.put(tick)
                 loop_tick_bar.update(1) 
@@ -210,7 +210,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
             tick_t.start()
         # preload the dataframe into strategy
         logging.info("Preloading ohlc into strategy")
-        with tqdm(total=len(self.ohlc.keys()),desc="Preloading ohlc",colour="green", position=0, leave=True, ascii=True) as bar:
+        with tqdm(total=len(self.ohlc.keys()),desc="Preloading ohlc",colour="green",  ascii=True) as bar:
             for symbol in self.ohlc.keys():
                 df = self.ohlc.get(symbol).copy()
                 df = df[(df.index < pd.to_datetime(fr))].copy()
@@ -294,7 +294,7 @@ class OHLCManager():
             # Load All into 
             logging.info("Loading data into RAM...")
             
-            with tqdm(total=len(symbols),colour="green",  position=0, leave=True, ascii=True) as pbar:
+            with tqdm(total=len(symbols),colour="green",   ascii=True) as pbar:
                 for symbol in symbols:
                     try:
                         #print(symbol)

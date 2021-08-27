@@ -155,3 +155,7 @@ __cache__/
 
 /configurations/scanner/*
 !/configurations/scanner/demo.json
+
+/configurations/strategy/*
+!/configurations/strategy/optmize/demo_strategy/*
+!/configurations/strategy/single/demo_strategy/*

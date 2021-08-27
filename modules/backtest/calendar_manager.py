@@ -21,7 +21,7 @@ class CalendarManager():
         file_path = sys_conf_loader.linux_windows_path_convert(file_path)
         files_list = os.listdir(file_path)
         result = None
-        with tqdm(total=len(files_list)+1,desc="Calendar Loader", colour="green",position=0, leave=True, ascii=True) as bar:
+        with tqdm(total=len(files_list)+1,desc="Calendar Loader", colour="green", ascii=True) as bar:
             for file_name in files_list:
                 if ".csv" in file_name:
                     df = pd.read_csv(file_path+file_name)
@@ -44,7 +44,7 @@ class CalendarManager():
     def round_check(self,date):
         results = []
         self.current_date = date
-        new_index = len(self._df[self._df["date"]<self.current_date])
+        new_index = len(self._df[self._df["date"]<=self.current_date])
         if new_index > self._index:
             results = self._df[self._index-1:new_index-1].T.to_dict().values()
             self._index = new_index
