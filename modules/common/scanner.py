@@ -16,7 +16,7 @@ class Scanner(modules.common.strategy.Strategy):
             price_location = price_location.replace('/','\\')
 
         filenames = os.listdir(price_location)
-        with tqdm.tqdm(total=len(filenames),desc="All symbols Loader", colour="green") as bar:
+        with tqdm.tqdm(total=len(filenames),desc="All symbols Loader", colour="green", position=0, leave=True, ascii=True) as bar:
             for filename in filenames:
                 if filename.endswith(".csv") : 
                     all_symbols.append(filename.replace('.csv',''))
