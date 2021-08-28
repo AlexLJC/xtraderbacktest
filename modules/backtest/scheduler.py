@@ -82,6 +82,8 @@ class Scheduler(modules.common.scheduler.Scheduler):
                 for date_str in temp_ticks.keys():
                     for item in temp_ticks[date_str]:
                         self.tick_queue.put(item)
+                        while(self.tick_queue.qsize() > 10000):
+                            time.sleep(1)
 
                 process_tick_bar.update(1)
         process_tick_bar.close()
