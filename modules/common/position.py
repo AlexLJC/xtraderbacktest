@@ -67,7 +67,8 @@ class Position():
             "commission":commission,
             "status":"opening",
             "swap":0,
-            "margin":margin
+            "margin":margin,
+            "extra":order["extra"]
         }
         self.current_position.append(new_position)
         self.margin = self.margin + margin

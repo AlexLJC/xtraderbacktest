@@ -51,6 +51,7 @@ def _load_price_backtest(symbol,fr,to,print_log = True):
         abs_path = abs_path.replace('/','\\')
 
     result = None
+    sys_conf = sys_conf_loader.get_sys_conf()
     # if there is cache file then load it locally
     if os.path.isfile(abs_path) is True:
         # read it form local file 
@@ -65,7 +66,6 @@ def _load_price_backtest(symbol,fr,to,print_log = True):
         result =  df
     else:
         # Otherwise try to load it from remote storage if the plugin is on
-        sys_conf = sys_conf_loader.get_sys_conf()
         if(sys_conf["backtest_conf"]["price_remote_cache"]["is_on"] == True):
             remote_stroage_type = sys_conf["backtest_conf"]["price_remote_cache"]["type"]
             file_path_remote = sys_conf["backtest_conf"]["price_remote_cache"]["path"]

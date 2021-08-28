@@ -44,7 +44,7 @@ class CalendarManager():
     def round_check(self,date):
         results = []
         self.current_date = date
-        new_index = len(self._df[self._df["date"]<=self.current_date])
+        new_index = len(self._df[self._df["date"]<self.current_date])
         if new_index > self._index:
             results = self._df[self._index-1:new_index-1].T.to_dict().values()
             self._index = new_index
