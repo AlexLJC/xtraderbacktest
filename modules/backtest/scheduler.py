@@ -91,8 +91,8 @@ class Scheduler(modules.common.scheduler.Scheduler):
         # loop ticks
         logging.info("Start looping ticks.")
         display_dict = {
-            "cash":str(self.strategy.order_manager.position.cash),
-            "pnl":str(self.strategy.order_manager.position.float_pnl),
+            "cash":str(round(self.strategy.order_manager.position.cash,2)),
+            "pnl":str(round(self.strategy.order_manager.position.float_pnl,2)),
             "date":""
         }
         with tqdm(total=total_ticks,desc="Tick Looper", postfix = display_dict, colour="green", ascii=True) as loop_tick_bar:
@@ -159,8 +159,8 @@ class Scheduler(modules.common.scheduler.Scheduler):
                             self.strategy._round_check_after_day(tick)
                         loop_tick_bar.update(1) 
                         display_dict = {
-                            "cash":str(self.strategy.order_manager.position.cash),
-                            "pnl":str(self.strategy.order_manager.position.float_pnl),
+                            "cash":str(round(self.strategy.order_manager.position.cash,2)),
+                            "pnl":str(round(self.strategy.order_manager.position.float_pnl,2)),
                             "date":tick["date"]
                         }
                         loop_tick_bar.set_postfix(display_dict)
