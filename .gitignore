@@ -159,3 +159,5 @@ __cache__/
 /configurations/strategy/*
 !/configurations/strategy/optmize/demo_strategy/*
 !/configurations/strategy/single/demo_strategy/*
+
+/study

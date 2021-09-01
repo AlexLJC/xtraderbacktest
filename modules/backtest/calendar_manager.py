@@ -52,7 +52,7 @@ class CalendarManager():
 
     def get_events(self):
         results = []
-        df = self._df[self._df["date"]<self.current_date].copy()
+        df = self._df[self._df["date"]<=self.current_date].copy()
         results = df.T.to_dict().values()
         return results
 
