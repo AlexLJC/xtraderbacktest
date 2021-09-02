@@ -11,7 +11,11 @@ TIMESTAMP_FORMAT=sys_conf_loader.get_sys_conf()["timeformat"]
 
 # create file handler
 sys_conf = sys_conf_loader.get_sys_conf()
+
+if os.path.isdir(sys_conf_loader.get_sys_path() + sys_conf["logger"]["location"]) is False:
+    os.mkdir(sys_conf_loader.get_sys_path() + sys_conf["logger"]["location"])
 log_path = sys_conf_loader.get_sys_path() + sys_conf["logger"]["location"] + datetime.datetime.now().strftime("%Y-%m-%d") + ".log"
+
 if sys.platform.startswith('linux') == False:
     log_path = log_path.replace('/','\\')
 

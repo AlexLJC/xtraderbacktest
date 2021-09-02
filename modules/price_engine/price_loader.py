@@ -100,6 +100,8 @@ def _load_price_backtest(symbol,fr,to,print_log = True):
 def _load_local_price_storage(symbol,fr,to):
     abs_project_path = sys_conf_loader.get_sys_path() 
     price_folder = abs_project_path + "/data/price/"
+    if os.path.isdir(price_folder) is False:
+        os.mkdir(price_folder)
     abs_location  = price_folder + symbol + ".csv"
     if sys.platform.startswith('linux') == False:
         abs_location = abs_location.replace('/','\\')
