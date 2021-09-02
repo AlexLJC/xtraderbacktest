@@ -199,8 +199,8 @@ class Strategy():
             df = self._history_data[symbol].copy(deep = True)
             df = price_period_converter.convert(df,period)
             if end_date_str is not None:
-                df = df[(df.index <= pd.to_datetime(end_date_str))].copy()
-            result = df[0-count:-1].copy()
+                df = df[(df.index <= pd.to_datetime(end_date_str))].copy(deep = True)
+            result = df[0-count-1:-1].copy(deep = True)
         return result
 
         
@@ -392,7 +392,7 @@ class Strategy():
         return results,new_grainness
 
     def _append_history_data(self,ohlc):
-        new_ohlc_list =[ohlc.open,ohlc.high,ohlc.low,ohlc.close,ohlc.volume,ohlc.open_interest,ohlc.symbol]
+        new_ohlc_list =[ohlc.open,ohlc.high,ohlc.low,ohlc.close,ohlc.symbol,ohlc.volume,ohlc.open_interest]
         self._history_data[ohlc.symbol].loc[pd.to_datetime(ohlc.date)] = new_ohlc_list
         # Cut the unnecesary dataframe into 
         while self._history_data[ohlc.symbol].shape[0] > self._max_df_len:

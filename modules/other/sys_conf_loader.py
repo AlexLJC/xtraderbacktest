@@ -137,6 +137,9 @@ def get_color_code(color):
     color_conf =  read_configs_yaml("color.yaml","/configurations/common/")
     return color_conf[color]["code"]
 
+
+
+
 if __name__ == "__main__":
     print("System path",get_sys_path())
     print("System Conf",get_sys_conf())

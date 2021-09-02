@@ -215,7 +215,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
         with tqdm(total=len(self.ohlc.keys()),desc="Preloading ohlc",colour="green",  ascii=True) as bar:
             for symbol in self.ohlc.keys():
                 df = self.ohlc.get(symbol).copy()
-                df = df[(df.index < pd.to_datetime(fr))].copy()
+                df = df[(df.index < pd.to_datetime(fr))].copy(deep = True)
                 self.strategy._preload_data(symbol,df)
                 bar.update(1)
             bar.close()
