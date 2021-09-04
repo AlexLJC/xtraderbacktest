@@ -16,7 +16,7 @@ def MA_2(df, n):
 
 def vwap_session(df,today):
     df = df.copy(deep = True)
-    df = df.reindex()
+    df = df.reset_index()
     df = df[df['date'] > pd.to_datetime(today)]
     df["hlc"] = (df["high"] + df["low"] + df["close"] ) / 3
     df["hlc_value"] = df["hlc"] * df['volume']
