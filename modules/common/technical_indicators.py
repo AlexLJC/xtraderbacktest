@@ -8,8 +8,18 @@ def MA(df, n):
 
 
 def MA_2(df, n):
-    df = df.copy()
+    df = df.copy(deep = True)
     MA = df['close'].rolling(n).mean()
     MA = pd.Series(MA, name='MA')
     df = df.join(MA)
     return df
+
+def vwap_session(df,today):
+    df = df.copy(deep = True)
+    df = df.reindex()
+    df = df[df['date'] > pd.to_datetime(today)]
+    df["hlc"] = (df["high"] + df["low"] + df["close"] ) / 3
+    df["hlc_value"] = df["hlc"] * df['volume']
+    result = df["hlc_value"].mean()
+    return result
+    

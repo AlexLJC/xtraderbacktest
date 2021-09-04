@@ -259,19 +259,23 @@ class Strategy():
                     result.append(order)
         return result
 
-    def withdraw_pending_orders(self,direction = None,order_refs = None):
+    def withdraw_pending_orders(self,direction = None,order_refs = None,symbol = None):
         delete_list = []
         for order in self.order_manager._orders:
             if order["status"] == "pending_open":
                 condi_1 = True
                 condi_2 = True
+                condi_3 = True
                 if direction is not None:
                     if order["direction"] != direction:
                         condi_1 = False
                 if order_refs is not None:
                     if order["order_ref"]  not in order_refs:
-                        condi_2 = False    
-                if all([condi_1,condi_2]):
+                        condi_2 = False   
+                if symbol is not None:
+                    if order["symbol"] != symbol:
+                        condi_3 = False 
+                if all([condi_1,condi_2,condi_3]):
                     delete_list.append(order["order_ref"])
         for order_ref in delete_list:
             self.close_order(order_ref)
