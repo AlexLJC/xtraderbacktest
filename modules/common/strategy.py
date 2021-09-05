@@ -31,6 +31,7 @@ class Strategy():
         self._mode = None
         self._max_df_len = sys_conf_loader.get_sys_conf()["bot"]["data_history_max_len"]
         self._current_day = ""
+        self._current_day_filled = False
         self._all_product_info = sys_conf_loader.get_all_products_info()
         self.calendar_list = []
     def _set_mode(self,mode):
@@ -365,11 +366,13 @@ class Strategy():
         self._process_order_manager(tick)
 
     def _round_check_after_day(self,tick):
-        if self._current_day == "":
-            self._current_day = tick["date"][0:10]
-        if tick["date"][0:10] !=  self._current_day:
+        datetemp = tick["date"][0:10]
+        if self._current_day_filled is False:
+            self._current_day_filled = True
+            self._current_day = datetemp
+        if datetemp !=  self._current_day:
             # new day
-            self._current_day = tick["date"][0:10]
+            self._current_day = datetemp
             week_day = datetime.strptime(self._current_day,"%Y-%m-%d").weekday()
             self.order_manager._round_check_after_day(week_day) 
             
@@ -411,6 +414,8 @@ class Strategy():
 
     # update the profit in the current position
     def _update_position(self):
+        if len(self.order_manager.current_position) == 0:
+            return 
         for symbol in self.current_tick.keys():
             self.order_manager._update_profit(self.current_tick[symbol])
 

@@ -23,9 +23,12 @@ class OrderManager():
 
     # check the orders relevant to this tick
     def _round_check(self, tick):
+        if len(self._orders) ==0:
+            return 
         symbol = tick["symbol"]
         remove_list = []
         update_list = []
+        
         for order in self._orders:
             if order["symbol"] != symbol:
                 continue
@@ -176,6 +179,8 @@ class OrderManager():
         return should_close,close_price
     # it can only be called by backtest strategy
     def _filled_all_ing_orders(self,tick):
+        if len(self._orders) ==0:
+            return 
         update_list = []
         for order in self._orders:
             if tick["symbol"] == order["symbol"]:
@@ -228,6 +233,8 @@ class OrderManager():
                         self._orders[index] = order_update    
 
     def _check_sending_order(self,tick):
+        if len(self._orders) ==0:
+            return 
         update_list = []
         for order in self._orders:
             if order["status"] == "sending_open" or order["status"] == "sending_close": 
