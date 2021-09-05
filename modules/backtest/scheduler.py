@@ -93,7 +93,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
         # loop ticks
         logging.info("Start looping ticks.")
         display_dict = {
-            "cash":str(round(self.strategy.order_manager.position.cash,2)),
+            "cash":str(round(self.strategy.order_manager.position.deposit,2)),
             "pnl":str(round(self.strategy.order_manager.position.float_pnl,2)),
             "date":""
         }
@@ -161,7 +161,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
                             self.strategy._round_check_after_day(tick)
                         loop_tick_bar.update(1) 
                         display_dict = {
-                            "cash":str(round(self.strategy.order_manager.position.cash,2)),
+                            "cash":str(round(self.strategy.order_manager.position.deposit,2)),
                             "pnl":str(round(self.strategy.order_manager.position.float_pnl,2)),
                             "date":tick["date"]
                         }
