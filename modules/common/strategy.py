@@ -414,7 +414,7 @@ class Strategy():
 
     # update the profit in the current position
     def _update_position(self):
-        if len(self.order_manager.current_position) == 0:
+        if len(self.order_manager.position) == 0:
             return 
         for symbol in self.current_tick.keys():
             self.order_manager._update_profit(self.current_tick[symbol])
