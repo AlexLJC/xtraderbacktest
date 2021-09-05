@@ -20,6 +20,6 @@ def vwap_session(df,today):
     df = df[df['date'] > pd.to_datetime(today)]
     df["hlc"] = (df["high"] + df["low"] + df["close"] ) / 3
     df["hlc_value"] = df["hlc"] * df['volume']
-    result = df["hlc_value"].mean()
+    result = df["hlc_value"].sum() / df["volume"].sum()
     return result
     
