@@ -304,9 +304,13 @@ class OHLCManager():
                 for symbol in symbols:
                     try:
                         #print(symbol)
+                        #print(pre_post_market)
+                        #exit(0)
                         df = price_loader.load_price(symbol,self._fr_load,self._to,"backtest",print_log=False)
-                        df = price_period_converter.convert(df,self.graininess, pre_market=pre_post_market)
+                        df = price_period_converter.convert(df,self.graininess, pre_post_market = pre_post_market)
                         self._ohlc[symbol] = df
+                        #print(df)
+                        #exit(0)
                         pbar.update(1)
                     except Exception as e:
                         logging.error("Crash when loading data. " + symbol)

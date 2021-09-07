@@ -7,6 +7,7 @@ import logging
 from queue import Queue
 import datetime
 import modules.other.date_converter as date_converter
+import dateutil
 
 # Constant
 TIMESTAMP_FORMAT="%Y-%m-%d %H:%M:%S"
@@ -60,8 +61,12 @@ class OHLCCounter():
         date_current= datetime.datetime.strptime(timestamp_input,TIMESTAMP_FORMAT)
         int_time_now = date_current.timestamp()
         int_time_period = int_time_now - int_time_now % (self.interval)
-        obj_time_period = datetime.datetime.fromtimestamp(int_time_period)
+        if self.period == '1d':                                                     # TBD
+            obj_time_period = datetime.datetime.fromtimestamp(int_time_period,dateutil.tz.gettz('UTC'))
+        else:
+            obj_time_period = datetime.datetime.fromtimestamp(int_time_period)
         time_current_str=obj_time_period.strftime(TIMESTAMP_OHLC)
+        #print(self.period,time_current_str)
         return time_current_str
 
     # get the queue of ohlc

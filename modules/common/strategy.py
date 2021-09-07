@@ -198,6 +198,7 @@ class Strategy():
         result = None
         if symbol in self._history_data.keys():
             df = self._history_data[symbol].copy(deep = True)
+            #print(df)
             df = price_period_converter.convert(df,period)
             if end_date_str is not None:
                 df = df[(df.index <= pd.to_datetime(end_date_str))].copy(deep = True)
