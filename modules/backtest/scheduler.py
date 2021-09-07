@@ -38,7 +38,11 @@ class Scheduler(modules.common.scheduler.Scheduler):
         self.strategy = strategy
         self.strategy._set_mode("backtest")
         self.backtest_graininess = self.strategy.context["backtest_graininess"]
-        self.ohlc = OHLCManager(mode = sys_conf_loader.get_sys_conf()["backtest_conf"]["price_data_mode"]["mode"],symbols = strategy.context["symbols"],fr = self.strategy.context["start_date"],to = self.strategy.context["end_date"],graininess=self.backtest_graininess)
+        if self.strategy.context["pre_post_market"]  == "enable":
+            self.use_pre_post_market_data = True
+        else:
+            self.use_pre_post_market_data = False
+        self.ohlc = OHLCManager(mode = sys_conf_loader.get_sys_conf()["backtest_conf"]["price_data_mode"]["mode"],symbols = strategy.context["symbols"],fr = self.strategy.context["start_date"],to = self.strategy.context["end_date"],graininess=self.backtest_graininess,pre_post_market=self.use_pre_post_market_data)
         self.strategy.init()
 
     def _generate_queue(self,fr,to):
@@ -283,7 +287,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
 
 
 class OHLCManager():
-    def __init__(self, mode, symbols, fr, to, graininess="1m"):
+    def __init__(self, mode, symbols, fr, to, graininess="1m",pre_post_market = True):
         self._mode = mode
         self._symbols = symbols
         self._ohlc = {}
@@ -301,7 +305,7 @@ class OHLCManager():
                     try:
                         #print(symbol)
                         df = price_loader.load_price(symbol,self._fr_load,self._to,"backtest",print_log=False)
-                        df = price_period_converter.convert(df,self.graininess)
+                        df = price_period_converter.convert(df,self.graininess, pre_market=pre_post_market)
                         self._ohlc[symbol] = df
                         pbar.update(1)
                     except Exception as e:
