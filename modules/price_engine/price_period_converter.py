@@ -25,7 +25,7 @@ def convert(df, to_tf,mode="normal",pre_market = True):
             _df.index = _df.index + pd.to_timedelta(3,unit='h')
             _df.index = _df.index.apply(lambda x : x + pd.to_timedelta(2,unit='d') if x.dayofweek==5 else x)
     if pre_market is False:
-        _df = _df.between_time("09:30:00","16:00:00")
+        _df = _df.between_time("09:29:59","15:59:59")
     
     # If from_tf is bar (not tick)
     if from_tf > 0:
