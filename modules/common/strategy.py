@@ -194,11 +194,11 @@ class Strategy():
     def send_notification(self,message):
         pass
     
-    def get_bars(self,symbol,count,period,end_date_str = None):
+    def get_bars(self,symbol,count,period,end_date_str = None,pre_post_marekt = True):
         result = None
         if symbol in self._history_data.keys():
             df = self._history_data[symbol].copy(deep = True)
-            df = price_period_converter.convert(df,period)
+            df = price_period_converter.convert(df,period,pre_post_marekt)
             if end_date_str is not None:
                 df = df[(df.index <= pd.to_datetime(end_date_str))].copy(deep = True)
             result = df[0-count-1:-1].copy(deep = True)

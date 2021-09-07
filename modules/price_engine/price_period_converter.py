@@ -10,7 +10,7 @@ _f - dataframe in 1 min
 to_tf - to what time frame
 mode - normal or cn_future
 '''
-def convert(df, to_tf,mode="normal"):
+def convert(df, to_tf,mode="normal",pre_market = True):
     _df = df.copy()
     from_tf = 1
     if type(to_tf) == type("1m"):
@@ -24,6 +24,9 @@ def convert(df, to_tf,mode="normal"):
         if mode == "cn_future":
             _df.index = _df.index + pd.to_timedelta(3,unit='h')
             _df.index = _df.index.apply(lambda x : x + pd.to_timedelta(2,unit='d') if x.dayofweek==5 else x)
+    if pre_market is False:
+        _df = _df.between_time("09:30:00","16:00:00")
+    
     # If from_tf is bar (not tick)
     if from_tf > 0:
         ohlc_dict = {                                                                                                             
@@ -46,9 +49,9 @@ def convert(df, to_tf,mode="normal"):
 
 if __name__ == '__main__':
     import price_loader 
-    df = price_loader.load_price("AAPL_US","2019-02-15 09:41:00","2019-03-15 10:03:00","backtest")
+    df = price_loader.load_price("AAPL_US","2019-02-15 09:00:00","2019-02-15 19:00:00","backtest")
     print("Ordinary Dataframe in 1 min","\n",df)
-    print("Converted Dataframe in 5 min","\n",convert(df,5))
-    print("Converted Dataframe in 5 min","\n",convert(df,1440*7))
+    print("Converted Dataframe in 5 min","\n",convert(df,5,pre_market=False))
+    print("Converted Dataframe in weekly","\n",convert(df,1440*7))
     pass
     
