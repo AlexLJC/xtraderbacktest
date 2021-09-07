@@ -49,9 +49,9 @@ def convert(df, to_tf,mode="normal",pre_market = True):
 
 if __name__ == '__main__':
     import price_loader 
-    df = price_loader.load_price("AAPL_US","2019-02-15 09:00:00","2019-02-15 19:00:00","backtest")
-    print("Ordinary Dataframe in 1 min","\n",df)
-    print("Converted Dataframe in 5 min","\n",convert(df,5,pre_market=False))
-    print("Converted Dataframe in weekly","\n",convert(df,1440*7))
+    df = price_loader.load_price("AAPL_US","2021-07-01 08:00:00","2021-09-08 19:00:00","backtest")
+    #print("Ordinary Dataframe in 1 min","\n",df)
+    #print("Converted Dataframe in 5 min","\n",convert(df,5,pre_market=False))
+    #print("Converted Dataframe in weekly","\n",convert(df,1440*7,pre_market=False))
     pass
     
