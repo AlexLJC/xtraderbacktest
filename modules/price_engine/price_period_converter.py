@@ -13,7 +13,6 @@ mode - normal or cn_future
 def convert(df, to_tf,mode="normal"):
     _df = df.copy()
     from_tf = 1
-    
     if type(to_tf) == type("1m"):
         if "s" in to_tf:
             # Excluse second bars transformation
@@ -37,15 +36,19 @@ def convert(df, to_tf,mode="normal"):
             'open_interest': 'last'
             }
         _df.fillna(0, inplace = True) 
-        _df = _df.resample(str(to_tf)+'T', closed='left', label='left').agg(ohlc_dict).dropna()
+        # Weekly Bar
+        if to_tf == 1440 * 7 * 1: 
+            _df = _df.resample('W-MON', closed='left', label='left').agg(ohlc_dict).dropna()
+        else :
+            _df = _df.resample(str(to_tf)+'T', closed='left', label='left').agg(ohlc_dict).dropna()
     result__df = _df.copy()
     return result__df
 
 if __name__ == '__main__':
     import price_loader 
-    df = price_loader.load_price("AAPL","2019-02-15 09:41:00","2019-03-15 10:03:00","backtest")
+    df = price_loader.load_price("AAPL_US","2019-02-15 09:41:00","2019-03-15 10:03:00","backtest")
     print("Ordinary Dataframe in 1 min","\n",df)
     print("Converted Dataframe in 5 min","\n",convert(df,5))
-    
+    print("Converted Dataframe in 5 min","\n",convert(df,1440*7))
     pass
     

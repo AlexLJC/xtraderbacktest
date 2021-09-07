@@ -22,4 +22,3 @@ def vwap_session(df,today):
     df["hlc_value"] = df["hlc"] * df['volume']
     result = df["hlc_value"].sum() / df["volume"].sum()
     return result
-    
