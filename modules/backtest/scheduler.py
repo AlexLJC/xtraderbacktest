@@ -24,7 +24,7 @@ import threading
 import time
 import numpy as np
 
-TIMESTAMP_FORMAT=sys_conf_loader.get_sys_conf()["timeformat"]
+TIMESTAMP_FORMAT = sys_conf_loader.get_sys_conf()["timeformat"]
 class Scheduler(modules.common.scheduler.Scheduler):
     def __init__(self,mode):
         self.mode = mode

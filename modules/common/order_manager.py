@@ -82,6 +82,7 @@ class OrderManager():
         # Market Order
         should_open = False
         should_delete = False
+        # Check the exipration
         if order["order_type"] != "market":
             if order["expiration"]!=0:
                 current_date = datetime.datetime.strptime(tick["date"],"%Y-%m-%d %H:%M:%S")
@@ -143,13 +144,13 @@ class OrderManager():
                 else:
                     point = all_products_info["_" + order["symbol"].split("_")[1]]["point"]
                 if order["direction"] == "long":
-                    if tick["bid_1"] >= (order['trailing_sl']["base_line"] + order['trailing_sl']["gap"] * point):
+                    if tick["ask_1"] >= (order['trailing_sl']["base_line"] + order['trailing_sl']["gap"] * point):
                         order['trailing_sl']["sl_price"] = order['trailing_sl']["sl_price"] + order['trailing_sl']["gap"] * point * order['trailing_sl']["ratio"]
                         order['trailing_sl']["base_line"] = order['trailing_sl']["base_line"] + order['trailing_sl']["gap"] * point
                         # update order
                         result = order
                 elif order["direction"] == "short":
-                    if tick["ask_1"] <= (order['trailing_sl']["base_line"] - order['trailing_sl']["gap"] * point):
+                    if tick["bid_1"] <= (order['trailing_sl']["base_line"] - order['trailing_sl']["gap"] * point):
                         order['trailing_sl']["sl_price"] = order['trailing_sl']["sl_price"] - order['trailing_sl']["gap"] * point * order['trailing_sl']["ratio"]
                         order['trailing_sl']["base_line"] = order['trailing_sl']["base_line"] - order['trailing_sl']["gap"] * point
                         # update order
@@ -167,13 +168,13 @@ class OrderManager():
         if order["direction"] == "long" and tick["bid_1"] >= tp and tp !=0:
             should_close = True
             close_price = tp
-        elif order["direction"] == "long" and tick["bid_1"] <= sl and sl !=0:
+        elif order["direction"] == "long" and tick["ask_1"] <= sl and sl !=0:
             should_close = True
             close_price = sl
         elif order["direction"] == "short" and tick["ask_1"] <= tp and tp !=0:
             should_close = True
             close_price = tp
-        elif order["direction"] == "short" and tick["ask_1"] >= sl and sl !=0:
+        elif order["direction"] == "short" and tick["bid_1"] >= sl and sl !=0:
             should_close = True
             close_price = sl
         return should_close,close_price

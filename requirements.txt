@@ -12,3 +12,4 @@ tablib==3.0.0
 trading_calendars==2.1.1
 xmltodict==0.12.0
 simplejson==3.17.2
+alpaca_trade_api 

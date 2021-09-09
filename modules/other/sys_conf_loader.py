@@ -91,7 +91,7 @@ Short cut for get specific products info
 '''
 def get_product_info(symbol,use_common = False):
     if use_common is True:
-        symbol = "_"+ symbol.split("_")[1] 
+        symbol = "_"+ symbol.split("_")[-1] 
     file_ = []
     file_path = "/configurations/symbols_conf/"
     for filename in os.listdir(get_sys_path()+ file_path):
@@ -100,7 +100,7 @@ def get_product_info(symbol,use_common = False):
             break
     if len(file_) == 0:
         for filename in os.listdir(get_sys_path()+ file_path):
-            s_temp = "_"+ symbol.split("_")[1] 
+            s_temp = "_"+ symbol.split("_")[-1] 
             if filename.endswith(".yaml") and filename.split('.yaml')[0] == s_temp: 
                 file_ = filename
                 break
