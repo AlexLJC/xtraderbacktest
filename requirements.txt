@@ -1,5 +1,5 @@
 pandas==1.1.5 
-boto3==1.18.13
+boto3
 oss2==2.15.0
 redis==3.5.3
 numpy==1.19.5
