@@ -4,10 +4,10 @@ import sys
 sys.path.append(os.path.join(os.getcwd().split('xtraderbacktest')[0],'xtraderbacktest'))
 
 import modules.other.logg
+import logging 
 import requests
 import modules.other.sys_conf_loader as sys_conf_loader
 import json
-import logging 
 import pandas as pd
 import dateutil
 import alpaca_trade_api as alpaca_trade_api
@@ -123,7 +123,7 @@ def subscribe_trade_updates(trade_update_call_back):
 
 def desubscribe(symbols):
     for symbol in symbols:
-        logging.info("Deubcribe symbol " + symbol)
+        logging.info("Desubscribe symbol " + symbol)
         stream.unsubscribe_quotes(symbol)
         stream.unsubscribe_trades(symbol)
 

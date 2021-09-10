@@ -34,7 +34,6 @@ class Scheduler(modules.common.scheduler.Scheduler):
         self.strategy = None
         self.stop_by_error = False
         self.tick_queue = queue.Queue()
-        self.current_tick = {}
 
     def register_strategy(self,strategy):
         self.strategy = strategy
@@ -102,121 +101,15 @@ class Scheduler(modules.common.scheduler.Scheduler):
                         self.strategy._update_position()
                     self.strategy._round_check_after_day(tick)
                 
-    async def quote_call_back(self,q):
-        #print('quote', q,flush=True)
-        symbol = q["S"]
-        ask_exchange_code = q["ax"]
-        ask_price = float(q["ap"])
-        ask_size = float(q["as"])
-        bid_exchange_code = q["bx"]
-        bid_price = float(q["bp"])
-        bid_size = float(q["bs"])
-        date = q["t"].to_datetime().astimezone(dateutil.tz.gettz('US/Eastern')).strftime("%Y-%m-%d %H:%M:%S") 
-        
-        if symbol not in self.current_tick.keys():
-            new_tick = {
-                "symbol":symbol,
-                "date": date,
-                "last_price":bid_price,
-                "open_interest":0,
-                "volume":0,
-                "ask_1":ask_price,
-                "ask_1_volume":ask_size,
-                "ask_2":ask_price,
-                "ask_2_volume":ask_size,
-                "ask_3":ask_price,
-                "ask_3_volume":ask_size,
-                "ask_4":ask_price,
-                "ask_4_volume":ask_size,
-                "ask_5":ask_price,
-                "ask_5_volume":ask_size,
-                "bid_1":bid_price,
-                "bid_1_volume":bid_size,
-                "bid_2":bid_price,
-                "bid_2_volume":bid_size,
-                "bid_3":bid_price,
-                "bid_3_volume":bid_size,
-                "bid_4":bid_price,
-                "bid_4_volume":bid_size,
-                "bid_5":bid_price,
-                "bid_5_volume":bid_size,
-                "is_gap" : True
-            }
-            self.current_tick[symbol] = new_tick
-        else:
-            new_tick = {
-                "symbol":symbol,
-                "date": date,
-                "last_price":self.current_tick[symbol]["last_price"],
-                "open_interest":0,
-                "volume":self.current_tick[symbol]["volume"],
-                "ask_1":ask_price,
-                "ask_1_volume":ask_size,
-                "ask_2":ask_price,
-                "ask_2_volume":ask_size,
-                "ask_3":ask_price,
-                "ask_3_volume":ask_size,
-                "ask_4":ask_price,
-                "ask_4_volume":ask_size,
-                "ask_5":ask_price,
-                "ask_5_volume":ask_size,
-                "bid_1":bid_price,
-                "bid_1_volume":bid_size,
-                "bid_2":bid_price,
-                "bid_2_volume":bid_size,
-                "bid_3":bid_price,
-                "bid_3_volume":bid_size,
-                "bid_4":bid_price,
-                "bid_4_volume":bid_size,
-                "bid_5":bid_price,
-                "bid_5_volume":bid_size,
-                "is_gap" : True
-            }
-            self.current_tick[symbol] = new_tick
-        self.tick_queue.put(self.current_tick[symbol])
+    def quote_call_back(self,channel,redis_data):
+        if "Tick:" in channel:
+            self.tick_queue.put(redis_data)
         
 
 
-    async def trade_call_back(self,q):
-        #print('trade', q,flush=True)
-        symbol = q["S"]
-        last_price = float(q["p"])
-        last_trade_size = float(q["s"])
-        date = q["t"].to_datetime().astimezone(dateutil.tz.gettz('US/Eastern')).strftime("%Y-%m-%d %H:%M:%S") 
-        if symbol in self.current_tick.keys():
-            new_tick = {
-                "symbol":symbol,
-                "date": date,
-                "last_price":last_price,
-                "open_interest":0,
-                "volume":last_trade_size,
-                "ask_1":self.current_tick[symbol]["ask_1"],
-                "ask_1_volume":self.current_tick[symbol]["ask_1_volume"],
-                "ask_2":self.current_tick[symbol]["ask_2"],
-                "ask_2_volume":self.current_tick[symbol]["ask_2_volume"],
-                "ask_3":self.current_tick[symbol]["ask_3"],
-                "ask_3_volume":self.current_tick[symbol]["ask_3_volume"],
-                "ask_4":self.current_tick[symbol]["ask_4"],
-                "ask_4_volume":self.current_tick[symbol]["ask_4_volume"],
-                "ask_5":self.current_tick[symbol]["ask_5"],
-                "ask_5_volume":self.current_tick[symbol]["ask_5_volume"],
-                "bid_1":self.current_tick[symbol]["bid_1"],
-                "bid_1_volume":self.current_tick[symbol]["bid_1_volume"],
-                "bid_2":self.current_tick[symbol]["bid_2"],
-                "bid_2_volume":self.current_tick[symbol]["bid_2_volume"],
-                "bid_3":self.current_tick[symbol]["bid_3"],
-                "bid_3_volume":self.current_tick[symbol]["bid_3_volume"],
-                "bid_4":self.current_tick[symbol]["bid_4"],
-                "bid_4_volume":self.current_tick[symbol]["bid_4_volume"],
-                "bid_5":self.current_tick[symbol]["bid_5"],
-                "bid_5_volume":self.current_tick[symbol]["bid_5_volume"],
-                "is_gap" : True
-            }
-            self.current_tick[symbol] = new_tick
-            self.tick_queue.put(self.current_tick[symbol])
-        pass
-    async def trade_update_call_back(self,q):
-        print('===============================trade_update', q,flush=True)
+    def trade_update_call_back(self,channel,redis_data):
+        if "OrderCallback" in channel:
+            print('===============================trade_update', redis_data,flush=True)
 
     def start(self):
         logging.info("Live Scheduler Start.")
@@ -237,7 +130,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
 
         # register the call backs
         logging.info("Registering data callbacks")
-        alpaca.subscribe(symbols,quote_call_back=self.quote_call_back,trade_call_back=self.trade_call_back,trade_update_call_back=self.trade_update_call_back)
+        
         
         
 

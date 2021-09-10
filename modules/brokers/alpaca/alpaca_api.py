@@ -6,6 +6,8 @@ import os
 import sys
 sys.path.append(os.path.join(os.getcwd().split('xtraderbacktest')[0],'xtraderbacktest'))
 
+import modules.other.logg
+import logging 
 import modules.brokers.alpaca.alpaca as alpaca
 import modules.database.redis_x as redis
 import dateutil
@@ -175,6 +177,7 @@ if __name__ == "__main__":
                 if delta.total_seconds() > 5 * 60:
                     delete_list.append(symbol)
         for symbol in delete_list:
+            logging.info("Desubscribe symbol " + symbol)
             alpaca.desubscribe([symbol])
             del heart_beat[symbol]
         time.sleep(60)
