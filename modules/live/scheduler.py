@@ -36,6 +36,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
         self.strategy = None
         self.stop_by_error = False
         self.tick_queue = queue.Queue()
+        self.tick_count = 0
 
     def register_strategy(self,strategy):
         self.strategy = strategy
@@ -106,7 +107,10 @@ class Scheduler(modules.common.scheduler.Scheduler):
     def quote_call_back(self,channel,redis_data):
         if "Ticks:" in channel:
             self.tick_queue.put(redis_data)
-            redis.redis_pulish("ALPACA-Ack",json.dumps({"symbol":redis_data["symbol"]}))
+            if self.tick_count > 200:
+                redis.redis_pulish("ALPACA-Ack",json.dumps({"symbol":redis_data["symbol"]}))
+                self.tick_count = 0
+            self.tick_count = self.tick_count + 1
 
 
     def trade_update_call_back(self,channel,redis_data):
