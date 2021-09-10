@@ -4,7 +4,7 @@ sys.path.append(os.path.join(os.getcwd().split('xtraderbacktest')[0],'xtraderbac
 
 import modules.other.logg
 import logging 
-import redis
+import redis as redis
 import threading
 import json
 import sys
@@ -26,7 +26,7 @@ def init_mode(mode = "live"): # mode : backtest  live
     REDIS_PORT=conf["port"]
     REDIS_PASSWORD=conf["password"]
     logging.info("Connecting redis host:"+ REDIS_HOST + " port:" + str(REDIS_PORT) + " password:" + str(REDIS_PASSWORD))
-    try:
+    if sys.platform.startswith('linux') == True:
         socket_keepalive_options = {
             socket.TCP_KEEPIDLE: 120,
             socket.TCP_KEEPCNT: 3,
@@ -34,8 +34,7 @@ def init_mode(mode = "live"): # mode : backtest  live
         }
         rc = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD,charset="utf-8", decode_responses=True,socket_keepalive=True,
             socket_keepalive_options=socket_keepalive_options) # redis
-    except Exception as e:
-        logging.exception(e)
+    else:
         rc = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD,charset="utf-8", decode_responses=True)
 
 
@@ -207,6 +206,7 @@ class SubscrberThread(threading.Thread):
             
 ## Test cases   
 if __name__ == "__main__":
-    print(redis_set('CTPStrategyPositionhtmn01:test_open[cu1912]',''))
-    print(redis_get('CTPStrategyPositionhtmn01:test_open[cu1912]'))
+    init_mode()
+    redis_pulish("ALPACA-Command",json.dumps({"cmd":"subscribe","symbol":"AAPL"}))
+
     pass

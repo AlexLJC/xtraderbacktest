@@ -7,7 +7,7 @@ import sys
 sys.path.append(os.path.join(os.getcwd().split('xtraderbacktest')[0],'xtraderbacktest'))
 
 import modules.brokers.alpaca.alpaca as alpaca
-import modules.database.redis as redis
+import modules.database.redis_x as redis
 import dateutil
 import json 
 import time 
