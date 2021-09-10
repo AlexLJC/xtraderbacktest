@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import math
 class TradeBook():
 
     def __init__(self,close_trades):
@@ -107,6 +108,6 @@ class TradeBook():
             result["profit/max_draw_down"] = -result["total_profit"] / result["max_draw_down"]
 
         for key in result.keys():
-            if result[key] is None or np.isnan(result[key]):
+            if result[key] is None or math.isnan(result[key]):
                 result[key] = 0
         return result
