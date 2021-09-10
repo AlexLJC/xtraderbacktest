@@ -168,9 +168,10 @@ if __name__ == "__main__":
     while True:
         now = datetime.now()
         for symbol in heart_beat.keys():
-            delta = (now - heart_beat[symbol])
-            if delta.total_seconds() > 5 * 60:
-                alpaca.desubscribe([symbol])
-                heart_beat.pop(symbol)
+            if symbol is not None and symbol != '' and symbol in heart_beat.keys():
+                delta = (now - heart_beat[symbol])
+                if delta.total_seconds() > 5 * 60:
+                    alpaca.desubscribe([symbol])
+                    heart_beat.pop(symbol)
         time.sleep(60)
     pass
