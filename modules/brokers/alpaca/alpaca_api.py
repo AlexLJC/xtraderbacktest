@@ -172,6 +172,6 @@ if __name__ == "__main__":
                 delta = (now - heart_beat[symbol])
                 if delta.total_seconds() > 5 * 60:
                     alpaca.desubscribe([symbol])
-                    heart_beat.pop(symbol)
+                    del heart_beat[symbol]
         time.sleep(60)
     pass
