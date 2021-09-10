@@ -248,7 +248,7 @@ class Strategy():
                     if order["order_ref"] not in order_refs:
                         condi_2 = False
                 condi_3 = True
-                if order_refs is not None:
+                if symbol is not None:
                     if order["symbol"] != symbol:
                         condi_3 = False
                 if all([condi_1,condi_2,condi_3]):
