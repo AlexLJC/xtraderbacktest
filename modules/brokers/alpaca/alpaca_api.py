@@ -14,7 +14,7 @@ import dateutil
 import json 
 import time 
 
-alpaca.init_stream()
+
 redis.init_mode(mode = "live")
 
 ACK_CHANNEL = "ALPACA-Ack"                                                                   # Receive acknowledge of market data received to prevent spare subscrition
@@ -43,12 +43,15 @@ def _process_ack(redis_data):
 def _process_command(redis_data):
     if redis_data["cmd"] == "subscribe":
         symbol = redis_data["symbol"]
-        alpaca.subscribe([symbol],quote_call_back,trade_call_back)
-        heart_beat[symbol] = datetime.now()
+        if symbol not in heart_beat.keys():
+            stream.subscribe([symbol])
+            heart_beat[symbol] = datetime.now()
 
     if redis_data["cmd"] == "desubscribe":
         symbol = redis_data["symbol"]
-        alpaca.desubscribe([symbol])
+        if symbol in heart_beat.keys():
+            stream.desubscribe([symbol])
+            del heart_beat[symbol]
 
 async def quote_call_back(q):
     symbol = q["S"]
@@ -162,9 +165,11 @@ async def trade_call_back(q):
     
 async def trade_update_call_back(q):
     redis.redis_pulish(ORDER_CALLBACK_CHANNEL,json.dumps(q))
-
+    
+stream = alpaca.StreamT(quote_call_back,trade_call_back,trade_update_call_back)
+stream.init_stream()
 if __name__ == "__main__":
-    alpaca.subscribe_trade_updates(trade_update_call_back)
+    stream.subscribe_trade_updates()
     redis.redis_subscribe_channel([ACK_CHANNEL,COMMAND_CHANNEL], process = _redis_call_back)
     
 
@@ -178,7 +183,7 @@ if __name__ == "__main__":
                     delete_list.append(symbol)
         for symbol in delete_list:
             logging.info("Desubscribe symbol " + symbol)
-            alpaca.desubscribe([symbol])
+            stream.desubscribe([symbol])
             del heart_beat[symbol]
         time.sleep(60)
     pass

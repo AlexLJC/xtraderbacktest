@@ -31,7 +31,7 @@ HEADERS  = {
 }
 
 
-stream = alpaca_trade_api.stream.Stream(KEY_ID,KEY_SECRET,base_url=BASE_URL,data_feed='sip', raw_data=True)
+
 _init = False
 
 def account():
@@ -97,35 +97,49 @@ def stocks_bars(symbol,timeframe,start,end):
     return result
 
 
+class StreamT():
+    def __init__(self,quote_call_back,trade_call_back,trade_update_call_back):
+        global conn 
+        conn = alpaca_trade_api.stream.Stream(KEY_ID,KEY_SECRET,base_url=BASE_URL,data_feed='sip', raw_data=True)
+        self.stream = conn
+        self.quote_call_back = quote_call_back
+        self.trade_call_back = trade_call_back
+        self.trade_update_call_back = trade_update_call_back
+    def _stream_thread(self):
+        try:
+            # make sure we have an event loop, if not create a new one
+            loop = asyncio.get_event_loop()
+            loop.set_debug(True)
+        except RuntimeError:
+            asyncio.set_event_loop(asyncio.new_event_loop())
+        logging.info("Stream thread start")
+        _init = True
+        
+        self.stream.run()
 
-def _stream_thread():
-    try:
-        # make sure we have an event loop, if not create a new one
-        loop = asyncio.get_event_loop()
-        loop.set_debug(True)
-    except RuntimeError:
-        asyncio.set_event_loop(asyncio.new_event_loop())
-    logging.info("Stream thread start")
-    _init = True
-    stream.run()
+    def init_stream(self):
+        threading.Thread(target=self._stream_thread).start()
 
-def init_stream():
-    threading.Thread(target=_stream_thread).start()
+    def subscribe(self,symbols):
+        try:
+            # make sure we have an event loop, if not create a new one
+            loop = asyncio.get_event_loop()
+            loop.set_debug(True)
+        except RuntimeError:
+            asyncio.set_event_loop(asyncio.new_event_loop())
+        for symbol in symbols:
+            logging.info("Subcribe symbol " + symbol)
+            self.stream.subscribe_quotes(self.quote_call_back, symbol)
+            self.stream.subscribe_trades(self.trade_call_back, symbol)
 
-def subscribe(symbols,quote_call_back,trade_call_back):
-    for symbol in symbols:
-        logging.info("Subcribe symbol " + symbol)
-        stream.subscribe_quotes(quote_call_back, symbol)
-        stream.subscribe_trades(trade_call_back, symbol)
+    def subscribe_trade_updates(self):
+        self.stream.subscribe_trade_updates(self.trade_update_call_back)
 
-def subscribe_trade_updates(trade_update_call_back):
-    stream.subscribe_trade_updates(trade_update_call_back)
-
-def desubscribe(symbols):
-    for symbol in symbols:
-        logging.info("Desubscribe symbol " + symbol)
-        stream.unsubscribe_quotes(symbol)
-        stream.unsubscribe_trades(symbol)
+    def desubscribe(self,symbols):
+        for symbol in symbols:
+            logging.info("Desubscribe symbol " + symbol)
+            self.stream.unsubscribe_quotes(symbol)
+            self.stream.unsubscribe_trades(symbol)
 
 def get_orders(symbols=None):
     result = None

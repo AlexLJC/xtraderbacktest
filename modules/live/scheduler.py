@@ -25,8 +25,10 @@ import time
 import numpy as np
 import modules.brokers.alpaca.alpaca as alpaca
 import dateutil
+import modules.database.redis_x as redis
+import json 
 
-alpaca.init_stream()
+redis.init_mode("live")
 TIMESTAMP_FORMAT = sys_conf_loader.get_sys_conf()["timeformat"]
 class Scheduler(modules.common.scheduler.Scheduler):
     def __init__(self,mode):
@@ -104,7 +106,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
     def quote_call_back(self,channel,redis_data):
         if "Tick:" in channel:
             self.tick_queue.put(redis_data)
-        
+            redis.redis_pulish("ALPACA-Ack",json.dumps({"symbol":redis_data["symbol"]}))
 
 
     def trade_update_call_back(self,channel,redis_data):
@@ -130,8 +132,13 @@ class Scheduler(modules.common.scheduler.Scheduler):
 
         # register the call backs
         logging.info("Registering data callbacks")
-        
-        
+        channel_symbol_list = []
+        for symbol in symbols:
+            channel_symbol_list.append("ALPACA-Ticks:"+symbol)
+            # Subscribe symbols
+            redis.redis_pulish("ALPACA-Command",json.dumps({"cmd":"subscribe","symbol":symbol}))
+        redis.redis_subscribe_channel(channel_symbol_list,process=self.quote_call_back)
+        redis.redis_subscribe_channel(["ALPACA-OrderCallback"],process=self.trade_update_call_back)
         
 
         # start tick processing thread
