@@ -1,7 +1,7 @@
 '''
 This is for running alpaca serperately because its websockets service limit the connections.
 '''
-from datetime import datetime, time
+from datetime import datetime
 import os
 import sys
 sys.path.append(os.path.join(os.getcwd().split('xtraderbacktest')[0],'xtraderbacktest'))
@@ -10,6 +10,7 @@ import modules.brokers.alpaca.alpaca as alpaca
 import modules.database.redis as redis
 import dateutil
 import json 
+import time 
 
 alpaca.init_stream()
 redis.init_mode(mode = "live")

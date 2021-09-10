@@ -15,9 +15,9 @@ sys_conf = sys_conf_loader.get_sys_conf()
 redis_conf = sys_conf["databases"]["redises"]
 ####Global variable
 rc = None
-REDIS_HOST = ""
-REDIS_PORT = ""
-REDIS_PASSWORD = ""
+REDIS_HOST = redis_conf["live"]["host"]
+REDIS_PORT = redis_conf["live"]["port"]
+REDIS_PASSWORD = redis_conf["live"]["password"]
 
 def init_mode(mode = "live"): # mode : backtest  live
     global rc
@@ -133,7 +133,7 @@ def redis_subscribe_channel(channel_list,process=None,runnalbe_object=None):
         rc2 = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD,charset="utf-8", decode_responses=True,socket_keepalive=True,
             socket_keepalive_options=socket_keepalive_options) # redis
     except Exception as e:
-        logging.exception(e)
+        #logging.exception(e)
         rc2 = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD,charset="utf-8", decode_responses=True)
     ps = rc2.pubsub()
     for item in channel_list:
