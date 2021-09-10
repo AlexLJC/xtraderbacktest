@@ -99,7 +99,7 @@ async def quote_call_back(q):
             "date": date,
             "last_price":current_tick[symbol]["last_price"],
             "open_interest":0,
-            "volume":current_tick[symbol]["volume"],
+            "volume":0,
             "ask_1":ask_price,
             "ask_1_volume":ask_size,
             "ask_2":ask_price,

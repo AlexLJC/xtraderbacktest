@@ -104,7 +104,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
                     self.strategy._round_check_after_day(tick)
                 
     def quote_call_back(self,channel,redis_data):
-        if "Tick:" in channel:
+        if "Ticks:" in channel:
             self.tick_queue.put(redis_data)
             redis.redis_pulish("ALPACA-Ack",json.dumps({"symbol":redis_data["symbol"]}))
 
