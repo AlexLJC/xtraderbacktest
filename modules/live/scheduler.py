@@ -23,7 +23,7 @@ import queue
 import threading
 import time
 import numpy as np
-import modules.brokers.alpaca as alpaca
+import modules.brokers.alpaca.alpaca as alpaca
 import dateutil
 
 alpaca.init_stream()
