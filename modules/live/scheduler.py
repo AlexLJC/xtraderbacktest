@@ -26,6 +26,7 @@ import numpy as np
 import modules.brokers.alpaca as alpaca
 import dateutil
 
+alpaca.init_stream()
 TIMESTAMP_FORMAT = sys_conf_loader.get_sys_conf()["timeformat"]
 class Scheduler(modules.common.scheduler.Scheduler):
     def __init__(self,mode):
@@ -214,8 +215,8 @@ class Scheduler(modules.common.scheduler.Scheduler):
             self.current_tick[symbol] = new_tick
             self.tick_queue.put(self.current_tick[symbol])
         pass
-    async def trade_update_call_back(q):
-        print('trade_update', q,flush=True)
+    async def trade_update_call_back(self,q):
+        print('===============================trade_update', q,flush=True)
 
     def start(self):
         logging.info("Live Scheduler Start.")

@@ -136,7 +136,10 @@ class Strategy():
                 return None
 
         if symbol not in self._all_product_info.keys():
-            s_temp = "_" + symbol.split("_")[1]
+            try:
+                s_temp = "_" + symbol.split("_")[1]
+            except Exception as e:
+                s_temp = "_US"
         else:
             s_temp = symbol
 
@@ -203,7 +206,10 @@ class Strategy():
                 df = price_period_converter.convert(df,period)
             if end_date_str is not None:
                 df = df[(df.index <= pd.to_datetime(end_date_str))].copy(deep = True)
-            result = df[0-count-1:-1].copy(deep = True)
+            if period != "1d":
+                result = df[0-count-1:].copy(deep = True)
+            if period == "1d":
+                result = df[0-count-1:-1].copy(deep = True)
         return result
 
         
@@ -361,6 +367,9 @@ class Strategy():
         if self._mode == "backtest":
             self.order_manager._filled_all_ing_orders(tick)
 
+        # For temporly use
+        if self._mode == "live":
+            self.order_manager._filled_all_ing_orders(tick)
     
     def _round_check_before(self,tick):
         self._set_current_time(tick["date"])

@@ -3,6 +3,7 @@ import os
 import sys
 sys.path.append(os.path.join(os.getcwd().split('xtraderbacktest')[0],'xtraderbacktest'))
 
+import modules.other.logg
 import requests
 import modules.other.sys_conf_loader as sys_conf_loader
 import json
@@ -31,6 +32,7 @@ HEADERS  = {
 
 
 stream = alpaca_trade_api.stream.Stream(KEY_ID,KEY_SECRET,base_url=BASE_URL,data_feed='sip', raw_data=True)
+_init = False
 
 def account():
     result = None
@@ -103,19 +105,27 @@ def _stream_thread():
         loop.set_debug(True)
     except RuntimeError:
         asyncio.set_event_loop(asyncio.new_event_loop())
-    print("Stream thread start")
+    logging.info("Stream thread start")
+    _init = True
     stream.run()
-threading.Thread(target=_stream_thread).start()
 
-def subscribe(symbols,quote_call_back,trade_call_back,trade_update_call_back):
+def init_stream():
+    threading.Thread(target=_stream_thread).start()
+
+def subscribe(symbols,quote_call_back,trade_call_back):
     for symbol in symbols:
+        logging.info("Subcribe symbol " + symbol)
         stream.subscribe_quotes(quote_call_back, symbol)
         stream.subscribe_trades(trade_call_back, symbol)
+
+def subscribe_trade_updates(trade_update_call_back):
     stream.subscribe_trade_updates(trade_update_call_back)
-    
-    # stream_thread = threading.Thread(target = stream.run)
-    # stream_thread.start()
-    print("Finish Subscribes.")
+
+def desubscribe(symbols):
+    for symbol in symbols:
+        logging.info("Deubcribe symbol " + symbol)
+        stream.unsubscribe_quotes(symbol)
+        stream.unsubscribe_trades(symbol)
 
 def get_orders(symbols=None):
     result = None
@@ -175,23 +185,30 @@ order = {
 '''
 def new_order(order,limit_price):
     result = None
-    url = BASE_URL + '/v2/orders' 
+    url = BASE_URL + '/v2/orders'
+    action = _convert_direction_to_side(order["direction"])
+    # force price to higher so that it can be triggered immediately
+    if action == "buy":
+        limit_price = round(limit_price*1.05,2)
+    if action == "sell":
+        limit_price = round(limit_price*0.95,2)
+
     params = {
         "symbol":order["symbol"],
         "qty":order["volume"],
-        "side":_convert_direction_to_side(order["direction"]),
+        "side":action,
         "type":"limit",
         "time_in_force":"day",
-        "extended_hours":True,
+        "extended_hours":False,
         "client_order_id":order["order_ref"],
         "order_class":"simple",
         "limit_price":limit_price,
-        "take_profit":{
-           "limit_price": float(order["tp"])
-        },
-        "stop_loss": {
-            "stop_price": float(order["sl"]), "limit_price": float(order["tp"])
-        }
+        # "take_profit":{
+        #    "limit_price": float(order["tp"])
+        # },
+        # "stop_loss": {
+        #     "stop_price": float(order["sl"]), "limit_price": float(order["tp"])
+        # }
         
     }
     response = requests.post(url, json = params, headers = HEADERS)
@@ -202,6 +219,49 @@ def new_order(order,limit_price):
         logging.error(response.status_code)
         logging.error(response.text)
     return result
+
+def close_order(order,limit_price):
+    result = None
+    url = BASE_URL + '/v2/orders' 
+    action = _convert_direction_to_side(order["direction"])
+    # reverse the direaction as they are closing order
+    if action == "buy":
+        action = "sell"
+    else:
+        action = "buy"
+    # force price to higher so that it can be triggered immediately
+    if action == "buy":
+        limit_price = round(limit_price*1.05,2)
+    if action == "sell":
+        limit_price = round(limit_price*0.95,2)
+    params = {
+        "symbol":order["symbol"],
+        "qty":order["volume"],
+        "side":action,
+        "type":"limit",
+        "time_in_force":"day",
+        "extended_hours":False,
+        "client_order_id":order["order_ref"]+"_close",
+        "order_class":"simple",
+        "limit_price":limit_price,
+        # "take_profit":{
+        #    "limit_price": float(order["tp"])
+        # },
+        # "stop_loss": {
+        #     "stop_price": float(order["sl"]), "limit_price": float(order["tp"])
+        # }
+        
+    }
+    response = requests.post(url, json = params, headers = HEADERS)
+    if response.status_code == 200:
+        result = response.json()
+    else:
+        logging.error("Error at " + url + " params " + json.dumps(params) + " headers " + json.dumps(HEADERS))
+        logging.error(response.status_code)
+        logging.error(response.text)
+    return result
+
+
 
 if __name__ == "__main__":
     print("Start testing.")
@@ -232,14 +292,14 @@ if __name__ == "__main__":
     #time.sleep(10)
     #print("Testing open order.")
     order = {
-        "order_ref":"test_order",
+        "order_ref":"test_order_3",
         "symbol":"AAPL",
         "volume":1,
         "direction":"long",
         "tp":180,
         "sl":120
     }
-    print(new_order(order,154))
+    print(new_order(order,155))
 
     print("Testing get orders.")
     print(get_orders(["AAPL","IBM"]))

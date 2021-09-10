@@ -7,7 +7,7 @@ import modules.other.sys_conf_loader as sys_conf_loader
 import modules.common.position 
 import modules.other.check_is_tradable as check_is_tradable
 import datetime 
-
+import modules.brokers.alpaca as alpaca
 all_products_info = sys_conf_loader.get_all_products_info()
 class OrderManager():
     def __init__(self,cash,untradable_times,mode = "backtest",is_reverse = "disable"):
@@ -253,7 +253,13 @@ class OrderManager():
                                 else:
                                     direction = "long"
                             u = self.position._open_position(tick,order,direction)
-                            # send to broker. TBD
+                            # send to broker live. TBD
+                            order_temp = order
+                            order_temp["direction"] = direction
+                            if direction == "long":
+                                alpaca.new_order(order,tick["ask_1"])
+                            if direction == "short":
+                                alpaca.new_order(order,tick["bid_1"])
 
                         if self._mode == "backtest":
                             u = self.position._open_position(tick,order, order["direction"])
@@ -275,6 +281,20 @@ class OrderManager():
                         if self._mode == "live":
                             u = self.position._close_position(tick,order["order_ref"],order["close_price"],"hit")
                             # send to broker. TBD
+                            direction = order["direction"]
+                            if self._is_reverse == "enable":
+                                # reverse
+                                if direction == "long":
+                                    direction = "short"
+                                else:
+                                    direction = "long"
+                            order_temp = order
+                            order_temp["direction"] = direction
+                            if direction == "long":
+                                alpaca.close_order(order,tick["bid_1"])
+                            if direction == "short":
+                                alpaca.close_order(order,tick["ask_1"])
+
                         elif self._mode == "backtest":
                             close_type = "hit"
                             if "close_type" in order.keys():

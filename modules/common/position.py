@@ -24,7 +24,11 @@ class Position():
         symbol = order["symbol"]
         direction = direction
         if symbol not in all_products_info.keys():
-            s_temp = "_" + order["symbol"].split("_")[1]
+            try:
+                s_temp = "_" + order["symbol"].split("_")[1]
+            except Exception as e:
+                s_temp = "_US"
+            
         else:
             s_temp = symbol
         contract_size = all_products_info[s_temp]["contract_size"]
@@ -101,7 +105,10 @@ class Position():
         for index, position in enumerate(self.history_position):
             if position["order_ref"] == order_ref:
                 if position["symbol"]  not in all_products_info.keys():
-                    s_temp = "_" + position["symbol"].split("_")[1]
+                    try:
+                        s_temp = "_" + position["symbol"].split("_")[1]
+                    except Exception as e:
+                        s_temp = "_US"
                 else:
                     s_temp = position["symbol"] 
 
@@ -136,7 +143,10 @@ class Position():
         symbol = position["symbol"]
 
         if symbol  not in all_products_info.keys():
-            s_temp = "_" + symbol.split("_")[1]
+            try:
+                s_temp = "_" + symbol.split("_")[1]
+            except Exception as e:
+                s_temp = "_US"
         else:
             s_temp = symbol
 
@@ -175,7 +185,10 @@ class Position():
         for index, position in enumerate(self.current_position):
             if position["symbol"] == tick["symbol"]:
                 if position["symbol"]  not in all_products_info.keys():
-                    s_temp = "_" + position["symbol"].split("_")[1]
+                    try:
+                        s_temp = "_" + position["symbol"].split("_")[1]
+                    except Exception as e:
+                        s_temp = "_US"
                 else:
                     s_temp = position["symbol"]
 
@@ -205,7 +218,10 @@ class Position():
             direction = position["direction"]
 
             if symbol not in all_products_info.keys():
-                s_temp = "_" + symbol.split("_")[1]
+                try:
+                    s_temp = "_" + symbol.split("_")[1]
+                except Exception as e:
+                    s_temp = "_US"
             else:
                 s_temp = symbol
 

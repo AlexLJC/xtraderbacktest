@@ -30,7 +30,10 @@ def check_market_is_tradable(timestamp_str,symbol):
     weekday = _convert_int_to_weekday(datetime.datetime.strptime(timestamp_str,"%Y-%m-%d %H:%M:%S").weekday())
 
     if symbol not in all_products_info.keys():
-        s_temp = "_" +symbol.split("_")[1]
+        try:
+            s_temp = "_" + symbol.split("_")[1]
+        except Exception as e:
+            s_temp = "_US"
     else:
         s_temp = symbol
 
