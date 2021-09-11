@@ -17,7 +17,10 @@ def save_result(backtest_result):
         locak_path = locak_path.replace('/','\\')
     with open(locak_path, 'w', encoding='utf-8') as f:
         #json.dump(backtest_result, f,ensure_ascii=False, indent=4)
-        json.dump(backtest_result, f,ensure_ascii=False)
+        #json.dump(backtest_result, f,ensure_ascii=False)
+        json_str = json.dumps(backtest_result,ensure_ascii=False)
+        json_str = json_str.replace('NaN','0')
+        f.write(json_str)
     f.close()
     sys_conf = sys_conf_loader.get_sys_conf()
     if sys_conf["backtest_conf"]["backtest_result_remote"]["is_on"] is True:

@@ -108,6 +108,6 @@ class TradeBook():
             result["profit/max_draw_down"] = -result["total_profit"] / result["max_draw_down"]
 
         for key in result.keys():
-            if result[key] is None or math.isnan(result[key]):
+            if result[key] is None:
                 result[key] = 0
         return result
