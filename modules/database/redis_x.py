@@ -169,7 +169,7 @@ def redis_lpop(key):
     return result
 
 def redis_llen(key):
-    result=None
+    result=0
     try:
         result=rc.llen(key)
     except Exception as e:
