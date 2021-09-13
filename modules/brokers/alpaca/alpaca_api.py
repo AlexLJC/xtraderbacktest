@@ -169,7 +169,7 @@ async def trade_update_call_back(q):
 stream = alpaca.StreamT(quote_call_back,trade_call_back,trade_update_call_back)
 stream.init_stream()
 if __name__ == "__main__":
-    stream.subscribe_trade_updates()
+    #stream.subscribe_trade_updates()
     redis.redis_subscribe_channel([ACK_CHANNEL,COMMAND_CHANNEL], process = _redis_call_back)
     
 

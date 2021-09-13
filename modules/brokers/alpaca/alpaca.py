@@ -105,6 +105,7 @@ class StreamT():
         self.quote_call_back = quote_call_back
         self.trade_call_back = trade_call_back
         self.trade_update_call_back = trade_update_call_back
+        self.current_subscribes = set()
     def _stream_thread(self):
         try:
             # make sure we have an event loop, if not create a new one
@@ -114,13 +115,28 @@ class StreamT():
             asyncio.set_event_loop(asyncio.new_event_loop())
         logging.info("Stream thread start")
         _init = True
-        
-        self.stream.run()
+
+        #self.stream.run()
+        self._run_stream()
+
+    def _run_stream(self):
+        try:
+            self.stream.run()
+            self.subscribe_trade_updates()
+            self.subscribe(self.current_subscribes)
+        except Exception as e:
+            logging.exception(e)
+        finally:
+            logging.info("Trying to re-establish connection")
+            time.sleep(1)
+            self._run_stream()
 
     def init_stream(self):
         threading.Thread(target=self._stream_thread).start()
 
     def subscribe(self,symbols):
+    
+        
         try:
             # make sure we have an event loop, if not create a new one
             loop = asyncio.get_event_loop()
@@ -129,6 +145,7 @@ class StreamT():
             asyncio.set_event_loop(asyncio.new_event_loop())
         for symbol in symbols:
             logging.info("Subcribe symbol " + symbol)
+            self.current_subscribes.add(symbol)
             self.stream.subscribe_quotes(self.quote_call_back, symbol)
             self.stream.subscribe_trades(self.trade_call_back, symbol)
 
@@ -140,6 +157,7 @@ class StreamT():
             logging.info("Desubscribe symbol " + symbol)
             self.stream.unsubscribe_quotes(symbol)
             self.stream.unsubscribe_trades(symbol)
+            self.current_subscribes.remove(symbol)
 
 def get_orders(symbols=None):
     result = None
