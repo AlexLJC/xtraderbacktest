@@ -38,6 +38,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
         self.stop_by_error = False
         self.tick_queue = queue.Queue()
         self.tick_count = 0
+        self.tick_recv_date = {}
 
     def register_strategy(self,strategy:modules.common.strategy.Strategy):
         self.strategy = strategy
@@ -47,6 +48,8 @@ class Scheduler(modules.common.scheduler.Scheduler):
         else:
             self.use_pre_post_market_data = False
         self.strategy.init()
+        for symbol in self.strategy.context["symbols"]:
+            self.tick_recv_date[symbol] = datetime.datetime.now()
 
     def _loop_ticks(self):
         tick = {"start":"start"}
@@ -108,9 +111,11 @@ class Scheduler(modules.common.scheduler.Scheduler):
     def quote_call_back(self,channel,redis_data):
         if "Ticks:" in channel:
             self.tick_queue.put(redis_data)
-            if self.tick_count > 200:
+            now = datetime.datetime.now()
+            if self.tick_count > 200 or (now - self.tick_recv_date[redis_data["symbol"]]).total_seconds()> 60:
                 redis.redis_pulish("ALPACA-Ack",json.dumps({"symbol":redis_data["symbol"]}))
                 self.tick_count = 0
+                self.tick_recv_date[redis_data["symbol"]] = now
             self.tick_count = self.tick_count + 1
 
 
