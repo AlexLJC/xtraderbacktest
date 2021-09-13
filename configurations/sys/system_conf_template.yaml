@@ -52,7 +52,7 @@ live_conf:                                                              # the co
   notification:                                                         # whether send notification
     is_on: false                                                        # on = true or off = false
     type: mail                                                          # the way of notification
-  alpaca:
+  alpaca:                                                               # Alpaca Configurations
     APCA-API-KEY-ID: APCA-API-KEY-ID                                    # Alpaca api key id
     APCA-API-SECRET-KEY: APCA-API-SECRET-KEY                            # Alpaca api secret key
     URL: https://paper-api.alpaca.markets                               # Base url
