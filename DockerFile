@@ -8,8 +8,8 @@ WORKDIR /home/xtradebacktest
 
 COPY ./ /home/xtradebacktest/
 
-WORKDIR /home/bots/
+WORKDIR /home/xtradebacktest/bots/
 ENTRYPOINT  ["python3"] 
 
-## sudo docker rmi alex2019/bfjfunds-private:backtest; 
-#  sudo docker build -f Dockerfile . -t alex2019/bfjfunds-private:backtest
+## sudo docker rmi alex2019/bfjfunds-private:xtraderbacktest; 
+#  sudo docker build -f DockerFile . -t alex2019/bfjfunds-private:xtraderbacktest;

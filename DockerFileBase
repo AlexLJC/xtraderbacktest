@@ -16,4 +16,4 @@ RUN pip install xmltodict
 RUN pip install simplejson
 RUN pip install alpaca_trade_api
 
-### COMMAND: sudo docker build -f DockerfileBase . -t alex2019/bfjfunds:xtradebacktest;sudo docker push alex2019/bfjfunds:xtradebacktest
+### COMMAND: sudo docker build -f DockerFileBase . -t alex2019/bfjfunds:xtradebacktest;sudo docker push alex2019/bfjfunds:xtradebacktest
