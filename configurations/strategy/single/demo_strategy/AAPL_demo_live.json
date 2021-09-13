@@ -1,8 +1,8 @@
 {
     "account_id":"demo_account",
-    "period":["1d"],
-    "backtest_graininess":"240m",
-    "symbols":["AAPL_US"],
+    "period":["1m"],
+    "backtest_graininess":"1m",
+    "symbols":["AAPL"],
     "platform":"IB",
     "start_date": "2019-05-25 08:00:00",
     "end_date": "2021-01-29 19:59:00",

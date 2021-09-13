@@ -150,14 +150,16 @@ __cache__/
 
 /bots/*
 !/bots/demo_strategy.py
+!/bots/demo_strategy_live.py
 /scanners/*
 !/scanners/demo_scanner.py
 
 /configurations/scanner/*
 !/configurations/scanner/demo.json
 
-/configurations/strategy/*
-!/configurations/strategy/optmize/demo_strategy/*
-!/configurations/strategy/single/demo_strategy/*
+/configurations/strategy/single/*
+/configurations/strategy/optmize/*
+!/configurations/strategy/optmize/demo_strategy/
+!/configurations/strategy/single/demo_strategy/
 
 /study

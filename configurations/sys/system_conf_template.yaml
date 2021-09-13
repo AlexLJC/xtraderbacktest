@@ -1,19 +1,19 @@
 ---
 # The system configurations
-databases:                                    # databases' configurations
-  mysqls:                                     # mysqls' database
+databases:                                                              # databases' configurations
+  mysqls:                                                               # mysqls' database
     db1:                                     
       host: 127.0.0.1                 
       user: user
       password: password
       port: 3433
-  mangos:                                     # mangos database
+  mangos:                                                               # mangos database
     db1:
       host: 127.0.0.1
       user: user
       password: password
       port: 3433
-  redises:                                    # redis database
+  redises:                                                              # redis database
     backtest:
       host: 127.0.0.1
       port: 6379
@@ -22,12 +22,12 @@ databases:                                    # databases' configurations
       host: 127.0.0.1
       port: 6379
       password: password
-remote_storage:                               # the remote locations of saving files
+remote_storage:                                                         # the remote locations of saving files
   ftp:
     host: 127.0.0.1
     port: 211
-    user: administrator
-    password: Ljc3388650
+    user: user
+    password: password
   s3:
     AWS_ACCESS_KEY_ID: AWS_ACCESS_KEY_ID
     AWS_SECRET_ACCESS_KEY: AWS_SECRET_ACCESS_KEY
@@ -37,57 +37,64 @@ remote_storage:                               # the remote locations of saving f
     OSS_SECRET_KEY: oss_secret_key
     BUCKET: XTRADERBACKTEST
     END_POINT: http://oss-cn-shanghai.aliyuncs.com
-notification:                                 # the notification configurations
-  mail:                                       # email
+notification:                                                           # the notification configurations
+  mail:                                                                 # email
     host: smtp.gmail.com
     port: 465
     user: admin@gmail.com
     password: password
-live_conf:                                    # the configuration of live mode 
-  save_order_record:                          # if save order record into database
-    is_on: false                              # on = true or off = false
-    type: mysqls                              # the type of database
-    db_name: db1                              # the name of the database
-  notification:                               # whether send notification
-    is_on: false                              # on = true or off = false
-    type: mail                                # the way of notification
-backtest_conf:                                # the configuration of backtest mode
-  price_timezone: UTC+0                       # the price data's time zone
-  price_preload:  10080                       # preload how many minues previous data into strategy
-  indicator_remote_cache:                     # the configuration of remote cache of indicators temp files
-    is_on: false                              # on = true or off = false
-    type: s3                                  # the location type
-    path: /cache/indicators/                  # the location path
-  price_remote_cache:                         # the configuration of remote cache of price data temp files
-    is_on: false                              # on = true or off = false
-    type: ftp                                 # the location type
-    path: /cache/prices/                      # the location path
-  tick_remote_cache:                          # the configuration of remote cache of tick data temp files
-    is_on: false                              # on = true or off = false
-    type: ftp                                 # the location type
-    path: /cache/ticks/                       # the location path
-  backtest_result_remote:                     # the configuration of backtest result  files
-    is_on: false                              # on = true or off = false
-    type: s3                                  # the location type
-    path: /cache/backtest_results/            # the location path
-  tick_mode:                                  # the tick mode
-    is_fake: true                             # using fake ticks
-    real:                                     # real ticks configuration
-      location: /data/ticks/                  # real ticks location
-  calendar:                                   # the configuration of calendar for backtest
-    location: /data/calendar/                 # the location of calendar events
-    type: local                               # choose the folder's location: local,s3,ftp...  
-    delay: 60                                 # delay seconds for simulation    
-  price_data_mode:                            # mode of storing prepared data
-    mode: ram                                 # ram - store in memory, would large memery but fast, disk - read from disk realtime, less memory but slow     
-timezone: US/Eastern                          # time zone of the system(for display correct backtest result)
-timeformat: "%Y-%m-%d %H:%M:%S"               # time format
-logger:                                       # the logger configuration
-  location: /data/logs/                       # log file location
-  info: true                                  # record info
-  debug: true                                 # record debug
-  warn: true                                  # record warn
-  error: true                                 # record error
-  critical: true                              # record critical
-bot:                                          # general configuration of bot
-  data_history_max_len: 1000                  # maximum of 1min dataframe loaded into bots, narrow it down if you want to save memory 
+live_conf:                                                              # the configuration of live mode 
+  price_preload:  10000                                                 # preload how many minues previous data into strategy
+  save_order_record:                                                    # if save order record into database
+    is_on: false                                                        # on = true or off = false
+    type: mysqls                                                        # the type of database
+    db_name: db1                                                        # the name of the database
+  notification:                                                         # whether send notification
+    is_on: false                                                        # on = true or off = false
+    type: mail                                                          # the way of notification
+  alpaca:
+    APCA-API-KEY-ID: APCA-API-KEY-ID                                    # Alpaca api key id
+    APCA-API-SECRET-KEY: APCA-API-SECRET-KEY                            # Alpaca api secret key
+    URL: https://paper-api.alpaca.markets                               # Base url
+    DATA_URL: https://data.alpaca.markets                               # Data url
+    WSS_URL: wss://paper-api.alpaca.markets/stream                      # Stream url
+backtest_conf:                                                          # the configuration of backtest mode
+  price_timezone: UTC+0                                                 # the price data's time zone
+  price_preload:  10000                                                 # preload how many minues previous data into strategy
+  indicator_remote_cache:                                               # the configuration of remote cache of indicators temp files
+    is_on: false                                                        # on = true or off = false
+    type: s3                                                            # the location type
+    path: /cache/indicators/                                            # the location path
+  price_remote_cache:                                                   # the configuration of remote cache of price data temp files
+    is_on: false                                                        # on = true or off = false
+    type: ftp                                                           # the location type
+    path: /cache/prices/                                                # the location path
+  tick_remote_cache:                                                    # the configuration of remote cache of tick data temp files
+    is_on: false                                                        # on = true or off = false
+    type: ftp                                                           # the location type
+    path: /cache/ticks/                                                 # the location path
+  backtest_result_remote:                                               # the configuration of backtest result  files
+    is_on: false                                                        # on = true or off = false
+    type: s3                                                            # the location type
+    path: /cache/backtest_results/                                      # the location path
+  tick_mode:                                                            # the tick mode
+    is_fake: true                                                       # using fake ticks
+    real:                                                               # real ticks configuration
+      location: /data/ticks/                                            # real ticks location
+  calendar:                                                             # the configuration of calendar for backtest
+    location: /data/calendar/                                           # the location of calendar events
+    type: local                                                         # choose the folder's location: local,s3,ftp...  
+    delay: 60                                                           # delay seconds for simulation       
+  price_data_mode:                                                      # mode of storing prepared data
+    mode: ram                                                           # ram - store in memory, would large memery but fast, disk - read from disk realtime, less memory but slow         
+timezone: US/Eastern                                                    # time zone of the system(for display correct backtest result)
+timeformat: "%Y-%m-%d %H:%M:%S"                                         # time format
+logger:                                                                 # the logger configuration
+  location: /data/logs/                                                 # log file location
+  info: true                                                            # record info
+  debug: true                                                           # record debug
+  warn: true                                                            # record warn
+  error: true                                                           # record error
+  critical: true                                                        # record critical
+bot:                                                                    # general configuration of bot
+  data_history_max_len: 100800                                          # maximum of 1min dataframe loaded into bots, narrow it down if you want to save memory 

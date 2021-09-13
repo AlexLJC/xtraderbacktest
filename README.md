@@ -27,6 +27,8 @@ Microsoft Visual C++ Build Tools(https://visualstudio.microsoft.com/visual-cpp-b
 -   Tablib supported.   
 -   Multiple and custom timeframe supported(seconds,mins,days).
 -   Absolute no future data usage.
+-   Live data feed and trading with.    
+    -   Alpaca broker support(US Stocks and ETFs).
 -   Draw custom chart for analysis usage.
       -   Line Chart  
       -   Bar Chart(ongoing)   
@@ -36,7 +38,7 @@ Microsoft Visual C++ Build Tools(https://visualstudio.microsoft.com/visual-cpp-b
       -   News Event(ongoing)
 -   Distribute nodes for optimizing parameters.(ongoing)
 -   Indicator calculate accelerate.(ongoing) 
--   Live data feed and trading with.(ongoing)
+
 
 # How to Start      
 ##  Quick Start   
