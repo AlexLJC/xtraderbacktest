@@ -12,6 +12,8 @@ import uuid
 import modules.other.logg
 import logging
 import json 
+redis.init_mode()
+
 DOCKER_IMAGE = "alex2019/bfjfunds-private:xtraderbacktest"
 TASK_QUEUE = "BotQueue"
 DOCKER_CONTAINER_PREFIX = "Bot-"
