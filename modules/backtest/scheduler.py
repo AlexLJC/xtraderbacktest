@@ -63,7 +63,10 @@ class Scheduler(modules.common.scheduler.Scheduler):
         #     date_set.add(val)
         date_set = sorted(date_set)
         logging.info("Symbol length "+ str(len(self.ohlc.keys())) + " Date Length " + str(len(date_set)))
-        with tqdm(total= len(date_set),desc="Tick Generator",colour ="green", ascii=True) as process_tick_bar:
+        display_dict = {
+            "date":""
+        }
+        with tqdm(total= len(date_set),desc="Tick Generator",colour ="green", ascii=True,postfix = display_dict,) as process_tick_bar:
             for date in date_set:
                 temp_ticks = {}
                 for symbol in self.ohlc.keys():
@@ -90,6 +93,10 @@ class Scheduler(modules.common.scheduler.Scheduler):
                             time.sleep(1)
 
                 process_tick_bar.update(1)
+                display_dict = {
+                    "date":str(date)
+                }
+                process_tick_bar.set_postfix(display_dict)
         process_tick_bar.close()
         self.tick_queue.put({"end":"end"})
 
