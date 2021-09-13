@@ -21,7 +21,7 @@ DOCKER_CONTAINER_PREFIX = "Bot-"
 def run():
     client = docker.from_env()
     while(True):
-        client.containers.prune()
+        #client.containers.prune()
         if redis.redis_llen(TASK_QUEUE) <= 0:
             time.sleep(1)
         else:
@@ -38,7 +38,7 @@ def run():
                     container = client.containers.get(worker_name)
                 except Exception as e:
                     print("Running",DOCKER_IMAGE,command,worker_name,flush=True)
-                    result = client.containers.run(DOCKER_IMAGE,command,auto_remove = True,name = worker_name, detach = True)
+                    result = client.containers.run(DOCKER_IMAGE,command,auto_remove = True,name = worker_name, detach = True,network_mode = "host")
             except Exception as e:
                 logging.exception(e)
 

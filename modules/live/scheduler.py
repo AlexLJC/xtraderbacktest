@@ -149,7 +149,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
             end_str = now.strftime(TIMESTAMP_FORMAT)
             df_temp = alpaca.stocks_bars(symbol,"1m",start_str,end_str)
             self.strategy._preload_data(symbol,df_temp)
-
+            print(df_temp)
         # register the call backs
         logging.info("Registering data callbacks")
         channel_symbol_list = []

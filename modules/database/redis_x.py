@@ -223,5 +223,9 @@ if __name__ == "__main__":
     #redis_pulish("ALPACA-Command",json.dumps({"cmd":"subscribe","symbol":"TSLA"}))
     #redis_pulish("ALPACA-Command",json.dumps({"cmd":"subscribe","symbol":"IBM"}))
     #redis_pulish("ALPACA-Command",json.dumps({"cmd":"subscribe","symbol":"TSLA"}))
-    redis_rpush("BotQueue",json.dumps({"file_name":"alex_2.py","symbol":"AAPL"}) )
+    symbols = set(["YPF","GGAL","ITMR","EFTR","ATER","LIFE","ADAP","RGNX","IRTC",'GSM','OLB','CRDF','ASAN','BMA',"MRSN","URNM","MEC","PAM"])
+    import time
+    for symbol in symbols:
+        redis_rpush("BotQueue",json.dumps({"file_name":"alex_2.py","symbol":symbol}) )
+        time.sleep(5)
     pass
