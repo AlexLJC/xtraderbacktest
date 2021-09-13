@@ -15,7 +15,7 @@ import threading
 import time
 import threading
 import asyncio
-
+import modules.database.redis_x as redis
 
 
 sys_conf = sys_conf_loader.get_sys_conf()
@@ -106,6 +106,8 @@ class StreamT():
         self.trade_call_back = trade_call_back
         self.trade_update_call_back = trade_update_call_back
         self.current_subscribes = set()
+        self.CACHE_REDIS_KEY = "ALPACA-SubscribeSet"
+        self.current_subscribes = redis.redis_smembers(self.CACHE_REDIS_KEY)
     def _stream_thread(self):
         try:
             # make sure we have an event loop, if not create a new one
@@ -146,6 +148,7 @@ class StreamT():
         for symbol in symbols:
             logging.info("Subcribe symbol " + symbol)
             self.current_subscribes.add(symbol)
+            redis.redis_sadd(self.CACHE_REDIS_KEY,symbol)
             self.stream.subscribe_quotes(self.quote_call_back, symbol)
             self.stream.subscribe_trades(self.trade_call_back, symbol)
 
@@ -158,6 +161,7 @@ class StreamT():
             self.stream.unsubscribe_quotes(symbol)
             self.stream.unsubscribe_trades(symbol)
             self.current_subscribes.remove(symbol)
+            redis.redis_srem(self.CACHE_REDIS_KEY,symbol)
 
 def get_orders(symbols=None):
     result = None

@@ -204,6 +204,31 @@ class OrderManager():
                 if order["order_ref"] == order_update["order_ref"]:
                     self._orders[index] = order_update    
 
+    # live use
+    def _filled_ing_order(self,order_symbol,order_type,order_hit_price,order_volume):
+        if len(self._orders) ==0:
+            return 
+        update_list = []
+        for order in self._orders:
+            if order_symbol == order["symbol"]:
+                if order["status"] == "opening" and order_type == "open":
+                    u = self.position._update_position(order["order_ref"],order_hit_price,order_volume)
+                    # if self._is_reverse == "enable" and self._mode == "backtest":
+                    #     u = self.reverse_position._update_position(order["order_ref"],order["open_price"],order["volume"])
+                    if u is not None:
+                        order.update(u)
+                        update_list.append(order)
+                elif order["status"] == "closing" and order_type == "close":
+                    u = self.position._update_history_position(order["order_ref"],order_hit_price)
+                    # if self._is_reverse == "enable" and self._mode == "backtest":
+                    #     u = self.reverse_position._update_history_position(order["order_ref"],order["close_price"])
+                    if u is not None:
+                        order.update(u)
+                        update_list.append(order)
+        for order_update in update_list:
+            for index, order in enumerate(self._orders):
+                if order["order_ref"] == order_update["order_ref"]:
+                    self._orders[index] = order_update            
 
                 
     def _close_or_delete(self,tick,order_ref):
@@ -253,7 +278,7 @@ class OrderManager():
                                 else:
                                     direction = "long"
                             u = self.position._open_position(tick,order,direction)
-                            # send to broker live. TBD
+                            # send to broker live. 
                             order_temp = order
                             order_temp["direction"] = direction
                             if direction == "long":
@@ -280,7 +305,7 @@ class OrderManager():
                         t["status"] = "closing"
                         if self._mode == "live":
                             u = self.position._close_position(tick,order["order_ref"],order["close_price"],"hit")
-                            # send to broker. TBD
+                            # send to broker. 
                             direction = order["direction"]
                             if self._is_reverse == "enable":
                                 # reverse

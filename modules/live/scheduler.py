@@ -15,6 +15,7 @@ import modules.backtest.save_backtest_result as save_backtest_result
 import modules.backtest.backtest_result_analyse as backtest_result_analyse
 import modules.price_engine.tick_loader as tick_loader
 import modules.backtest.calendar_manager 
+import modules.common.strategy 
 
 import pandas as pd
 from tqdm import tqdm
@@ -38,7 +39,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
         self.tick_queue = queue.Queue()
         self.tick_count = 0
 
-    def register_strategy(self,strategy):
+    def register_strategy(self,strategy:modules.common.strategy.Strategy):
         self.strategy = strategy
         self.strategy._set_mode("live")
         if self.strategy.context["pre_post_market"]  == "enable":
@@ -116,6 +117,16 @@ class Scheduler(modules.common.scheduler.Scheduler):
     def trade_update_call_back(self,channel,redis_data):
         if "OrderCallback" in channel:
             print('===============================trade_update', redis_data,flush=True)
+            if redis_data["event"] == "fill":
+                order = redis_data["order"]
+                client_order_id = order['client_order_id']
+                order_type = 'open'
+                order_hit_price = order["filled_avg_price"]
+                if '_close' in client_order_id:
+                    client_order_id = client_order_id.split('_')[0]
+                    order_type = 'close'
+                order_symbol = order["symbol"]
+                self.strategy.order_manager._filled_ing_order(order_symbol,order_type,order_hit_price)
 
     def start(self):
         logging.info("Live Scheduler Start.")

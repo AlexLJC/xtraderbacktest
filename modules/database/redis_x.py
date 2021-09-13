@@ -105,7 +105,7 @@ def redis_hdel(list_name,field):
     return result
 # SMEMBERS
 def redis_smembers(list_name):
-    result=None
+    result=set()
     try:
         result=rc.smembers(list_name)
     except Exception as e:
@@ -120,6 +120,16 @@ def redis_sadd(list_name,value):
     except Exception as e:
        logging.exception(e)
     return result
+
+# SREM
+def redis_srem(list_name,value):
+    result=None
+    try:
+        result=rc.srem(list_name,value)
+    except Exception as e:
+       logging.exception(e)
+    return result
+
 
 # process 和 runnable_object二选一
 def redis_subscribe_channel(channel_list,process=None,runnalbe_object=None):
