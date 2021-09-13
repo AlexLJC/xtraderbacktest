@@ -217,8 +217,10 @@ class SubscrberThread(threading.Thread):
 ## Test cases   
 if __name__ == "__main__":
     init_mode()
-    redis_pulish("ALPACA-Command",json.dumps({"cmd":"subscribe","symbol":"BBIG"}))
+    redis_pulish("ALPACA-Command",json.dumps({"cmd":"subscribe","symbol":"AAPL"}))
     import time 
     time.sleep(5)
+    redis_pulish("ALPACA-Command",json.dumps({"cmd":"subscribe","symbol":"TSLA"}))
+    redis_pulish("ALPACA-Command",json.dumps({"cmd":"subscribe","symbol":"IBM"}))
     redis_pulish("ALPACA-Command",json.dumps({"cmd":"subscribe","symbol":"TSLA"}))
     pass

@@ -1,0 +1,15 @@
+FROM alex2019/bfjfunds:xtradebacktest
+
+### This one is the base image for installing relevenat building tools
+ENV TZ=America/New_York
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+WORKDIR /home/xtradebacktest
+
+COPY ./ /home/xtradebacktest/
+
+WORKDIR /home/bots/
+ENTRYPOINT  ["python3"] 
+
+## sudo docker rmi alex2019/bfjfunds-private:backtest; 
+#  sudo docker build -f Dockerfile . -t alex2019/bfjfunds-private:backtest
