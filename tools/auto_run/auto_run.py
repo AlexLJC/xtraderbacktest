@@ -21,7 +21,7 @@ DOCKER_CONTAINER_PREFIX = "Bot-"
 def run():
     client = docker.from_env()
     while(True):
-        #client.containers.prune()
+        client.containers.prune()
         if redis.redis_llen(TASK_QUEUE) <= 0:
             time.sleep(1)
         else:
