@@ -25,12 +25,14 @@ def run():
         else:
             
             try:
+                
                 task_str = redis.redis_lpop(TASK_QUEUE)
                 task = json.loads(task_str)
                 file_name = task["file_name"]#"alex_2.py"
                 symbol = task["symbol"] #"AAPL"
                 command = file_name + " " + symbol
                 worker_name = DOCKER_CONTAINER_PREFIX + file_name.replace('.py','') + symbol
+                print("Running",DOCKER_IMAGE,command,worker_name,flush=True)
                 result = client.containers.run(DOCKER_IMAGE,command,auto_remove = True,name = worker_name, detach = True)
             except Exception as e:
                 logging.exception(e)
