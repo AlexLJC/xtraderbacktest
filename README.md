@@ -216,18 +216,17 @@ The template of scanner is shown in /scanners/demo_scanner.py
 ### Step 1    
 Fill the redis and alpaca configurations correctly.
 ### Step 2  
-Start the websocket process for subscribing market data.    
-'''
+```
 cd ./modules/brokers/alpaca/
 chmod 777 run_api.sh
 ./run_api.sh
-''' 
+```
 ### Step 3    
 Run the bot   
-'''
+```
 cd ./bots/
 python demo_strategy_live.py    
-'''
+```
 # Existing Problems     
 -   ~~Takes too much time in generating fake ticks.~~   
 -   ~~Fake ticks take too much memory.~~
