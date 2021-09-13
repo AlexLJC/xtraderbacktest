@@ -34,8 +34,11 @@ def run():
                 symbol = task["symbol"] #"AAPL"
                 command = file_name + " " + symbol
                 worker_name = DOCKER_CONTAINER_PREFIX + file_name.replace('.py','') + symbol
-                print("Running",DOCKER_IMAGE,command,worker_name,flush=True)
-                result = client.containers.run(DOCKER_IMAGE,command,auto_remove = True,name = worker_name, detach = True)
+                try:
+                    container = client.containers.get(worker_name)
+                except Exception as e:
+                    print("Running",DOCKER_IMAGE,command,worker_name,flush=True)
+                    result = client.containers.run(DOCKER_IMAGE,command,auto_remove = True,name = worker_name, detach = True)
             except Exception as e:
                 logging.exception(e)
 
