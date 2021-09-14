@@ -21,24 +21,31 @@ DOCKER_CONTAINER_PREFIX = "Bot-"
 def run():
     client = docker.from_env()
     while(True):
-        client.containers.prune()
+        #client.containers.prune()
         if redis.redis_llen(TASK_QUEUE) <= 0:
             time.sleep(1)
         else:
             
             try:
-                
                 task_str = redis.redis_lpop(TASK_QUEUE)
                 task = json.loads(task_str)
                 file_name = task["file_name"]#"alex_2.py"
                 symbol = task["symbol"] #"AAPL"
-                command = file_name + " " + symbol
-                worker_name = DOCKER_CONTAINER_PREFIX + file_name.replace('.py','') + symbol
-                try:
-                    container = client.containers.get(worker_name)
-                except Exception as e:
-                    print("Running",DOCKER_IMAGE,command,worker_name,flush=True)
-                    result = client.containers.run(DOCKER_IMAGE,command,auto_remove = True,name = worker_name, detach = True,network_mode = "host")
+                cmd = task["cmd"]
+                if cmd == "create":
+                    command = file_name + " " + symbol
+                    worker_name = DOCKER_CONTAINER_PREFIX + file_name.replace('.py','') + symbol
+                    try:
+                        container = client.containers.get(worker_name)
+                    except Exception as e:
+                        print("Running",DOCKER_IMAGE,command,worker_name,flush=True)
+                        result = client.containers.run(DOCKER_IMAGE,command,auto_remove = True,name = worker_name, detach = True,network_mode = "host")
+                if cmd == "delete_all":
+                    containers = client.containers.list(all=True)
+                    for container in containers:
+                        container_name = container.name
+                        if DOCKER_CONTAINER_PREFIX in container_name:
+                            container.remove(force = True)
             except Exception as e:
                 logging.exception(e)
 
