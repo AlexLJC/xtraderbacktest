@@ -55,7 +55,10 @@ def get_screen_to_csv():
     prepared = req.prepare()
     response = s.send(prepared).text.encode('utf8')
     #print(response)
-    
+    try:
+        os.remove("./screener_cache.csv")
+    except Exception as e:
+        pass
     with open("./screener_cache.csv",'wb') as f:
         f.write(response)
     f.close
@@ -67,9 +70,10 @@ def load_csv():
 
 if __name__ == "__main__":
     while True:
+        print("Geting Screener")
         get_screen_to_csv()
         list_of_symbols =  load_csv()
-        print(list_of_symbols)
+        print("List of symbos",list_of_symbols)
         now = datetime.datetime.now()
         if now.hour >= 9 and now.hour <= 15:
             for symbol in list_of_symbols:
@@ -78,4 +82,4 @@ if __name__ == "__main__":
         if now.hour >=17:
             redis.redis_rpush("BotQueue",json.dumps({"cmd":"delete_all"}) )
         time.sleep(10)
-        break
+        

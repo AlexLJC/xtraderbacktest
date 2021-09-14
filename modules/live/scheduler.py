@@ -112,7 +112,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
         if "Ticks:" in channel:
             self.tick_queue.put(redis_data)
             now = datetime.datetime.now()
-            if self.tick_count > 200 or (now - self.tick_recv_date[redis_data["symbol"]]).total_seconds()> 60:
+            if self.tick_count > 50 or (now - self.tick_recv_date[redis_data["symbol"]]).total_seconds()> 60:
                 redis.redis_pulish("ALPACA-Ack",json.dumps({"symbol":redis_data["symbol"]}))
                 self.tick_count = 0
                 self.tick_recv_date[redis_data["symbol"]] = now
