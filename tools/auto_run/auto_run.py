@@ -29,10 +29,10 @@ def run():
             try:
                 task_str = redis.redis_lpop(TASK_QUEUE)
                 task = json.loads(task_str)
-                file_name = task["file_name"]#"alex_2.py"
-                symbol = task["symbol"] #"AAPL"
                 cmd = task["cmd"]
                 if cmd == "create":
+                    file_name = task["file_name"]#"alex_2.py"
+                    symbol = task["symbol"] #"AAPL"
                     command = file_name + " " + symbol
                     worker_name = DOCKER_CONTAINER_PREFIX + file_name.replace('.py','') + symbol
                     try:
