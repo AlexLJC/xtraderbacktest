@@ -26,13 +26,13 @@ headers={
     'Sec-Fetch-Mode':'navigate',
     'Sec-Fetch-User':'?1',
     'Sec-Fetch-Dest':'document',
-    'Referer':'https://elite.finviz.com/screener.ashx?v=151&f=exch_amex|nasd|nyse,sh_curvol_o400,sh_float_0to100,ta_perf_d10o&ft=4&o=-change',
+    'Referer':'https://elite.finviz.com/screener.ashx?v=151&f=exch_amex|nasd|nyse,sh_curvol_o400,ta_perf_d10o&ft=4&o=-change',
     'Accept-Encoding':'gzip, deflate',
     'Accept-Language':'en,zh-CN;q=0.9,zh;q=0.8',
     #'Cookie':'cal-custom-range=2021-07-19|2021-08-18; ASP.NET_SessionId=gvgnkdccim3jn12vrjzws5aa; _ga=GA1.2.587031881.1629260869; _gid=GA1.2.1613324830.1629260869; cal-timezone-offset=0; TEServer=TEIIS'
 }
 url = "https://elite.finviz.com"
-sub = "https://elite.finviz.com/export.ashx?v=151&f=exch_amex|nasd|nyse,sh_curvol_o400,sh_float_0to100,ta_perf_d10o&ft=4&o=-change"
+sub = "https://elite.finviz.com/export.ashx?v=151&f=exch_amex|nasd|nyse,sh_curvol_o400,ta_perf_d10o&ft=4&o=-change"
 cookies = {
     "__qca":"P0-340760822-1624364498275",
     "_admrla":"2.0-0c3d148a-eb88-8699-0558-707b5f1308b4",
@@ -69,17 +69,20 @@ def load_csv():
     return df["Ticker"].tolist()
 
 if __name__ == "__main__":
+    close_today = False
     while True:
         print("Geting Screener")
         get_screen_to_csv()
         list_of_symbols =  load_csv()
         print("List of symbos",list_of_symbols)
         now = datetime.datetime.now()
-        if now.hour >= 9 and now.hour <= 15:
+        if now.hour >= 9 and now.hour <= 15 :
             for symbol in list_of_symbols:
                 redis.redis_rpush("BotQueue",json.dumps({"cmd":"create","file_name":"alex_2.py","symbol":symbol}) )
                 time.sleep(1)
-        if now.hour >=17:
+                close_today = False
+        if now.hour >=17 and close_today is False:
             redis.redis_rpush("BotQueue",json.dumps({"cmd":"delete_all"}) )
+            close_today = True
         time.sleep(10)
         
