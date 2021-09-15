@@ -36,7 +36,7 @@ class OrderManager():
             # save positions
             position_key = self._unique_prefix + ">" + "CurrentPositions"
             redis.redis_set(position_key,json.dumps(self.position.current_position)) 
-            his_position_key = self._unique_prefix + ">" + "CurrentPositions"
+            his_position_key = self._unique_prefix + ">" + "HisPositions"
             redis.redis_set(his_position_key,json.dumps(self.position.history_position)) 
     
     def _load_from_redis(self):
@@ -51,11 +51,13 @@ class OrderManager():
             t = redis.redis_get(position_key)
             if t is not None:
                 self.position.current_position = json.loads(t) 
-            his_position_key = self._unique_prefix + ">" + "CurrentPositions"
+            his_position_key = self._unique_prefix + ">" + "HisPositions"
             t = redis.redis_get(his_position_key)
             if t is not None:
                 self.position.history_position = json.loads(t) 
-
+            print("Orders",self._orders )
+            print("Current Position",self.position.current_position )
+            print("History Position",self.position.history_position )
     def _append_to_orders(self,order):
         self._orders.append(order)
         self._save_to_redis()
