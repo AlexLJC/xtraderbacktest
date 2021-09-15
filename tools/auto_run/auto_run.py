@@ -47,7 +47,7 @@ def run():
                         container_name = container.name
                         if DOCKER_CONTAINER_PREFIX in container_name:
                             container.remove(force = True)
-                if cmd == "reconnect":
+                if cmd == "restart":
                     containers = client.containers.list(all=True)
                     symbol = task["symbol"]
                     for container in containers:
