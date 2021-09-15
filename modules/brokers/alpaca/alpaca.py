@@ -151,6 +151,7 @@ class StreamT():
             redis.redis_sadd(self.CACHE_REDIS_KEY,symbol)
             self.stream.subscribe_quotes(self.quote_call_back, symbol)
             self.stream.subscribe_trades(self.trade_call_back, symbol)
+            self.subscribe_trade_updates()
 
     def subscribe_trade_updates(self):
         self.stream.subscribe_trade_updates(self.trade_update_call_back)
