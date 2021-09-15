@@ -12,6 +12,7 @@ import uuid
 import modules.other.logg
 import logging
 import json 
+import datetime
 redis.init_mode()
 
 DOCKER_IMAGE = "alex2019/bfjfunds-private:xtraderbacktest"
@@ -38,7 +39,7 @@ def run():
                     try:
                         container = client.containers.get(worker_name)
                     except Exception as e:
-                        print("Running",DOCKER_IMAGE,command,worker_name,flush=True)
+                        print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+" Running",DOCKER_IMAGE,command,worker_name,flush=True)
                         result = client.containers.run(DOCKER_IMAGE,command,auto_remove = True,name = worker_name, detach = True,network_mode = "host")
                 if cmd == "delete_all":
                     containers = client.containers.list(all=True)

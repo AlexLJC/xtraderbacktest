@@ -162,4 +162,6 @@ __cache__/
 !/configurations/strategy/optmize/demo_strategy/
 !/configurations/strategy/single/demo_strategy/
 
+/configurations/sys/*
+!/configurations/sys/system_conf_template.yaml
 /study
