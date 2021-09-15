@@ -125,9 +125,10 @@ class StreamT():
     def _run_stream(self):
         try:
             self.subscribe_trade_updates()
+            self.subscribe(self.current_subscribes)
             self.stream.run()
             
-            self.subscribe(self.current_subscribes)
+            #self.subscribe(self.current_subscribes)
         except Exception as e:
             logging.exception(e)
         finally:
@@ -154,6 +155,7 @@ class StreamT():
             self.stream.subscribe_quotes(self.quote_call_back, symbol)
             self.stream.subscribe_trades(self.trade_call_back, symbol)
             self.subscribe_trade_updates()
+            time.sleep(1)
 
     def subscribe_trade_updates(self):
         self.stream.subscribe_trade_updates(self.trade_update_call_back)
