@@ -16,7 +16,7 @@ import time
 import threading
 import asyncio
 import modules.database.redis_x as redis
-
+redis.init_mode()
 
 sys_conf = sys_conf_loader.get_sys_conf()
 alpaca_conf = sys_conf["live_conf"]["alpaca"]
@@ -108,6 +108,7 @@ class StreamT():
         self.current_subscribes = set()
         self.CACHE_REDIS_KEY = "ALPACA-SubscribeSet"
         self.current_subscribes = redis.redis_smembers(self.CACHE_REDIS_KEY)
+        print(self.current_subscribes,flush=True)
     def _stream_thread(self):
         try:
             # make sure we have an event loop, if not create a new one
@@ -123,8 +124,9 @@ class StreamT():
 
     def _run_stream(self):
         try:
-            self.stream.run()
             self.subscribe_trade_updates()
+            self.stream.run()
+            
             self.subscribe(self.current_subscribes)
         except Exception as e:
             logging.exception(e)
@@ -322,14 +324,16 @@ if __name__ == "__main__":
         # print('trade', q,flush=True)
         pass
     async def trade_update_call_back(q):
-        print('trade_update', q,flush=True)
+        #print('trade_update', q,flush=True)
+        #print(type(q),flush=True)
+        #print(str(q),flush=True)
         pass
-    #subscribe(["AAPL"],quote_call_back,trade_call_back,trade_update_call_back) # pass
-    
+    stream = StreamT(quote_call_back,trade_call_back,trade_update_call_back) # pass
+    stream.init_stream()
     #time.sleep(10)
     #print("Testing open order.")
     order = {
-        "order_ref":"test_order_3",
+        "order_ref":"test_order_5",
         "symbol":"AAPL",
         "volume":1,
         "direction":"long",
@@ -338,6 +342,6 @@ if __name__ == "__main__":
     }
     print(new_order(order,155))
 
-    print("Testing get orders.")
-    print(get_orders(["AAPL","IBM"]))
+    #print("Testing get orders.")
+    #print(get_orders(["AAPL","IBM"]))
     pass
