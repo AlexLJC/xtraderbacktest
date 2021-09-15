@@ -29,6 +29,12 @@ Microsoft Visual C++ Build Tools(https://visualstudio.microsoft.com/visual-cpp-b
 -   Absolute no future data usage.
 -   Live data feed and trading with.    
     -   Alpaca broker support(US Stocks and ETFs).
+-   Notification in live trading.   
+    -   Telegram    
+    -   Mail(ongoing)
+-   Live order record.    
+    -   MongoDB.
+    -   Mysql(ongoing).
 -   Draw custom chart for analysis usage.
       -   Line Chart  
       -   Bar Chart(ongoing)   
