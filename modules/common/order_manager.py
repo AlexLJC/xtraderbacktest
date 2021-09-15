@@ -8,7 +8,11 @@ import modules.common.position
 import modules.other.check_is_tradable as check_is_tradable
 import datetime 
 import modules.brokers.alpaca.alpaca as alpaca
+import modules.database.database_live as database_live
+import modules.notification.notifaction as notifaction
+
 all_products_info = sys_conf_loader.get_all_products_info()
+sys_conf = sys_conf_loader.get_sys_conf()
 class OrderManager():
     def __init__(self,cash,untradable_times,mode = "backtest",is_reverse = "disable"):
         self.position = modules.common.position.Position(cash)
@@ -208,23 +212,29 @@ class OrderManager():
     def _filled_ing_order(self,order_symbol,order_type,order_hit_price,order_volume):
         if len(self._orders) ==0:
             return 
+        if self._mode != "live":
+            return 
         update_list = []
         for order in self._orders:
             if order_symbol == order["symbol"]:
                 if order["status"] == "opening" and order_type == "open":
                     u = self.position._update_position(order["order_ref"],order_hit_price,order_volume)
-                    # if self._is_reverse == "enable" and self._mode == "backtest":
-                    #     u = self.reverse_position._update_position(order["order_ref"],order["open_price"],order["volume"])
                     if u is not None:
                         order.update(u)
                         update_list.append(order)
+                        # Save to db
+                        database_live.save_json(order,"Positions",id=order["order_ref"])
+                        # Send Notifcation
+                        notifaction.send_message("Open Position",order)
                 elif order["status"] == "closing" and order_type == "close":
                     u = self.position._update_history_position(order["order_ref"],order_hit_price)
-                    # if self._is_reverse == "enable" and self._mode == "backtest":
-                    #     u = self.reverse_position._update_history_position(order["order_ref"],order["close_price"])
                     if u is not None:
                         order.update(u)
                         update_list.append(order)
+                        # Save to db
+                        database_live.save_json(order,"Positions",id=order["order_ref"])
+                        # Send Notifcation
+                        notifaction.send_message("Close Position",order)
         for order_update in update_list:
             for index, order in enumerate(self._orders):
                 if order["order_ref"] == order_update["order_ref"]:

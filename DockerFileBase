@@ -15,5 +15,6 @@ RUN pip install trading_calendars
 RUN pip install xmltodict
 RUN pip install simplejson
 RUN pip install alpaca_trade_api
+RUN pip install python-telegram-bot
 
 ### COMMAND: sudo docker build -f DockerFileBase . -t alex2019/bfjfunds:xtraderbacktest;sudo docker push alex2019/bfjfunds:xtraderbacktest

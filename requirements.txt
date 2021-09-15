@@ -14,3 +14,4 @@ xmltodict
 simplejson
 alpaca_trade_api 
 docker
+python-telegram-bot

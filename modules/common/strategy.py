@@ -12,7 +12,7 @@ import modules.other.sys_conf_loader as sys_conf_loader
 from abc import ABC, abstractmethod
 import pandas as pd
 import uuid
-
+import modules.notification.notifaction as notifaction
 
 class Strategy():
     def __init__(self,pars):
@@ -194,7 +194,9 @@ class Strategy():
         self.order_manager._close_or_delete(self.current_tick,order_ref)
         
     
-    def send_notification(self,message):
+    def send_notification(self,message,obj=None):
+        if self._mode == "live":
+            notifaction.send_message(message,obj)
         pass
     
     def get_bars(self,symbol,count,period,end_date_str = None):

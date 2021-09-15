@@ -22,15 +22,18 @@ def init():
         logging.info("Mongodb Version " + mongo_client.server_info()["version"])
         mongo_dbs[db_name] = mongo_db
 
-def save_json(obj,collection,id= None):
+def save_json(obj,collection,id= None,db_name = None):
     if len(mongo_dbs.keys()) == 0:
         init()
     if id is not None:
         obj['_id'] = str(id)
-    for db_name in mongo_dbs.keys():
+    if db_name is None:
+        for db_name_t in mongo_dbs.keys():
+            mongo_db = mongo_dbs[db_name_t]
+            mongo_db[collection].replace_one({'_id': obj['_id']}, obj, upsert=True)
+    else:
         mongo_db = mongo_dbs[db_name]
-        mongo_db[collection].insert_one(obj)
-
+        mongo_db[collection].replace_one({'_id': obj['_id']}, obj, upsert=True)
 
 if __name__ == "__main__":
-    save_json({"test":"test content"},"test")
+    save_json({"test":"test content"},"test","test_id")
