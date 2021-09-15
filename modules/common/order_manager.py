@@ -10,11 +10,13 @@ import datetime
 import modules.brokers.alpaca.alpaca as alpaca
 import modules.database.database_live as database_live
 import modules.notification.notifaction as notifaction
+import modules.database.redis_x as redis
+import json 
 
 all_products_info = sys_conf_loader.get_all_products_info()
 sys_conf = sys_conf_loader.get_sys_conf()
 class OrderManager():
-    def __init__(self,cash,untradable_times,mode = "backtest",is_reverse = "disable"):
+    def __init__(self,cash,untradable_times,mode = "backtest",is_reverse = "disable",unique_prefix = 'Xtrader-Cache-Test:AAPL'):
         self.position = modules.common.position.Position(cash)
         self.reverse_position = modules.common.position.Position(cash)
         self._orders = []
@@ -22,8 +24,41 @@ class OrderManager():
         self._untradable_times = untradable_times
         self._mode = mode
         self._is_reverse = is_reverse
+        self._unique_prefix = unique_prefix
+        self._load_from_redis()
+    
+    # for live
+    def _save_to_redis(self):
+        if self._mode == "live":
+            # save orders
+            orders_key = self._unique_prefix + ">" + "Orders"
+            redis.redis_set(orders_key,json.dumps(self._orders))
+            # save positions
+            position_key = self._unique_prefix + ">" + "CurrentPositions"
+            redis.redis_set(position_key,json.dumps(self.position.current_position)) 
+            his_position_key = self._unique_prefix + ">" + "CurrentPositions"
+            redis.redis_set(his_position_key,json.dumps(self.position.history_position)) 
+    
+    def _load_from_redis(self):
+        if self._mode == "live":
+            # load orders
+            orders_key = self._unique_prefix + ">" + "Orders"
+            t = redis.redis_get(orders_key)
+            if t is not None:
+                self._orders = json.loads(t) 
+            # load positions
+            position_key = self._unique_prefix + ">" + "CurrentPositions"
+            t = redis.redis_get(position_key)
+            if t is not None:
+                self.position.current_position = json.loads(t) 
+            his_position_key = self._unique_prefix + ">" + "CurrentPositions"
+            t = redis.redis_get(his_position_key)
+            if t is not None:
+                self.position.history_position = json.loads(t) 
+
     def _append_to_orders(self,order):
         self._orders.append(order)
+        self._save_to_redis()
 
     # check the orders relevant to this tick
     def _round_check(self, tick):
@@ -67,12 +102,13 @@ class OrderManager():
         # remove those gonna remove
         for order_remove in remove_list:
             self._orders.remove(order_remove)
+            self._save_to_redis()
         # updatge
         for order_update in update_list:
             for index, order in enumerate(self._orders):
                 if order["order_ref"] == order_update["order_ref"]:
                     self._orders[index] = order_update
-                    
+                    self._save_to_redis()        
 
     def _round_check_pending_open(self,tick,order):
         result = None
@@ -238,7 +274,8 @@ class OrderManager():
         for order_update in update_list:
             for index, order in enumerate(self._orders):
                 if order["order_ref"] == order_update["order_ref"]:
-                    self._orders[index] = order_update            
+                    self._orders[index] = order_update   
+                    self._save_to_redis()         
 
                 
     def _close_or_delete(self,tick,order_ref):
@@ -267,7 +304,7 @@ class OrderManager():
                 for index, order in enumerate(self._orders):
                     if order["order_ref"] == order_update["order_ref"]:
                         self._orders[index] = order_update    
-
+                        self._save_to_redis()
     def _check_sending_order(self,tick):
         if len(self._orders) ==0:
             return 
@@ -343,7 +380,7 @@ class OrderManager():
             for index, order in enumerate(self._orders):
                 if order["order_ref"] == order_update["order_ref"]:
                     self._orders[index] = order_update    
-    
+                    self._save_to_redis()
 
     def _update_profit(self,tick):
         update_list = self.position._update_profit(tick)
@@ -354,6 +391,7 @@ class OrderManager():
             for index, order in enumerate(self._orders):
                 if order["order_ref"] == order_update["order_ref"]:
                     self._orders[index].update(order_update)
+                    self._save_to_redis()
 
     def _round_check_after_day(self,week_day):
         # update swaps
@@ -365,3 +403,4 @@ class OrderManager():
             for index, order in enumerate(self._orders):
                 if order["order_ref"] == order_update["order_ref"]:
                     self._orders[index].update(order_update)
+                    self._save_to_redis()

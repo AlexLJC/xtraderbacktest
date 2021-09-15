@@ -102,6 +102,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
                         
                         try:
                             self.strategy.handle_bar(new_bar_dict,new_bar_dict["period"])
+                            self.strategy._save_cg()
                         except Exception as e:
                             self.stop_by_error = True
                             logging.error("Error in handle bar.")

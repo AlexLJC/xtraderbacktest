@@ -47,6 +47,14 @@ def run():
                         container_name = container.name
                         if DOCKER_CONTAINER_PREFIX in container_name:
                             container.remove(force = True)
+                if cmd == "reconnect":
+                    containers = client.containers.list(all=True)
+                    symbol = task["symbol"]
+                    for container in containers:
+                        container_name = container.name
+                        container_name = container_name.replace(DOCKER_CONTAINER_PREFIX,'') # Get the pure name
+                        if symbol in container_name:
+                            container.restart()
             except Exception as e:
                 logging.exception(e)
 

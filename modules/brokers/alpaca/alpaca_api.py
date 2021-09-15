@@ -179,7 +179,7 @@ if __name__ == "__main__":
         for symbol in heart_beat.keys():
             if symbol is not None and symbol != '' and symbol in heart_beat.keys():
                 delta = (now - heart_beat[symbol])
-                if delta.total_seconds() > 5 * 60:
+                if delta.total_seconds() > 15 * 60:
                     delete_list.append(symbol)
         for symbol in delete_list:
             logging.info("Desubscribe symbol " + symbol)

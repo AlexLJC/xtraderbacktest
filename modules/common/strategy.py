@@ -13,12 +13,14 @@ from abc import ABC, abstractmethod
 import pandas as pd
 import uuid
 import modules.notification.notifaction as notifaction
+import modules.database.redis_x as redis
+import json 
 
 class Strategy():
     def __init__(self,pars):
         self.pars = pars["custom"]
         self.g = {}
-        self.cg = {}
+        self.cg = {}                                                                        # Consistent Varaibale for strategy incase it nees to be restarted
         self.context = pars
         self.context.pop("custom",None)
         self.context["init_cash"] = self.context["cash"]
@@ -36,7 +38,32 @@ class Strategy():
         self.calendar_list = []
     def _set_mode(self,mode):
         self._mode = mode
-        self.order_manager = modules.common.order_manager.OrderManager(self.context["cash"],self.context["untradable_period"],self._mode,self.context["reverse_mode"])
+        self._unique_prefix = self._genreate_unique_prefix()                                      # for saving orders and positions to cache database in the live mode
+        self.order_manager = modules.common.order_manager.OrderManager(self.context["cash"],self.context["untradable_period"],self._mode,self.context["reverse_mode"],self._unique_prefix)
+        
+        # load cg
+        self._load_cg()
+
+    def _load_cg(self):
+        if self._mode == "live":
+            cg_key = self._unique_prefix + ">" + "CG"
+            t = redis.redis_get(cg_key)
+            if t is not None:
+                self.cg = json.loads(t)     
+    
+    def _save_cg(self):
+        if self._mode == "live":
+            cg_key = self._unique_prefix + ">" + "CG"
+            redis.redis_set(cg_key,json.dumps(self.cg))
+
+    def _genreate_unique_prefix(self):
+        symbols_str = ''
+        for symbol in self.context['symbols']:
+            symbols_str = symbols_str + symbol + ','
+        size = len(symbols_str)
+        symbols_str = symbols_str[:size-1]
+        result = 'Xtrader-Cache-' + self.context['strategy_name_code'] + ':' + symbols_str
+        return result
 
     # Init
     @abstractmethod
