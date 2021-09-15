@@ -28,6 +28,7 @@ import modules.brokers.alpaca.alpaca as alpaca
 import dateutil
 import modules.database.redis_x as redis
 import json 
+import modules.notification.notifaction as notifaction
 
 redis.init_mode("live")
 TIMESTAMP_FORMAT = sys_conf_loader.get_sys_conf()["timeformat"]
@@ -39,7 +40,8 @@ class Scheduler(modules.common.scheduler.Scheduler):
         self.tick_queue = queue.Queue()
         self.tick_count = 0
         self.tick_recv_date = {}
-
+        self._stream_alive = {}
+        self._stream_alive_dict = {}
     def register_strategy(self,strategy:modules.common.strategy.Strategy):
         self.strategy = strategy
         self.strategy._set_mode("live")
@@ -50,6 +52,8 @@ class Scheduler(modules.common.scheduler.Scheduler):
         self.strategy.init()
         for symbol in self.strategy.context["symbols"]:
             self.tick_recv_date[symbol] = datetime.datetime.now()
+            self._stream_alive[symbol] = True
+            self._stream_alive_dict[symbol] = datetime.datetime.now()
 
     def _loop_ticks(self):
         tick = {"start":"start"}
@@ -117,7 +121,8 @@ class Scheduler(modules.common.scheduler.Scheduler):
                 self.tick_count = 0
                 self.tick_recv_date[redis_data["symbol"]] = now
             self.tick_count = self.tick_count + 1
-
+            self._stream_alive_dict[redis_data["symbol"]] = now
+            self._stream_alive[redis_data["symbol"]] = True
 
     def trade_update_call_back(self,channel,redis_data):
         if "OrderCallback" in channel:
@@ -132,6 +137,17 @@ class Scheduler(modules.common.scheduler.Scheduler):
                     order_type = 'close'
                 order_symbol = order["symbol"]
                 self.strategy.order_manager._filled_ing_order(order_symbol,order_type,order_hit_price)
+
+    def _check_alive(self):
+        while True:
+            for symbol in self.strategy.context["symbols"]:
+                if self._stream_alive[symbol] is True:
+                    now = datetime.datetime.now()
+                    if (now - self._stream_alive_dict[symbol]).total_seconds()> 300:
+                        # Disconnect and send notification to warn
+                        self._stream_alive[symbol] = False
+                        notifaction.send_message("Market data may be disconnected, symbol:" + symbol + " at " + now.strftime("%Y-%m-%d %H:%M:%S"))
+            time.sleep(10)
 
     def start(self):
         logging.info("Live Scheduler Start.")
@@ -165,6 +181,8 @@ class Scheduler(modules.common.scheduler.Scheduler):
         
         strategy_t = threading.Thread(target = self._loop_ticks)
         strategy_t.start()
+        check_alive_t = threading.Thread(target = self._check_alive)
+        check_alive_t.start()
         strategy_t.join()
 
         if self.stop_by_error is True:
