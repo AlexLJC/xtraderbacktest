@@ -132,12 +132,13 @@ class Scheduler(modules.common.scheduler.Scheduler):
                 order = redis_data["order"]
                 client_order_id = order['client_order_id']
                 order_type = 'open'
-                order_hit_price = order["filled_avg_price"]
+                order_hit_price = float(order["filled_avg_price"])
                 if '_close' in client_order_id:
                     client_order_id = client_order_id.split('_')[0]
                     order_type = 'close'
                 order_symbol = order["symbol"]
-                self.strategy.order_manager._filled_ing_order(order_symbol,order_type,order_hit_price)
+                order_volume = float(order["filled_qty"]) 
+                self.strategy.order_manager._filled_ing_order(order_symbol,order_type,order_hit_price,order_volume )
 
     def _check_alive(self):
         while True:
