@@ -26,17 +26,19 @@ def init_mode(mode = "live"): # mode : backtest  live
     REDIS_PORT=conf["port"]
     REDIS_PASSWORD=conf["password"]
     logging.info("Connecting redis host:"+ REDIS_HOST + " port:" + str(REDIS_PORT) + " password:" + str(REDIS_PASSWORD))
-    if sys.platform.startswith('linux') == True:
-        socket_keepalive_options = {
-            socket.TCP_KEEPIDLE: 120,
-            socket.TCP_KEEPCNT: 3,
-            socket.TCP_KEEPINTVL: 5
-        }
-        rc = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD,charset="utf-8", decode_responses=True,socket_keepalive=True,
-            socket_keepalive_options=socket_keepalive_options) # redis
-    else:
-        rc = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD,charset="utf-8", decode_responses=True)
-
+    try:
+        if sys.platform.startswith('linux') == True:
+            socket_keepalive_options = {
+                socket.TCP_KEEPIDLE: 120,
+                socket.TCP_KEEPCNT: 3,
+                socket.TCP_KEEPINTVL: 5
+            }
+            rc = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD,charset="utf-8", decode_responses=True,socket_keepalive=True,
+                socket_keepalive_options=socket_keepalive_options) # redis
+        else:
+            rc = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD,charset="utf-8", decode_responses=True)
+    except Exception as e:
+        logging.exception(e)
 
 # init_mode()
 
@@ -230,6 +232,6 @@ if __name__ == "__main__":
     #     redis_rpush("BotQueue",json.dumps({"cmd":"create","file_name":"alex_2.py","symbol":symbol}) )
         #time.sleep(5)
     #redis_rpush("BotQueue",json.dumps({"cmd":"create","file_name":"alex_2.py","symbol":"AAPL"}) )
-    redis_rpush("BotQueue",json.dumps({"cmd":"delete_all"}) )
+    #redis_rpush("BotQueue",json.dumps({"cmd":"delete_all"}) )
     #redis_rpush("BotQueue",json.dumps({"cmd":"restart","symbol":"RRC"}) )
     pass
