@@ -164,7 +164,10 @@ async def trade_call_back(q):
         redis.redis_pulish(MARKET_DATA_CHANNEL_PREFIX + symbol,json.dumps(current_tick[symbol]))
     
 async def trade_update_call_back(q):
-    redis.redis_pulish(ORDER_CALLBACK_CHANNEL,str(q).replace('Entity({','{').replace('})','}')  )
+    json_str = str(q).replace('Entity(','')
+    size = len(json_str)
+    json_str = json_str[:size-1]
+    redis.redis_pulish(ORDER_CALLBACK_CHANNEL,  json_str)
     
 stream = alpaca.StreamT(quote_call_back,trade_call_back,trade_update_call_back)
 stream.init_stream()

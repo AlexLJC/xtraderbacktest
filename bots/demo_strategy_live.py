@@ -14,7 +14,7 @@ class Bot(modules.common.strategy.Strategy):
     def init(self):
         self.create_chart("ma_fast",size=3,base_color="blue")
         self.create_chart("ma_slow",size=3,base_color="red")
-
+        self.palced = False
     # Handle Tick
     def handle_tick(self, tick):
         #print(tick)
@@ -30,7 +30,8 @@ class Bot(modules.common.strategy.Strategy):
         # print(self.get_bars(bar["symbol"],30,"1d"))
         positions = self.get_current_position(symbol=bar["symbol"])
         print(positions)
-        if len(positions) == 0:
+        if len(positions) == 0 and self.palced is False:
+            self.palced  = True
             self.open_order("AAPL","market",1,"long")
         else:
             self.close_all_position()
