@@ -11,6 +11,7 @@ import pandas as pd
 all_products_info = sys_conf_loader.get_all_products_info()
 class Position():
     def __init__(self,cash):
+        self._init_deposit = cash
         self.deposit = cash
         self.cash = cash
         self.margin = 0
