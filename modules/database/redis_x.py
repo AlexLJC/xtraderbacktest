@@ -39,6 +39,7 @@ def init_mode(mode = "live"): # mode : backtest  live
             rc = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD,charset="utf-8", decode_responses=True)
     except Exception as e:
         logging.exception(e)
+    logging.info("Redis connected,")
 
 # init_mode()
 
