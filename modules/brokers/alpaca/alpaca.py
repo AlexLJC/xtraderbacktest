@@ -154,7 +154,7 @@ class StreamT():
             redis.redis_sadd(self.CACHE_REDIS_KEY,symbol)
             self.stream.subscribe_quotes(self.quote_call_back, symbol)
             self.stream.subscribe_trades(self.trade_call_back, symbol)
-            self.subscribe_trade_updates()
+            #self.subscribe_trade_updates()
             time.sleep(1)
 
     def subscribe_trade_updates(self):
@@ -324,18 +324,21 @@ if __name__ == "__main__":
         pass
     async def trade_call_back(q):
         # print('trade', q,flush=True)
+        
         pass
     async def trade_update_call_back(q):
         #print('trade_update', q,flush=True)
         #print(type(q),flush=True)
         #print(str(q),flush=True)
+        str_entity = str(q).replace('Entity({','{').replace('})','}')
+        print("TradeupdateDebug",json.loads(str_entity),flush=True )
         pass
     stream = StreamT(quote_call_back,trade_call_back,trade_update_call_back) # pass
     stream.init_stream()
     #time.sleep(10)
     #print("Testing open order.")
     order = {
-        "order_ref":"test_order_5",
+        "order_ref":"test_order_7",
         "symbol":"AAPL",
         "volume":1,
         "direction":"long",
