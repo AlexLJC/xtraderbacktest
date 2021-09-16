@@ -127,7 +127,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
 
     def trade_update_call_back(self,channel,redis_data):
         if "OrderCallback" in channel:
-            print('===============================trade_update', redis_data,flush=True)
+            #print('===============================trade_update', redis_data,flush=True)
             if redis_data["event"] == "fill":
                 order = redis_data["order"]
                 client_order_id = order['client_order_id']
@@ -138,7 +138,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
                     order_type = 'close'
                 order_symbol = order["symbol"]
                 order_volume = float(order["filled_qty"]) 
-                self.strategy.order_manager._filled_ing_order(order_symbol,order_type,order_hit_price,order_volume )
+                self.strategy.order_manager._filled_ing_order(order_symbol,order_type,order_hit_price,order_volume,client_order_id )
 
     def _check_alive(self):
         while True:

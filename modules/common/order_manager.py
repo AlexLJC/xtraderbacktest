@@ -247,7 +247,7 @@ class OrderManager():
                     self._orders[index] = order_update    
 
     # live use
-    def _filled_ing_order(self,order_symbol,order_type,order_hit_price,order_volume):
+    def _filled_ing_order(self,order_symbol,order_type,order_hit_price,order_volume,order_ref):
         if len(self._orders) ==0:
             return 
         if self._mode != "live":
@@ -255,7 +255,7 @@ class OrderManager():
         update_list = []
         for order in self._orders:
             if order_symbol == order["symbol"]:
-                if order["status"] == "opening" and order_type == "open":
+                if order["status"] == "opening" and order_type == "open" and order_ref == order["order_ref"]:
                     u = self.position._update_position(order["order_ref"],order_hit_price,order_volume)
                     if u is not None:
                         order.update(u)
@@ -264,7 +264,7 @@ class OrderManager():
                         database_live.save_json(order,"Positions",id=order["order_ref"])
                         # Send Notifcation
                         notifaction.send_message("Open Position",order)
-                elif order["status"] == "closing" and order_type == "close":
+                elif order["status"] == "closing" and order_type == "close" and order_ref == order["order_ref"]:
                     u = self.position._update_history_position(order["order_ref"],order_hit_price)
                     if u is not None:
                         order.update(u)
