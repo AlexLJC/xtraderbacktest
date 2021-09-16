@@ -167,6 +167,10 @@ async def trade_update_call_back(q):
     json_str = str(q).replace('Entity(','')
     size = len(json_str)
     json_str = json_str[:size-1]
+    json_str = json_str.replace("'",'"')
+    json_str = json_str.replace("None",'null')
+    json_str = json_str.replace("True",'true')
+    json_str = json_str.replace("False",'false')
     redis.redis_pulish(ORDER_CALLBACK_CHANNEL,  json_str)
     
 stream = alpaca.StreamT(quote_call_back,trade_call_back,trade_update_call_back)

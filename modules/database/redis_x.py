@@ -210,11 +210,15 @@ class SubscrberThread(threading.Thread):
                 channel = item['channel']
                 if channel in self.channel_list:
                     if item['data'] != "{}":
-                        redis_data = json.loads(item['data'])
-                        if self.process is not None:
-                            self.process(channel,redis_data)
-                        else:
-                            self.runnalbe_object.process(channel,redis_data)
+                        try:
+                            redis_data = json.loads(item['data'])
+                            if self.process is not None:
+                                self.process(channel,redis_data)
+                            else:
+                                self.runnalbe_object.process(channel,redis_data)
+                        except Exception as e:
+                            print(item['data'])
+                            logging.exception(e)
 
             
 ## Test cases   
