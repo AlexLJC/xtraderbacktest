@@ -74,11 +74,12 @@ if __name__ == "__main__":
         print("Geting Screener")
         get_screen_to_csv()
         list_of_symbols =  load_csv()
-        print("List of symbos",list_of_symbols)
+        print("List of symbos",list_of_symbols,len(list_of_symbols))
         now = datetime.datetime.now()
         if now.hour >= 9 and now.hour <= 15 :
             for symbol in list_of_symbols:
                 redis.redis_rpush("BotQueue",json.dumps({"cmd":"create","file_name":"alex_2.py","symbol":symbol}) )
+                redis.redis_rpush("BotQueue",json.dumps({"cmd":"create","file_name":"alex_3.py","symbol":symbol}) )
                 time.sleep(1)
                 close_today = False
         if now.hour >=17 and close_today is False:

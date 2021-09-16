@@ -397,8 +397,8 @@ class Strategy():
             self.order_manager._filled_all_ing_orders(tick)
 
         # For temporly use. TBD
-        if self._mode == "live":
-            self.order_manager._filled_all_ing_orders(tick)
+        #if self._mode == "live":
+            #self.order_manager._filled_all_ing_orders(tick)
     
     def _round_check_before(self,tick):
         self._set_current_time(tick["date"])
