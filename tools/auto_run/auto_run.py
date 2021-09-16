@@ -52,8 +52,8 @@ def run():
                     symbol = task["symbol"]
                     for container in containers:
                         container_name = container.name
-                        container_name = container_name.replace(DOCKER_CONTAINER_PREFIX,'') # Get the pure name
-                        if symbol in container_name:
+                        container_name_pure = container_name.replace(DOCKER_CONTAINER_PREFIX,'') # Get the pure name
+                        if symbol in container_name_pure and DOCKER_CONTAINER_PREFIX in container_name:
                             container.restart()
             except Exception as e:
                 logging.exception(e)
