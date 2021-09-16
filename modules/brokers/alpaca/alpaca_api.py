@@ -170,6 +170,7 @@ stream = alpaca.StreamT(quote_call_back,trade_call_back,trade_update_call_back)
 stream.init_stream()
 if __name__ == "__main__":
     #stream.subscribe_trade_updates()
+    logging.info("Alpaca Streamming api is starting")
     redis.redis_subscribe_channel([ACK_CHANNEL,COMMAND_CHANNEL], process = _redis_call_back)
     
 

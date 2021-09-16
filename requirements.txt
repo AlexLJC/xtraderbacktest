@@ -13,5 +13,4 @@ trading_calendars
 xmltodict
 simplejson
 alpaca_trade_api 
-docker
 python-telegram-bot
