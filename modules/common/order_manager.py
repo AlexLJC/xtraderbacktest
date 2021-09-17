@@ -27,6 +27,9 @@ class OrderManager():
         self._unique_prefix = unique_prefix
         self._load_from_redis()
     
+    def _deposit_withdraw(self,cash):
+        self.position._deposit_withdraw(cash)
+        self.reverse_position._deposit_withdraw(cash)
     # for live
     def _save_to_redis(self):
         if self._mode == "live":

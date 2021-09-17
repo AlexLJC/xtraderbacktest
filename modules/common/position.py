@@ -21,6 +21,10 @@ class Position():
         self.current_position = []
         self.history_position = []
 
+    def _deposit_withdraw(self,cash):
+        self.deposit = self.deposit + cash
+        self._init_deposit = self._init_deposit + cash
+
     def _open_position(self,tick,order,direction):
         symbol = order["symbol"]
         direction = direction
@@ -53,7 +57,7 @@ class Position():
         
 
         margin = open_price * volume * margin_rate * contract_size
-        commission = 0 - all_products_info[s_temp]["commission"]
+        commission = 0 - all_products_info[s_temp]["commission"]*volume
         new_position = {
             "order_ref":order_ref,
             "volume":volume,
@@ -247,7 +251,7 @@ class Position():
                 volume = volume + item["current_volume"]
         return volume
     def get_margin_rate(self):
-        result = 0
+        result = 9999999999
         if self.margin!=0:
             result = (self.cash - self.margin ) / self.margin
         return result

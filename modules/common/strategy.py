@@ -210,7 +210,9 @@ class Strategy():
 
     def modify_order(self,order_ref,fields):
         unwanted = set(["profit","margin","commission","close_filled_price","close_price","open_filled_price","open_price","status","close_date","open_date","create_date","filled"]) 
-        for unwanted_key in unwanted: del fields[unwanted_key]
+        for unwanted_key in unwanted: 
+            if unwanted_key in fields.keys():
+                del fields[unwanted_key]
         for index, order in enumerate(self.order_manager._orders):
             if order["order_ref"] == order_ref:
                 if order["status"] == "pending_open" or order["status"] == "open_filled":
@@ -381,7 +383,10 @@ class Strategy():
         else:
             logging.error('chart ' + chart_name + ' not exist')
 
-     # Send Order
+    def deposit_withdraw(self,cash):
+        self.order_manager._deposit_withdraw(cash)
+
+    # Send Order
     def _send_order(self,order):
         self._pending_orders.append(order)
 

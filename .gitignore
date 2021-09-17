@@ -165,3 +165,6 @@ __cache__/
 /configurations/sys/*
 !/configurations/sys/system_conf_template.yaml
 /study
+
+/data/custom_event/*
+!/data/custom_event/README.md

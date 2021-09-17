@@ -2,12 +2,12 @@
 name: XAUUSD                            # symbol name
 point: 0.01                             # point value
 tick_size: 0.01                         # tick_size
-commission: 0.1                         # commission in currency
+commission: 0.0                         # commission in currency
 slippage: 0                             # slippage in points
-margin_rate: 0.05                       # margin rate 0.05 = 5%
+margin_rate: 0.0025                     # margin rate 0.05 = 5%
 minimum_tp_sl: 3                        # minimum gap in points between entry price and tpsl price
 contract_size: 100                      # contract size
-spread: 15                              # the spread(between ask and bid) in points for backtest
+spread: 0                               # the spread(between ask and bid) in points for backtest
 type: cfd                               # symbol type
 exchange: None                          # the trading exchange
 t+0: true                               # whether is t+0
