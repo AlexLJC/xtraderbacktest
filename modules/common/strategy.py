@@ -121,7 +121,7 @@ class Strategy():
         'ratio':0.5
     }
     '''
-    def open_order(self, symbol, order_type,  volume, direction, limit_price = 0, tp = 0, sl = 0, expiration = 0, mutiple_exits = None, trailing_sl = None, extra = None):
+    def open_order(self, symbol, order_type,  volume, direction, limit_price = 0, tp = 0, sl = 0, expiration = 0, mutiple_exits = None, trailing_sl = None, extra = None, force_price = None):
         price = self.current_tick[symbol]
         if order_type == "limit":
             if direction == "long":
@@ -202,7 +202,8 @@ class Strategy():
             "commission":0,
             "margin":0,
             "profit":0,
-            "swap":0
+            "swap":0,
+            "open_force_price":force_price
         }
         self.order_manager._append_to_orders(order)
 
@@ -219,8 +220,8 @@ class Strategy():
                     self.order_manager._orders[index].update(fields)
         
     
-    def close_order(self, order_ref):
-        self.order_manager._close_or_delete(self.current_tick,order_ref)
+    def close_order(self, order_ref,force_price = None):
+        self.order_manager._close_or_delete(self.current_tick,order_ref, force_price)
         
     
     def send_notification(self,message,obj=None):

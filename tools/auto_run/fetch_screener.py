@@ -76,7 +76,7 @@ if __name__ == "__main__":
         list_of_symbols =  load_csv()
         print("List of symbos",list_of_symbols,len(list_of_symbols))
         now = datetime.datetime.now()
-        if now.hour >= 9 and now.hour <= 15 :
+        if now.hour >= 9 and now.hour <= 15 and now.weekday() <5 :
             for symbol in list_of_symbols:
                 redis.redis_rpush("BotQueue",json.dumps({"cmd":"create","file_name":"alex_2.py","symbol":symbol}) )
                 redis.redis_rpush("BotQueue",json.dumps({"cmd":"create","file_name":"alex_3.py","symbol":symbol}) )
@@ -85,7 +85,11 @@ if __name__ == "__main__":
         if now.hour >=17 and close_today is False:
             redis.redis_rpush("BotQueue",json.dumps({"cmd":"delete_all"}) )
             close_today = True
-        if now.hour >=17 or now.hour < 9:
+        if  now.weekday() >= 5 and close_today is False:
+            redis.redis_rpush("BotQueue",json.dumps({"cmd":"delete_all"}) )
+            close_today = True
+            print("WeekDay")
+        if now.hour >=17 or now.hour < 9 or now.weekday() >= 5 :
             time.sleep(60)
         else:
             time.sleep(10)

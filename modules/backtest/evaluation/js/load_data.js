@@ -123,6 +123,48 @@ function load(backtest_result,file_name){
 
                     line_chart.setData(line_data);
                 }
+                if(custom_chart["type"] == "linear" && custom_chart["window"] != "default"){
+                    var chart = LightweightCharts.createChart(candle_chart_holder, 
+                        { 
+                            width: candle_chart_holder.offsetWidth,
+                            height: window.innerHeight/2 ,
+                            timeScale: {
+                                timeVisible: true,
+                                borderColor: '#D1D4DC',
+                            },
+                            rightPriceScale: {
+                                borderColor: '#D1D4DC',
+                            },
+                            layout: {
+                                backgroundColor: '#ffffff',
+                                textColor: '#000',
+                            },
+                            grid: {
+                                horzLines: {
+                                    color: '#F0F3FA',
+                                },
+                                vertLines: {
+                                    color: '#F0F3FA',
+                                },
+                            },
+                            
+                        } 
+                    );
+                   
+                    var line_chart = chart.addLineSeries({
+                        color: custom_chart["base_color"],
+                        lineWidth: custom_chart["symbol_size"],
+                    });
+                    // Prepare line data
+                    line_data = []
+
+                    for(var data_index in custom_chart["data"]){
+                        single_data = custom_chart["data"][data_index];
+                        line_data.push({ time: single_data["x_timestamp"], value: single_data["y"]});
+                    }
+
+                    line_chart.setData(line_data);
+                }
             }
         }
         
@@ -170,7 +212,8 @@ function load(backtest_result,file_name){
            "Open Price":order["open_filled_price"].toFixed(5) ,
            "Close Date":order["close_date"] ,
            "Close Price":order["close_filled_price"].toFixed(5) ,
-           "Profit":order["profit"].toFixed(5) 
+           "Profit":order["profit"].toFixed(5),
+           "Volume":order["volume"].toFixed(5)  
         };
         table_data.push(t);
     }
@@ -186,7 +229,8 @@ function load(backtest_result,file_name){
                 { mData: "Open Price" },
                 { mData: "Close Date" },
                 { mData: "Close Price" },
-                { mData: "Profit" }
+                { mData: "Profit" },
+                { mData: "Volume" }
             ],
             "responsive": true, "lengthChange": false, "autoWidth": false,"paging": true,
             "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
