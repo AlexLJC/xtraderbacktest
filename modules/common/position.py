@@ -58,6 +58,8 @@ class Position():
 
         margin = open_price * volume * margin_rate * contract_size
         commission = 0 - all_products_info[s_temp]["commission"]*volume
+        if abs(commission) < all_products_info[s_temp]["min_commission"]:
+            commission = 0 - all_products_info[s_temp]["min_commission"]
         new_position = {
             "order_ref":order_ref,
             "volume":volume,

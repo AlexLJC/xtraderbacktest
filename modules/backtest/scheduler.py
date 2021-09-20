@@ -291,7 +291,10 @@ class Scheduler(modules.common.scheduler.Scheduler):
             save_backtest_result.save_scanner_result(scanner_result,strategy_name=self.strategy.context["strategy_name"])
 
         logging.info("Congratulation!! The backtest finished. Hope you find The Holy Grail.")
-
+        if "summary" in backtest_result.keys():
+            return backtest_result["summary"]
+        else:
+            return None
 
 class OHLCManager():
     def __init__(self, mode, symbols, fr, to, graininess="1m",pre_post_market = True):

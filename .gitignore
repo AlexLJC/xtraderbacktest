@@ -168,3 +168,5 @@ __cache__/
 
 /data/custom_event/*
 !/data/custom_event/README.md
+
+*zip

@@ -11,7 +11,7 @@ def save_result(backtest_result):
     local_dir = os.path.join(os.getcwd().split('xtraderbacktest')[0],'xtraderbacktest','data','backtest_results',backtest_result["pars"]["strategy_name"])
     if not os.path.exists(local_dir):
         os.makedirs(local_dir)
-    file_name = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f") + ".json"
+    file_name = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f") + "_" + backtest_result["pars"]["tag"] + ".json"
     locak_path = local_dir + "/" + file_name
     if sys.platform.startswith('linux') == False:
         locak_path = locak_path.replace('/','\\')
