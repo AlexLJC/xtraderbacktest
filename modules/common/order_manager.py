@@ -283,7 +283,7 @@ class OrderManager():
                     self._save_to_redis()         
 
                 
-    def _close_or_delete(self,tick,order_ref):
+    def _close_or_delete(self,tick,order_ref,force_price = None):
         symbol = None
         for order in self._orders:
             if order["order_ref"] == order_ref:
@@ -304,6 +304,7 @@ class OrderManager():
                         t["status"] = "delete"
                     elif order["status"] == "open_filled":
                         t["status"] = "sending_close"
+                        t["close_force_price"] = force_price
                     update_list.append(t)
             for order_update in update_list:
                 for index, order in enumerate(self._orders):
@@ -376,9 +377,12 @@ class OrderManager():
                             close_type = "hit"
                             if "close_type" in order.keys():
                                 close_type = order["close_type"]
-                            u = self.position._close_position(tick,order["order_ref"],order["close_price"],close_type)
+                            if self._is_reverse != "enable":
+                                u = self.position._close_position(tick,order["order_ref"],order["close_price"],close_type,order["close_force_price"])
                             if self._is_reverse == "enable":
-                                u = self.reverse_position._close_position(tick,order["order_ref"],order["close_price"],close_type)
+                               
+                                u = self.reverse_position._close_position(tick,order["order_ref"],order["close_price"],close_type,order["close_force_price"])
+                                
                         t.update(u)     
                         update_list.append(t)
         for order_update in update_list:

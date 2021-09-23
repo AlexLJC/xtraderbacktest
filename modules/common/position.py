@@ -54,7 +54,8 @@ class Position():
             open_price = order["limit_price"]
         if direction == "short" and order_type != "market" and is_gap is False:
             open_price = order["limit_price"]
-        
+        if order["open_force_price"] is not None:
+            open_price = order["open_force_price"] 
 
         margin = open_price * volume * margin_rate * contract_size
         commission = 0 - all_products_info[s_temp]["commission"]*volume
@@ -137,7 +138,7 @@ class Position():
         
         return result
 
-    def _close_position(self,tick,order_ref,price,close_type = "hit"):
+    def _close_position(self,tick,order_ref,price,close_type = "hit",force_price = None):
         position = None
         for p in self.current_position:
             if p["order_ref"] == order_ref:
@@ -171,6 +172,8 @@ class Position():
             close_price = price
         if position["direction"] == "short" and close_type != "hit" and is_gap is False:
             close_price = price
+        if force_price is not None:
+            close_price = force_price
         position["close_price"] = close_price
         position["close_date"] = tick["date"]
         position["close_timestamp"] = int(pd.Timestamp(datetime.datetime.strptime(position["close_date"], "%Y-%m-%d %H:%M:%S")).timestamp())
@@ -255,5 +258,5 @@ class Position():
     def get_margin_rate(self):
         result = 9999999999
         if self.margin!=0:
-            result = (self.cash - self.margin ) / self.margin
+            result = ((self.cash - self.margin ) / self.margin) 
         return result
