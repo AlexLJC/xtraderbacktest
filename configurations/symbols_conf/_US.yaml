@@ -8,7 +8,7 @@ slippage: 0                             # slippage in points
 margin_rate: 0.25                       # margin rate 0.05 = 5%
 minimum_tp_sl: 3                        # minimum gap in points between entry price and tpsl price
 contract_size: 1                        # contract size
-spread: 5                               # the spread(between ask and bid) in points for backtest
+spread: 2                               # the spread(between ask and bid) in points for backtest
 type: stock                             # symbol type
 exchange: None                          # the trading exchange
 t+0: true                               # whether is t+0
