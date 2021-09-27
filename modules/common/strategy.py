@@ -203,7 +203,8 @@ class Strategy():
             "margin":0,
             "profit":0,
             "swap":0,
-            "open_force_price":force_price
+            "open_force_price":force_price,
+            "close_force_price":None
         }
         self.order_manager._append_to_orders(order)
 

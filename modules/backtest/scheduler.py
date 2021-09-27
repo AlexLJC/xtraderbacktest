@@ -285,8 +285,8 @@ class Scheduler(modules.common.scheduler.Scheduler):
             df['timestamp'] = df['date'].values.astype(np.int64) // 10 ** 9
             df['date'] = df["date"].dt.strftime("%Y-%m-%d %H:%M:%S")
             backtest_result["price_data"][symbol] = df.to_dict('records')
-            
-        save_backtest_result.save_result(backtest_result)
+        if len(self.strategy.order_manager.position.history_position) > 0:    
+            save_backtest_result.save_result(backtest_result)
 
         if self.mode == "scanner":
             logging.info("Saving scanner result")

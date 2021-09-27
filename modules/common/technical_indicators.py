@@ -37,3 +37,17 @@ def vwap_session_series(df,today):
     df["hlc_value"] = df["hlc"] * df['volume']
     df["vwap"] = df["hlc_value"].cumsum() / df["volume"].cumsum()
     return df["vwap"]
+
+def fractal(df):
+    df = df.copy(deep = True)
+    win_max = pd.Series.rolling(df['high'], 3, center=True).max()
+    win_min = pd.Series.rolling(df['low'], 3, center=True).min()
+    df['up_frac'] = np.where((df['high'] == win_max) \
+                                & (df["low"] > df["low"].shift(1)) \
+                                & (df["low"] > df["low"].shift(-1)) \
+                                , df['high'], np.nan)
+    df['down_frac'] = np.where((df['low'] == win_min) \
+                               & (df["high"] < df["high"].shift(1)) \
+                               & (df["high"] <  df["high"].shift(-1)) \
+                               , df['low'], np.nan)
+    return df
