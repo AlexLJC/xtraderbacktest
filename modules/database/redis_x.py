@@ -237,7 +237,7 @@ if __name__ == "__main__":
     #     redis_rpush("BotQueue",json.dumps({"cmd":"create","file_name":"alex_2.py","symbol":symbol}) )
         #time.sleep(5)
     #redis_rpush("BotQueue",json.dumps({"cmd":"create","file_name":"alex_2.py","symbol":"AAPL"}) )
-    #redis_rpush("BotQueue",json.dumps({"cmd":"delete_all"}) )
+    redis_rpush("BotQueue",json.dumps({"cmd":"delete_all"}) )
     #redis_rpush("BotQueue",json.dumps({"cmd":"restart","symbol":"RKLY"}) )
     #redis_rpush("BotQueue",json.dumps({"cmd":"restart","symbol":"HLBZ"}) )
     #redis_rpush("BotQueue",json.dumps({"cmd":"create","file_name":"alex_3.py","symbol":'AAPL'}) )

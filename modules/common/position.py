@@ -258,5 +258,5 @@ class Position():
     def get_margin_rate(self):
         result = 9999999999
         if self.margin!=0:
-            result = ((self.cash - self.margin ) / self.margin) 
+            result = ((self.cash) / self.margin) 
         return result

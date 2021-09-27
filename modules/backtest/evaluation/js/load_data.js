@@ -2,7 +2,7 @@
 function load(backtest_result,file_name){
     candle_chart_holder = document.getElementById("candle_chart_holder");
     candle_chart_holder.innerHTML = "";
-    
+    console.log(backtest_result)
     
     
     for(var symbol in backtest_result["price_data"]){
