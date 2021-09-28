@@ -135,6 +135,7 @@ __cache__/
 /data/backtest_results/*/
 /data/web_crawler/*/
 *.csv
+*.txt
 
 /configurations/strategy/optmize/*
 !/configurations/strategy/optmize/demo_strategy/
