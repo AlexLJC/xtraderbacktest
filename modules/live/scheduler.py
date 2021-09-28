@@ -146,7 +146,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
             for symbol in self.strategy.context["symbols"]:
                 if self._stream_alive[symbol] is True:
                     now = datetime.datetime.now()
-                    if (now - self._stream_alive_dict[symbol]).total_seconds()> 400:
+                    if (now - self._stream_alive_dict[symbol]).total_seconds()> 400 and now.hour() < 16:
                         # Disconnect and send notification to warn
                         self._stream_alive[symbol] = False
                         notifaction.send_message("Market data may be disconnected, symbol:" + symbol + " at " + now.strftime("%Y-%m-%d %H:%M:%S" + ". Try to Restart now."))

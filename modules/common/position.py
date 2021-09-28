@@ -256,7 +256,8 @@ class Position():
                 volume = volume + item["current_volume"]
         return volume
     def get_margin_rate(self):
-        result = 9999999999
-        if self.margin!=0:
-            result = ((self.cash) / self.margin) 
+        if self.cash !=0:
+            result = (self.margin / (self.cash) ) 
+        else:
+            result = 0
         return result
