@@ -9,17 +9,17 @@ databases:                                                              # databa
       port: 3433
   mangos:                                                               # mangos database
     db1:
-      host: 127.0.0.1
+      host: 127.0.0.1   
       user: user
       password: password
-      port: 3433
+      port: 27017
   redises:                                                              # redis database
     backtest:
-      host: 127.0.0.1
+      host: 127.0.0.1 
       port: 6379
       password: password
     live:
-      host: 127.0.0.1
+      host: 127.0.0.1 
       port: 6379
       password: password
 remote_storage:                                                         # the remote locations of saving files
@@ -43,24 +43,28 @@ notification:                                                           # the no
     port: 465
     user: admin@gmail.com
     password: password
+  telegram:
+    token: token
+    chat_id: "-1"
 live_conf:                                                              # the configuration of live mode 
   price_preload:  10000                                                 # preload how many minues previous data into strategy
   save_order_record:                                                    # if save order record into database
-    is_on: false                                                        # on = true or off = false
-    type: mysqls                                                        # the type of database
+    is_on: true                                                         # on = true or off = false
+    type: mangos                                                        # the type of database
     db_name: db1                                                        # the name of the database
   notification:                                                         # whether send notification
-    is_on: false                                                        # on = true or off = false
-    type: mail                                                          # the way of notification
+    is_on: true                                                         # on = true or off = false
+    type: telegram                                                      # the way of notification
   alpaca:                                                               # Alpaca Configurations
-    APCA-API-KEY-ID: APCA-API-KEY-ID                                    # Alpaca api key id
-    APCA-API-SECRET-KEY: APCA-API-SECRET-KEY                            # Alpaca api secret key
+    APCA-API-KEY-ID: AAAAAAAAAAAAAAAAAAAA                               # Alpaca api key id
+    APCA-API-SECRET-KEY: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA       # Alpaca api secret key
     URL: https://paper-api.alpaca.markets                               # Base url
     DATA_URL: https://data.alpaca.markets                               # Data url
     WSS_URL: wss://paper-api.alpaca.markets/stream                      # Stream url
 backtest_conf:                                                          # the configuration of backtest mode
   price_timezone: UTC+0                                                 # the price data's time zone
   price_preload:  10000                                                 # preload how many minues previous data into strategy
+  price_loaction: /data/price/
   indicator_remote_cache:                                               # the configuration of remote cache of indicators temp files
     is_on: false                                                        # on = true or off = false
     type: s3                                                            # the location type

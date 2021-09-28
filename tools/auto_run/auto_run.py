@@ -43,6 +43,7 @@ def run():
                         result = client.containers.run(DOCKER_IMAGE,command,auto_remove = True,name = worker_name, detach = True,network_mode = "host")
                         time.sleep(1)
                 if cmd == "delete_all":
+                    print("delete_all")
                     containers = client.containers.list(all=True)
                     for container in containers:
                         container_name = container.name
