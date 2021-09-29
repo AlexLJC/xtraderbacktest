@@ -321,17 +321,16 @@ class IBCore(EClient, EWrapper):
     # ! [scannerdata]
     def scannerData(self, reqId: int, rank: int, contractDetails: ContractDetails,
                     distance: str, benchmark: str, projection: str, legsStr: str):
-        super().scannerData(reqId, rank, contractDetails, distance, benchmark,
-                            projection, legsStr)
-        # print("ScannerData. ReqId:", reqId, "Rank:", rank, "Symbol:", contractDetails.contract.symbol,
-        #         "SecType:", contractDetails.contract.secType,
-        #         "Currency:", contractDetails.contract.currency,
-        #         "Distance:", distance, "Benchmark:", benchmark,
-        #         "Projection:", projection, "Legs String:", legsStr)
-        
-        if rank <20:
+        #super().scannerData(reqId, rank, contractDetails, distance, benchmark, projection, legsStr)
+        print("ScannerData. ReqId:", reqId, "Rank:", rank, "Symbol:", contractDetails.contract.symbol,
+                "SecType:", contractDetails.contract.secType,
+                "Currency:", contractDetails.contract.currency,
+                "Distance:", distance, "Benchmark:", benchmark,
+                "Projection:", projection, "Legs String:", legsStr)
+        print('=========================================================')
+        if rank <20 or True:
             now = datetime.datetime.now()
-            print("ScannerData. ReqId:", reqId, ScanData(contractDetails.contract, rank, distance, benchmark, projection, legsStr))
+            #print("ScannerData. ReqId:", reqId, ScanData(contractDetails.contract, rank, distance, benchmark, projection, legsStr))
             if now.hour >= 8 and now.hour <= 15 and now.weekday() <5 :
                 symbol = contractDetails.contract.symbol
                 redis.redis_rpush("BotQueue",json.dumps({"cmd":"create","file_name":"alex_3.py","symbol":symbol}) )
@@ -345,15 +344,22 @@ class IBCore(EClient, EWrapper):
         # ! [scannerdataend]
         
     def screener(self):
-        scanSub = ScannerSubscription()
-        scanSub.instrument = "STK"
-        scanSub.locationCode = "STK.US"
-        scanSub.scanCode = "TOP_PERC_GAIN"
-        scanSub.abovePrice = 5
-        scanSub.aboveVolume = 40000
-
-        req_id = self.nextOrderId()
-        self.reqScannerSubscription(req_id,scanSub,None,None)
+        for locationCode in ['STK.NASDAQ','STK.NYSE','STK.AMEX','STK.ARCA']:
+            scanSub = ScannerSubscription()
+            scanSub.instrument = "STK"
+            scanSub.locationCode = locationCode#"STK.US"
+            scanSub.scanCode = "TOP_PERC_GAIN"
+            scanSub.abovePrice = 20
+            #scanSub.aboveVolume = 40000
+            #scanSub.scannerSettingPairs = "Change,true"
+            
+            tagValues = [
+                TagValue("changePercAbove", "8"),
+                TagValue('priceAbove', 20),
+                TagValue('priceBelow', 100)
+                ]
+            req_id = self.nextOrderId()
+            self.reqScannerSubscription(req_id,scanSub,None,tagValues)
 
 if __name__ == "__main__":
     ib_core = IBCore()
