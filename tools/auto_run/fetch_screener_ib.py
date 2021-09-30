@@ -368,6 +368,7 @@ if __name__ == "__main__":
     ib_core.connect("127.0.0.1", 7497, clientID) 
     #ib_core.run()
     thread_ib = threading.Thread(target = ib_core.run,args =())
+    thread_ib.setDaemon(True)
     thread_ib.start()
 
     time.sleep(5)
@@ -375,5 +376,6 @@ if __name__ == "__main__":
     while(True):
         now = datetime.datetime.now()
         if now.hour >=17:
+            redis.redis_rpush("BotQueue",json.dumps({"cmd":"delete_all"}))
             exit(0)
         time.sleep(5)
