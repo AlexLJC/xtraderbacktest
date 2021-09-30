@@ -1,8 +1,10 @@
 ##To check for a particular  string in a file
 
-File=nohup.out  
+searchString="code = 1006"
+File="./nohup.out"  
 while true; do 
-    if grep -q "code = 1006" "$File";then
+    if grep -Fxq "$searchString" $file
+    then
         ./run_api.sh
     fi
     sleep 10
