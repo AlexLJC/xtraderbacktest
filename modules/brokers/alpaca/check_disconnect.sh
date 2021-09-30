@@ -1,7 +1,7 @@
 ##To check for a particular  string in a file
 
 searchString="code = 1006"
-File="./nohup.out"  
+file="./nohup.out"  
 while true; do 
     if grep -Fxq "$searchString" $file
     then
