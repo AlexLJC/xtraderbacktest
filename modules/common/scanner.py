@@ -11,7 +11,7 @@ class Scanner(modules.common.strategy.Strategy):
     def __init__(self,pars):
         all_symbols = []
         symbol_reports = sys_conf_loader.get_all_products_report()
-        price_location = sys_conf_loader.get_sys_path() + "/data/price/"
+        price_location = sys_conf_loader.get_sys_path() + sys_conf_loader.get_sys_conf()["backtest_conf"]["price_loaction"] 
         if sys.platform.startswith('linux') == False:
             price_location = price_location.replace('/','\\')
 
