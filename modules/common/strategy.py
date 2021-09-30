@@ -242,7 +242,7 @@ class Strategy():
             if period != "1d":
                 result = df[0-count-1:].copy(deep = True)
             if period == "1d":
-                result = df[0-count-1:-1].copy(deep = True)
+                result = df[0-count-1:].copy(deep = True)
         return result
 
         
@@ -463,8 +463,8 @@ class Strategy():
 
     # update the profit in the current position
     def _update_position(self):
-        if len(self.order_manager.position.current_position) == 0:
-            return 
+        # if len(self.order_manager.position.current_position) == 0:
+        #     return 
         for symbol in self.current_tick.keys():
             self.order_manager._update_profit(self.current_tick[symbol])
 

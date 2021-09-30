@@ -24,6 +24,8 @@ def convert_period_to_int(period):
         return int(period.split('d')[0]) * 1440
     elif "w" in period:
         return int(period.split('w')[0]) * 1440 * 7
+    elif "M" in period:                                     # Month
+        return int(period.split('M')[0]) * 1440 * 7 * 4
     else:
         return None
 

@@ -43,6 +43,10 @@ def convert(df, to_tf,mode="normal",pre_post_market = True):
         if to_tf == 1440 * 7 * 1: 
             #print(_df)
             _df = _df.resample('W-MON', closed='left', label='left').agg(ohlc_dict).dropna()
+        # Monthly Bar
+        elif to_tf == 1440 * 7 * 1 * 4: 
+            #print(_df)
+            _df = _df.resample('M', closed='left', label='left').agg(ohlc_dict).dropna()
         else :
             _df = _df.resample(str(to_tf)+'T', closed='left', label='left').agg(ohlc_dict).dropna()
     result__df = _df.copy()
