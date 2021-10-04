@@ -103,4 +103,6 @@ class OHLCCounter():
                 self.ohlc_queue_length = self.ohlc_queue.qsize()
                 self.latest_date = ohlc_time_str
                 return result,ohlc 
+            else:
+                ohlc = self.ohlc_queue.queue[self.ohlc_queue_length-1]
         return None,ohlc
