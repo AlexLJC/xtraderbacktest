@@ -20,21 +20,21 @@ minimum_lots: 1                         # minimum lot
 trade_session:                          # tradable session
   sunday: []
   monday:                               # the template of multiple tradable session in one day
-  - - '01:00:00'
+  - - '00:00:00'
     - '10:59:59'
   - - '10:59:59'
     - '23:59:59'
   tuesday:
-  - - '01:00:00'
+  - - '00:00:00'
     - '23:59:59'
   wednesday:
-  - - '01:00:00'
+  - - '00:00:00'
     - '23:59:59'
   thursday:
-  - - '01:00:00'
+  - - '00:00:00'
     - '23:59:59'
   friday:
-  - - '01:00:00'
+  - - '00:00:00'
     - '23:59:59'
   saturday: []
 

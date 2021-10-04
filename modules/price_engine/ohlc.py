@@ -87,6 +87,7 @@ class OHLCCounter():
             # If the last tick and current tick is in the same mininute
             if self.latest_date == ohlc_time_str:
                 self.ohlc_queue.queue[self.ohlc_queue_length-1].update(price,ohlc_time_str,volume,open_insterest)
+                ohlc = self.ohlc_queue.queue[self.ohlc_queue_length-1]
             # Otherwise they are not in the same miniute
             elif self.latest_date != ohlc_time_str:
                 # Read the last one
@@ -96,10 +97,10 @@ class OHLCCounter():
                 # If the queue is full
                 if self.ohlc_queue_length >= self.period_len:
                     self.full_flag=True
-                    result = self.ohlc_queue.get() ## Remove the first item
+                    self.ohlc_queue.get() ## Remove the first item
                 ohlc = OHLC(price,ohlc_time_str,self.symbol,volume,open_insterest,self.period)
                 self.ohlc_queue.put(ohlc)
                 self.ohlc_queue_length = self.ohlc_queue.qsize()
                 self.latest_date = ohlc_time_str
-                return result 
-        return None
+                return result,ohlc 
+        return None,ohlc

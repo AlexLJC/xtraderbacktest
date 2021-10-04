@@ -239,10 +239,11 @@ class Strategy():
                 df = price_period_converter.convert(df,period)
             if end_date_str is not None:
                 df = df[(df.index <= pd.to_datetime(end_date_str))].copy(deep = True)
-            if period != "1d":
-                result = df[0-count-1:].copy(deep = True)
-            if period == "1d":
-                result = df[0-count-1:].copy(deep = True)
+            if period == "1m":
+                result = df[0-count-1:-1].copy(deep = True)
+            else:
+                result = df[0-count-1:-1].copy(deep = True)
+                #result = df[0-count:].copy(deep = True)
         return result
 
         
@@ -435,21 +436,24 @@ class Strategy():
             self._ohlc_counter_graininess[tick["symbol"]] = modules.price_engine.ohlc.OHLCCounter(tick["symbol"],self.context["backtest_graininess"])
         results = []
         for period in self.context["period"]:
-            result = self._ohlc_counter_dict[period][tick["symbol"]].update(tick["last_price"],tick["date"],tick["volume"],tick["open_interest"])
+            result,current_ohlc = self._ohlc_counter_dict[period][tick["symbol"]].update(tick["last_price"],tick["date"],tick["volume"],tick["open_interest"])
             if result is not None:
                 results.append(result)
-        new_bar_grainness = self._ohlc_counter_graininess[tick["symbol"]].update(tick["last_price"],tick["date"],tick["volume"],tick["open_interest"])
+        new_bar_grainness,current_ohlc = self._ohlc_counter_graininess[tick["symbol"]].update(tick["last_price"],tick["date"],tick["volume"],tick["open_interest"])
         new_grainness = False
         if new_bar_grainness is not None:
-            self._append_history_data(new_bar_grainness)
+            self._append_history_data(new_bar_grainness,current_ohlc)
             new_grainness = True
         return results,new_grainness
 
-    def _append_history_data(self,ohlc):
+    def _append_history_data(self,ohlc,current_ohlc):
         new_ohlc_list =[ohlc.open,ohlc.high,ohlc.low,ohlc.close,ohlc.symbol,ohlc.volume,ohlc.open_interest]
         # print(self._history_data[ohlc.symbol])
         # print(new_ohlc_list)
         self._history_data[ohlc.symbol].loc[pd.to_datetime(ohlc.date)] = new_ohlc_list
+
+        new_ohlc_list =[current_ohlc.open,current_ohlc.high,current_ohlc.low,current_ohlc.close,current_ohlc.symbol,current_ohlc.volume,current_ohlc.open_interest]
+        self._history_data[current_ohlc.symbol].loc[pd.to_datetime(current_ohlc.date)] = new_ohlc_list
         # Cut the unnecesary dataframe into 
         while self._history_data[ohlc.symbol].shape[0] > self._max_df_len:
             self._history_data[ohlc.symbol] = self._history_data[ohlc.symbol].iloc[1: , :]

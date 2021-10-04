@@ -51,3 +51,52 @@ def fractal(df):
                                & (df["high"] <  df["high"].shift(-1)) \
                                , df['low'], np.nan)
     return df
+
+
+# Average True Range 
+def atr(df, ave_n):
+    df = df.copy(deep = True)
+    local_max = pd.Series(pd.concat([df["high"], df["close"].shift()], axis=1).max(axis=1), name="LocalMax")
+    local_min = pd.Series(pd.concat([df["low"], df["close"].shift()], axis=1).min(axis=1), name="LocalMin")
+    TR_s = pd.Series(local_max - local_min, name="TR")
+    ATR_s = pd.Series(TR_s.rolling(window=ave_n, min_periods=ave_n).mean(), name='ATR')
+    df = df.join(TR_s).join(ATR_s)
+    return df
+
+
+def storm(df):
+    df = df.copy(deep = True)
+   
+    # a. Current Day’s TR>=2*ATR(14,'1d') 
+    df = atr(df,14)
+    df['condi_a'] = 0
+    df.loc[df['TR'] >= 2 * df['ATR'],'condi_a'] = 1
+
+    # b. Volume>=2*Average Volume(20,'1d')
+    df['avg_20_volume'] = pd.Series.rolling(df['volume'], 20).mean() 
+    df['condi_b'] = 0
+    df.loc[df['volume'] >= 2 * df['avg_20_volume'],'condi_b'] = 1
+    
+    # c. volume*Price> = 5million
+    df['condi_c'] = 0
+    df.loc[df['volume'] * df['close']  >= 5 * 1000000,'condi_c'] = 1
+    
+    # d. High = 40 day’s High
+    df['40_day_higest'] = pd.Series.rolling(df['high'], 40).max() 
+    df['condi_d'] = 0
+    df.loc[df['high'] == df['40_day_higest'],'condi_d'] = 1
+
+    df["is_storm"] = 0
+    df.loc[(df['condi_a'] == 1) & (df['condi_b'] == 1) & (df['condi_c'] == 1) & (df['condi_d'] == 1), 'is_storm'] = 1
+
+    return df
+
+
+
+def ema(df, n):
+    df = df.copy(deep = True)
+    EMA = pd.Series.ewm(df['close'], span=n, min_periods=n).mean()
+    EMA = pd.Series(EMA, name='EMA')
+    EMA_div = pd.Series(df['close'] / EMA - 1, name='EMA%div')
+    df = df.join(EMA).join(EMA_div)
+    return df
