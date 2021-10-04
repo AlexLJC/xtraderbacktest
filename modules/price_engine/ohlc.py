@@ -89,7 +89,7 @@ class OHLCCounter():
                 self.ohlc_queue.queue[self.ohlc_queue_length-1].update(price,ohlc_time_str,volume,open_insterest)
                 ohlc = self.ohlc_queue.queue[self.ohlc_queue_length-1]
             # Otherwise they are not in the same miniute
-            elif self.latest_date != ohlc_time_str:
+            elif self.latest_date < ohlc_time_str:
                 # Read the last one
                 result = None
                 if self.ohlc_queue.qsize() > 0:
