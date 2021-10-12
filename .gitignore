@@ -171,3 +171,4 @@ __cache__/
 !/data/custom_event/README.md
 
 *zip
+/tools/analyser/merged_results/*.csv
