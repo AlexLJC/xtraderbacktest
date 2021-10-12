@@ -2,16 +2,16 @@
 name: _XSHG                             # symbol name
 point: 0.01                             # point value
 tick_size: 0.01                         # tick_size
-commission: 0.1                         # commission in currency
-min_commission: 1                       # minimum commission in currency
+commission: 0.0025                      # commission in currency
+min_commission: 5                       # minimum commission in currency
 slippage: 0                             # slippage in points
 margin_rate: 1                          # margin rate 0.05 = 5%
 minimum_tp_sl: 3                        # minimum gap in points between entry price and tpsl price
 contract_size: 1                        # contract size
-spread: 5                               # the spread(between ask and bid) in points for backtest
+spread: 0                               # the spread(between ask and bid) in points for backtest
 type: stock                             # symbol type
 exchange: None                          # the trading exchange
-t+0: true                               # whether is t+0
+t+0: false                              # whether is t+0
 swaps:                                  # the swaps in points
   long: 0
   short: 0
@@ -20,21 +20,21 @@ minimum_lots: 1                         # minimum lot
 trade_session:                          # tradable session
   sunday: []
   monday:                               # the template of multiple tradable session in one day
-  - - '01:00:00'
+  - - '00:00:00'
     - '10:59:59'
   - - '10:59:59'
     - '23:59:59'
   tuesday:
-  - - '01:00:00'
+  - - '00:00:00'
     - '23:59:59'
   wednesday:
-  - - '01:00:00'
+  - - '00:00:00'
     - '23:59:59'
   thursday:
-  - - '01:00:00'
+  - - '00:00:00'
     - '23:59:59'
   friday:
-  - - '01:00:00'
+  - - '00:00:00'
     - '23:59:59'
   saturday: []
 
