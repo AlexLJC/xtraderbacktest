@@ -41,7 +41,7 @@ function load(backtest_result,file_name){
             watermark: {
                 color: 'rgba(11, 94, 29, 0.4)',
                 visible: true,
-                text: 'Backtest Evaluation ' + file_name,
+                text: 'Backtest Evaluation ' + file_name + ' on ' + symbol,
                 fontSize: 24,
                 horzAlign: 'left',
                 vertAlign: 'bottom',
