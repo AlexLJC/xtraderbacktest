@@ -52,7 +52,21 @@ def fractal(df):
                                , df['low'], np.nan)
     return df
 
+def william_fractal(df):
+    df = df.copy(deep = True)
+    win_max = pd.Series.rolling(df['high'], 5, center=True).max()
+    win_min = pd.Series.rolling(df['low'], 5, center=True).min()
 
+    df['up_frac'] = np.where((df['high'] == win_max) \
+                             & (df["high"].shift(2) < df["high"].shift(1)) \
+                             & (df["high"].shift(-2) < df["high"].shift(-1)) \
+                             , df['high'], np.nan)
+    df['down_frac'] = np.where((df['low'] == win_min) \
+                               & (df["low"].shift(2) > df["low"].shift(1)) \
+                               & (df["low"].shift(-2) > df["low"].shift(-1)) \
+                               , df['low'], np.nan)
+    return df
+    
 # Average True Range 
 def atr(df, ave_n):
     df = df.copy(deep = True)
