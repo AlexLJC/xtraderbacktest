@@ -1,3 +1,6 @@
+file_index = 0;
+
+
 // Load the backtest result
 function load(backtest_result,file_name){
     candle_chart_holder = document.getElementById("candle_chart_holder");
@@ -218,6 +221,7 @@ function load(backtest_result,file_name){
         table_data.push(t);
     }
     var $table = $('#order_table');
+    $('#order_table').DataTable().destroy();
     $(function () {
         $('#order_table').DataTable({
             data: table_data,
@@ -240,7 +244,12 @@ function load(backtest_result,file_name){
 
 // Import file
 function importFile(){
-    var selectedFile = document.getElementById("files").files[0];
+    file_index = 0;
+    load_file_by_index(file_index);
+}
+
+function load_file_by_index(i){
+    var selectedFile = document.getElementById("files").files[i];
     var name = selectedFile.name;
     var size = selectedFile.size;
     console.log("Loading File Name " +name+" File Size " + size + " bytes");
@@ -254,5 +263,21 @@ function importFile(){
         console.log(backtest_result);
         load(backtest_result,name);
     };
+
 }
 
+function next(){
+
+    console.log("Next chart.");
+    file_index = file_index + 1;
+    load_file_by_index(file_index);
+    
+}
+
+function previous(){
+
+    console.log("Pre chart.");
+    file_index = file_index - 1;
+    load_file_by_index(file_index);
+    
+}

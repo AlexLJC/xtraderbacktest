@@ -51,14 +51,21 @@
             <div class="content-header">
                 <div class="container-fluid">
                     <div class="row mb-2">
-                    <div class="col-sm-6">
+                    <div class="col-sm-3">
                         <h1 class="m-0">Evaluation Dashboard</h1>
                     </div><!-- /.col -->
-                    <div class="col-sm-6">
+                    
+                    <div class="col-sm-3">
                         <div class = "breadcrumb float-sm-right">
-                           <input type="file" id="files" onchange="importFile();" class="btn btn-block btn-primary"/>
+                            
+                            <input type="file" id="files" onchange="importFile();" class="btn btn-block btn-primary" multiple/>
                         </div>
-                    </div><!-- /.col -->
+                    </div>
+                    <div class="col-sm-3"><button type="button" onclick="previous()"  class="btn btn-block btn-primary">Previous</button></div>
+                    <div class="col-sm-3"><button type="button" onclick="next()"  class="btn btn-block btn-primary">Next</button></div>
+
+                    
+                    <!-- /.col -->
                     </div><!-- /.row -->
                 </div><!-- /.container-fluid -->
             </div>
