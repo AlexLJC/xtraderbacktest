@@ -364,7 +364,7 @@ class IBCore(EClient, EWrapper):
 if __name__ == "__main__":
     ib_core = IBCore()
     #ib_core.phrase_time("2020-01-01 02:50:00")
-    clientID =  32           
+    clientID =  31           
     ib_core.connect("127.0.0.1", 7497, clientID) 
     #ib_core.run()
     thread_ib = threading.Thread(target = ib_core.run,args =())
