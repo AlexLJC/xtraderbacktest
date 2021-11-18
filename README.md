@@ -31,7 +31,7 @@ Microsoft Visual C++ Build Tools(https://visualstudio.microsoft.com/visual-cpp-b
     -   Alpaca broker support(US Stocks and ETFs).
 -   Notification in live trading.   
     -   Telegram    
-    -   Mail(ongoing)
+    -   Mail
 -   Live order record.    
     -   MongoDB.
     -   Mysql(ongoing).
