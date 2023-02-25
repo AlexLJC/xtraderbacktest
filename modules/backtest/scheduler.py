@@ -26,8 +26,8 @@ import numpy as np
 
 TIMESTAMP_FORMAT = sys_conf_loader.get_sys_conf()["timeformat"]
 class Scheduler(modules.common.scheduler.Scheduler):
-    def __init__(self,mode):
-        self.mode = mode
+    def __init__(self,mode = "backtest"):                                       # "backtest", "scanner" , "auto-backtest"
+        self.mode = mode                                                        
         self.fake_tick = sys_conf_loader.get_sys_conf()["backtest_conf"]["tick_mode"]["is_fake"]
         self.strategy = None
         self.tick_queue = queue.Queue()
@@ -285,19 +285,31 @@ class Scheduler(modules.common.scheduler.Scheduler):
             df['timestamp'] = df['date'].values.astype(np.int64) // 10 ** 9
             df['date'] = df["date"].dt.strftime("%Y-%m-%d %H:%M:%S")
             backtest_result["price_data"][symbol] = df.to_dict('records')
-        if len(self.strategy.order_manager.position.history_position) > 0:    
-            save_backtest_result.save_result(backtest_result)
+
+        save_conditions = [self.mode == "backtest", self.mode == "scanner"]
+        saved_file_name = None
+        if len(self.strategy.order_manager.position.history_position) > 0 and any(save_conditions):    
+            logging.info("Saving backtest result")
+            saved_file_name = save_backtest_result.save_result(backtest_result)
+            logging.info("Saved backtest result "+saved_file_name)
 
         if self.mode == "scanner":
             logging.info("Saving scanner result")
             scanner_result = self.strategy.scanner_result
             save_backtest_result.save_scanner_result(scanner_result,strategy_name=self.strategy.context["strategy_name"])
+            #logging.info("Saved scanner result",saved_file_name)
+
+        if self.mode == "auto-backtest":
+            logging.info("Saving auto-backtest result")
+            del backtest_result["price_data"]                                   # Drop price data to save space
+            saved_file_name = save_backtest_result.save_result(backtest_result)
+            logging.info("Saved auto-backtest result " + saved_file_name)
 
         logging.info("Congratulation!! The backtest finished. Hope you find The Holy Grail.")
         if "summary" in backtest_result.keys():
-            return backtest_result["summary"]
+            return backtest_result["summary"],saved_file_name
         else:
-            return None
+            return None,None
 
 class OHLCManager():
     def __init__(self, mode, symbols, fr, to, graininess="1m",pre_post_market = True):

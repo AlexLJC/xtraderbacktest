@@ -16,10 +16,10 @@ print("Terminal Info",mt5.terminal_info())
 print("MT5 Version",mt5.version())
 print("Account Info",mt5.account_info())
 # The symbols which need keep watching 
-symbol_list = ["AUDNZD.a","XTIUSD.a","US500.a","XAUUSD.a", "EURUSD.a", "GBPUSD.a"]
+symbol_list = ["AUDNZD.a","XTIUSD.a","US500.a","XAUUSD.a", "EURUSD.a", "GBPUSD.a","AUDUSD.a","USTEC.a"]
 # The symbols which need init
-init_list = ["AUDNZD.a","XTIUSD.a","US500.a","XAUUSD.a", "EURUSD.a", "GBPUSD.a"]
-
+init_list = ["AUDNZD.a","XTIUSD.a","US500.a","XAUUSD.a", "EURUSD.a", "GBPUSD.a","AUDUSD.a","USTEC.a"]
+init_list = ["AUDUSD.a","USTEC.a"]
 
 
 if __name__ == "__main__":
@@ -61,8 +61,9 @@ if __name__ == "__main__":
                 try:
                     influx_db.save_bulk_ohlc(ohlc_dicts, db_name = 'db1', measurement = 'ohlc')
                 except Exception as e:
-                    influx_db.initialize()
-                    influx_db.save_bulk_ohlc(ohlc_dicts, db_name = 'db1', measurement = 'ohlc')
+                    influx_db.init()
+                    #influx_db.save_bulk_ohlc(ohlc_dicts, db_name = 'db1', measurement = 'ohlc')
+                    continue
                     
                 # prepare next round
                 i+=n
@@ -103,7 +104,7 @@ if __name__ == "__main__":
                     try:
                         influx_db.save_ohlc(symbol_pure,open_,high,low,close,tick_volume,time_2,open_interest = 0, db_name = 'db1', measurement = 'ohlc')
                     except Exception as e:
-                        influx_db.initialize()
+                        influx_db.init()
                         influx_db.save_ohlc(symbol_pure,open_,high,low,close,tick_volume,time_2,open_interest = 0, db_name = 'db1', measurement = 'ohlc')
                 
             time.sleep(1)

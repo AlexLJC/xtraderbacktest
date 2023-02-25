@@ -83,7 +83,6 @@ class Position():
             "extra":order["extra"]
         }
         self.current_position.append(new_position)
-        self.margin = self.margin + margin
         self._update_cash()
         result = new_position.copy()
         result.pop("direction")

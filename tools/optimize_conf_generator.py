@@ -80,12 +80,14 @@ def _generate_opt_input_all(opt_json_dict=None):
             results.append(result)
     return results
 
-def generate(path,file_name):
+def generate(path,file_name,saved_confs = True):
     abs_path = sys_conf_loader.get_sys_path() + path 
     if sys.platform.startswith('linux') == False:
         abs_path = abs_path.replace('/','\\')
     opt_json = sys_conf_loader.read_configs_json(file_name,path)
     confs = _generate_opt_input_all(opt_json)
+    if saved_confs is False:
+        return confs
     folder_name = file_name.split(".json")[0]
     file_path_dir = abs_path + folder_name + "/"
     if sys.platform.startswith('linux') == False:
@@ -106,6 +108,7 @@ def generate(path,file_name):
             #pass
         f.close()
         i = i + 1
+    return confs
         
 if __name__ == "__main__":
     generate("/configurations/strategy/optmize/demo_strategy/","AAPL_opt.json")

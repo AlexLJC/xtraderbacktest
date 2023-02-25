@@ -3,18 +3,23 @@
     "opt_ranges":{
         "ma_fast":{
             "type":"range",
-            "values":[10,1,25]
+            "values":[10,1,15]
         },
         "ma_slow":{
             "type":"range",
-            "values":[20,1,40]
+            "values":[20,1,21]
+        },
+        "lots":{
+            "type":"range",
+            "values":[1,1,1]
         }
+        
     },
     "opt_rules": [
         ["ma_fast","<","ma_slow"]
     ],
     "symbols":[
-        ["AAPL"]
+        ["AAPL_US"]
     ],
     "fix_input":{
         "account_id":"demo_account",
@@ -26,6 +31,8 @@
         "strategy_name_code": "DM",
         "strategy_name": "demo",
         "reverse_mode":"enable",
+        "pre_post_market":"enable",
+        "calendar_event":"disable",
         "cash":10000,
         "untradable_period":[
             {

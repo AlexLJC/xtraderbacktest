@@ -35,6 +35,7 @@ def save_result(backtest_result):
         elif remote_stroage_type == "ftp":
             import modules.remote_storage.ftp as ftp
             ftp.file_write(file_name,file_path_remote,json.dumps(backtest_result))
+    return file_name
 
 def save_scanner_result(scanner_result,strategy_name):
     local_dir = os.path.join(os.getcwd().split('xtraderbacktest')[0],'xtraderbacktest','data','scanner_results',strategy_name)

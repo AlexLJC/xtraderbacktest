@@ -25,6 +25,7 @@ import threading
 import time
 import numpy as np
 import modules.brokers.alpaca.alpaca as alpaca
+import modules.brokers.alpaca.alpaca_api as alpaca_api
 import dateutil
 import modules.database.redis_x as redis
 import json 
@@ -60,7 +61,8 @@ class Scheduler(modules.common.scheduler.Scheduler):
         while("end" not in tick.keys()):
             while(self.tick_queue.empty()):
                 time.sleep(0.005) 
-            tick = self.tick_queue.get()
+            while(self.tick_queue.empty() == False):                            # Get the last tick to avoid latency
+                tick = self.tick_queue.get()
             if "end" not in tick.keys():
                 # handle to strategy internal fuc to deal with basic info, such as datetime
                 self.strategy._round_check_before(tick)
@@ -114,11 +116,11 @@ class Scheduler(modules.common.scheduler.Scheduler):
                     self.strategy._round_check_after_day(tick)
                 
     def quote_call_back(self,channel,redis_data):
-        if "Ticks:" in channel:
+        if alpaca_api.MARKET_DATA_CHANNEL_PREFIX in channel:
             self.tick_queue.put(redis_data)
             now = datetime.datetime.now()
             if self.tick_count > 50 or (now - self.tick_recv_date[redis_data["symbol"]]).total_seconds()> 60:
-                redis.redis_pulish("ALPACA-Ack",json.dumps({"symbol":redis_data["symbol"]}))
+                redis.redis_pulish(alpaca_api.ACK_CHANNEL ,json.dumps({"symbol":redis_data["symbol"]}))
                 self.tick_count = 0
                 self.tick_recv_date[redis_data["symbol"]] = now
             self.tick_count = self.tick_count + 1
@@ -126,7 +128,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
             self._stream_alive[redis_data["symbol"]] = True
 
     def trade_update_call_back(self,channel,redis_data):
-        if "OrderCallback" in channel:
+        if alpaca_api.ORDER_CALLBACK_CHANNEL in channel:
             #print('===============================trade_update', redis_data,flush=True)
             if redis_data["event"] == "fill":
                 order = redis_data["order"]
