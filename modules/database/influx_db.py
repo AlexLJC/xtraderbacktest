@@ -17,7 +17,7 @@ def init():
         token = confs_read[db_name]["token"]
         org = confs_read[db_name]["org"]
         bucket = confs_read[db_name]["bucket"]
-        clients[db_name] = influxdb_client.InfluxDBClient(url=url, token=token, org=org)
+        clients[db_name] = influxdb_client.InfluxDBClient(url=url, token=token, org=org,timeout=180*1000)
         confs[db_name] = confs_read[db_name]
 
 def save_ohlc(symbol,open_,high,low,close,volume,time_,open_interest = 0, db_name = 'db1', measurement = 'ohlc'):
@@ -104,8 +104,11 @@ def load_ohlc(symbol,fr,to,db_name = 'db1'):
         |> filter(fn: (r) => r["symbol"] == "'+symbol+'")'\
         '|> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value")'
     query_api = clients[db_name].query_api()
+    print(query)
     result = query_api.query_data_frame(org=org, query=query)
+    #print(result)
     result["date"] = pd.to_datetime(result["_time"])
+    result["date"] = result["date"].dt.tz_convert(None)
     result = result.drop(["result","table","_start","_stop","_measurement","_time"],axis=1)
     result = result.sort_values(by = 'date')
     result = result.set_index('date')

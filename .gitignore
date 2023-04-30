@@ -155,6 +155,9 @@ __cache__/
 /scanners/*
 !/scanners/demo_scanner.py
 
+/auto_backtest/*
+!/auto_backtest/demo_auto_backtest.py
+
 /configurations/scanner/*
 !/configurations/scanner/demo.json
 

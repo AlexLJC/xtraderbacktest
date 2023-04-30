@@ -104,10 +104,11 @@ class Scheduler(modules.common.scheduler.Scheduler):
         # loop ticks
         logging.info("Start looping ticks.")
         display_dict = {
-            "deposit":str(round(self.strategy.order_manager.position.deposit,2)),
-            "total_pnl ":str(round(self.strategy.order_manager.position.deposit - self.strategy.order_manager.position._init_deposit,2)),
-            "float_pnl ":str(round(self.strategy.order_manager.position.float_pnl,2)),
-            "date":""
+            # "deposit":str(round(self.strategy.order_manager.position.deposit,2)),
+            # "total_pnl":str(round(self.strategy.order_manager.position.deposit - self.strategy.order_manager.position._init_deposit,2)),
+            # "float_pnl":str(round(self.strategy.order_manager.position.float_pnl,2)),
+            # "positions":str(len(self.strategy.get_current_position())),
+            # "date":""
         }
         with tqdm(total=total_ticks,desc="Tick Looper", postfix = display_dict, colour="green", ascii=True) as loop_tick_bar:
             try:
@@ -171,15 +172,18 @@ class Scheduler(modules.common.scheduler.Scheduler):
                                 self.strategy._round_check_before(tick)
                                 self.strategy._update_position()
                             self.strategy._round_check_after_day(tick)
+                       
+                            display_dict = {
+                                # "MR":str(round(self.strategy.order_manager.position.get_margin_rate()*100,2)) + '%',
+                                "DP":str(round(self.strategy.order_manager.position.deposit,2)),
+                                "PNL":str(int(self.strategy.order_manager.position.get_total_pnl())),
+                                "FPNL":str(round(self.strategy.order_manager.position.get_float_pnl(),0)),
+                                "HIS":str(len(self.strategy.order_manager.position.history_position)),
+                                "CUR":str(len(self.strategy.get_current_position())),
+                                "D":tick["date"]
+                            }
+                            loop_tick_bar.set_postfix(display_dict)
                         loop_tick_bar.update(1) 
-                        display_dict = {
-                            "margin_rate":str(round(self.strategy.order_manager.position.get_margin_rate()*100,2)) + '%',
-                            "deposit":str(round(self.strategy.order_manager.position.deposit,2)),
-                            "total_pnl ":str(round(self.strategy.order_manager.position.deposit - self.strategy.order_manager.position._init_deposit,2)),
-                            "float_pnl ":str(round(self.strategy.order_manager.position.float_pnl,2)),
-                            "date":tick["date"]
-                        }
-                        loop_tick_bar.set_postfix(display_dict)
                         last_ticks[tick["symbol"]] = tick
 
 
@@ -288,6 +292,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
 
         save_conditions = [self.mode == "backtest", self.mode == "scanner"]
         saved_file_name = None
+        logging.info('Save conditions'+str(save_conditions))
         if len(self.strategy.order_manager.position.history_position) > 0 and any(save_conditions):    
             logging.info("Saving backtest result")
             saved_file_name = save_backtest_result.save_result(backtest_result)

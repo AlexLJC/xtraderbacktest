@@ -114,3 +114,16 @@ def ema(df, n):
     EMA_div = pd.Series(df['close'] / EMA - 1, name='EMA%div')
     df = df.join(EMA).join(EMA_div)
     return df
+
+# Bollinger Bands - Up, Mean, Low
+def bbands(df, bands, dev=2, is_ema=False):
+    n = int(bands)
+    if is_ema == True:
+        MA = df['close'].ewm(span=n, min_periods=n).mean()
+    else:
+        MA = df['close'].rolling(window=n).mean()
+    MSD = df['close'].rolling(window=n).std()
+    BL = pd.Series(MA - dev * MSD, name="BBL")
+    BU = pd.Series(MA + dev * MSD, name="BBU")
+    return BU,MA,BL
+

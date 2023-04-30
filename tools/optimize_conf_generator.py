@@ -111,4 +111,5 @@ def generate(path,file_name,saved_confs = True):
     return confs
         
 if __name__ == "__main__":
-    generate("/configurations/strategy/optmize/demo_strategy/","AAPL_opt.json")
+    #generate("/configurations/strategy/optmize/demo_strategy/","AAPL_opt.json")
+    generate("/configurations/strategy/optmize/bbs_scalper/","AUDNZD_opt.json")

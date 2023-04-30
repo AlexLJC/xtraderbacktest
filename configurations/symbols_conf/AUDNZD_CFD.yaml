@@ -1,0 +1,40 @@
+---
+name: AUDNZD                            # symbol name
+point: 0.00001                          # point value
+tick_size: 0.00001                      # tick_size
+commission: 8                           # commission in currency
+min_commission: 0.08                    # minimum commission in currency
+slippage: 0                             # slippage in points
+margin_rate: 0.0025                     # margin rate 0.05 = 5%
+minimum_tp_sl: 3                        # minimum gap in points between entry price and tpsl price
+contract_size: 100000                   # contract size
+spread: 14                              # the spread(between ask and bid) in points for backtest
+type: cfd                               # symbol type
+exchange: None                          # the trading exchange
+t+0: true                               # whether is t+0
+swaps:                                  # the swaps in points
+  long: -3.35
+  short: 1.75
+  triple_day: 2                         # 0-Monday 6-Sunday
+minimum_lots: 0.01                      # minimum lot
+trade_session:                          # tradable session
+  sunday: []
+  monday:                               # the template of multiple tradable session in one day
+  - - '01:00:00'
+    - '10:59:59'
+  - - '10:59:59'
+    - '23:59:59'
+  tuesday:
+  - - '01:00:00'
+    - '23:59:59'
+  wednesday:
+  - - '01:00:00'
+    - '23:59:59'
+  thursday:
+  - - '01:00:00'
+    - '23:59:59'
+  friday:
+  - - '01:00:00'
+    - '23:59:59'
+  saturday: []
+

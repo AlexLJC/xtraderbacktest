@@ -377,12 +377,9 @@ class OrderManager():
                             close_type = "hit"
                             if "close_type" in order.keys():
                                 close_type = order["close_type"]
-                            if self._is_reverse != "enable":
-                                u = self.position._close_position(tick,order["order_ref"],order["close_price"],close_type,order["close_force_price"])
+                            u = self.position._close_position(tick,order["order_ref"],order["close_price"],close_type,order["close_force_price"])
                             if self._is_reverse == "enable":
-                               
                                 u = self.reverse_position._close_position(tick,order["order_ref"],order["close_price"],close_type,order["close_force_price"])
-                                
                         t.update(u)     
                         update_list.append(t)
         for order_update in update_list:

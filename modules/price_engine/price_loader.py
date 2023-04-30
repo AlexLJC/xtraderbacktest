@@ -78,9 +78,17 @@ def _load_price_backtest(symbol,fr,to,print_log = True):
             elif remote_stroage_type == "ftp":
                 import modules.remote_storage.ftp as ftp
                 result = ftp.dataframe_read(file_name,file_path_remote,abs_path)
+                
+
     if result is None:
-        # if the remote storage does not have the cache then load it from the local price storage.
-        result = _load_local_price_storage(symbol,fr,to)
+        if(sys_conf["backtest_conf"]["price_storage"]["type"] == 'local'):
+            # if the remote storage does not have the cache then load it from the local price storage.
+            result = _load_local_price_storage(symbol,fr,to)
+        elif(sys_conf["backtest_conf"]["price_storage"]["type"] == 'influxdb'):
+            import modules.database.influx_db as influx_db
+            print("Loading from InfluxDB",symbol,str(fr),str(to))
+            result = influx_db.load_ohlc(symbol,str(fr),str(to),db_name = 'db1')
+
         # Save it to cache
         result.to_pickle(abs_path)
         # post it into remote storage
@@ -120,6 +128,8 @@ def _load_price_live(symbol,fr,to):
 if __name__ == '__main__':
     import modules.other.logg 
     import logging
-    #print(_load_local_price_storage("AAPL","2019-02-22 09:41:00","2019-02-15 10:03:00"))
-    print(load_price("AAPL","2019-02-22 09:41:00","2019-02-15 10:03:00","backtest"))
+    print(_load_local_price_storage("AAPL_US","2019-02-15 09:41:00","2019-02-22 10:03:00"))
+    import modules.database.influx_db as influx_db
+    print(influx_db.load_ohlc('AUDNZD_CFD',"2022-12-22 00:00:00","2023-02-24 22:59:00",db_name = 'db1'))
+    #print(load_price("AAPL","2019-02-22 09:41:00","2019-02-15 10:03:00","backtest"))
     pass

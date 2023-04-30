@@ -7,19 +7,21 @@ import modules.other.sys_conf_loader as sys_conf_loader
 import time
 import datetime
 import pandas as pd 
+import copy
 
 all_products_info = sys_conf_loader.get_all_products_info()
 class Position():
     def __init__(self,cash):
-        self._init_deposit = cash
-        self.deposit = cash
-        self.cash = cash
+        self._init_deposit = 0 + float(cash)
+        self.deposit = 0 + float(cash)
+        self.cash = 0 + float(cash)
         self.margin = 0
         self.float_pnl = 0
         self.closed_fund = {}
         self.float_fund = {}
         self.current_position = []
         self.history_position = []
+        self.total_pnl = 0
 
     def _deposit_withdraw(self,cash):
         self.deposit = self.deposit + cash
@@ -129,7 +131,10 @@ class Position():
                     "profit":profit,
                     "status":"close_filled"
                 }
+                #print(self.deposit + profit)
                 self.deposit = self.deposit + profit
+                self.total_pnl = profit + self.total_pnl
+                #print(self.deposit)
                 self.history_position[index].update(update)
                 result = self.history_position[index].copy()
                 result.pop("direction")
@@ -142,10 +147,11 @@ class Position():
         for p in self.current_position:
             if p["order_ref"] == order_ref:
                 position =  p.copy()
+                self.current_position.remove(p)
                 break
         if position is None:
             return None
-        self.current_position.remove(p)
+        
 
         symbol = position["symbol"]
 
@@ -182,10 +188,15 @@ class Position():
         else:
             profit = (close_price - position["open_filled_price"] ) *  position["filled"]  * contract_size
         position["profit"] = profit
-        self.history_position.append(position)
+        self.history_position.append(position.copy())
+        # print(len(self.history_position))
+        # exit(0)
         result = position.copy()
         result.pop("direction")
         return result
+    
+    def get_deposit(self):
+        return self.deposit
 
     def _update_profit(self,tick):
         result = []
@@ -213,6 +224,7 @@ class Position():
                 result.append(p)
             float_pnl = float_pnl + position["profit"] 
             margin = margin + position["margin"] 
+        #print(float_pnl)
         self.float_pnl = float_pnl
         self.margin = margin
         self._update_cash()
@@ -260,3 +272,11 @@ class Position():
         else:
             result = 0
         return result
+    
+    def get_total_pnl(self):
+        result = 0
+        for p in self.history_position:
+            result+=p['profit']
+        return result
+    def get_float_pnl(self):
+        return float(self.float_pnl)

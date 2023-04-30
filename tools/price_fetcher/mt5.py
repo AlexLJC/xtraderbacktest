@@ -19,14 +19,14 @@ print("Account Info",mt5.account_info())
 symbol_list = ["AUDNZD.a","XTIUSD.a","US500.a","XAUUSD.a", "EURUSD.a", "GBPUSD.a","AUDUSD.a","USTEC.a"]
 # The symbols which need init
 init_list = ["AUDNZD.a","XTIUSD.a","US500.a","XAUUSD.a", "EURUSD.a", "GBPUSD.a","AUDUSD.a","USTEC.a"]
-init_list = ["AUDUSD.a","USTEC.a"]
+init_list = ["AUDNZD.a","XTIUSD.a","US500.a","XAUUSD.a", "EURUSD.a", "GBPUSD.a","AUDUSD.a","USTEC.a"]
 
 
 if __name__ == "__main__":
     if sys.argv[1] == "init":
         records_going_to_save = []
         for symbol in init_list:
-            symbol_pure = symbol.split(".")[0].split("-")[0]
+            symbol_pure = symbol.split(".")[0].split("-")[0] + '_CFD'
             i = 1
             n = 5000
             rates = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_M1, i, n)             # Template (1672444620, 3844.2, 3844.3, 3843.8, 3844.3, 7, 50, 0)
@@ -85,7 +85,7 @@ if __name__ == "__main__":
         # TODO Upgrade the stupid update method       
         while True:
             for symbol in symbol_list:
-                symbol_pure = symbol.split(".")[0].split("-")[0]
+                symbol_pure = symbol.split(".")[0].split("-")[0] + '_CFD'
                 i = 1
                 n = 10
                 rates = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_M1, i, n)
