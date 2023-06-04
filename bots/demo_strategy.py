@@ -24,19 +24,28 @@ class Bot(modules.common.strategy.Strategy):
     def handle_bar(self, bar,period):
         #logging.info("new bar "+bar["date"])
         #logging.info("current_time " + self.current_time)
-        df = self.get_bars(bar["symbol"],30,period)
-        ma_fast = ti.MA(df,self.pars["ma_fast"]).iloc[-1]
-        ma_slow = ti.MA(df,self.pars["ma_slow"]).iloc[-1]
-        self.draw_chart("ma_fast",ma_fast,symbol = bar["symbol"])
-        self.draw_chart("ma_slow",ma_slow,symbol =bar["symbol"])
-        if ma_fast > ma_slow:
-            if len(self.get_current_position(direction="long")) ==0:
-                self.open_order(bar["symbol"],"market",self.pars["lots"],"long")
-            self.close_all_position(direction="short")
-        elif ma_fast < ma_slow:
-            if len(self.get_current_position(direction="short")) ==0:
-                self.open_order(bar["symbol"],"market",self.pars["lots"],"short")
-            self.close_all_position(direction="long")
+        # df = self.get_bars(bar["symbol"],30,period)
+        # ma_fast = ti.MA(df,self.pars["ma_fast"]).iloc[-1]
+        # ma_slow = ti.MA(df,self.pars["ma_slow"]).iloc[-1]
+        # self.draw_chart("ma_fast",ma_fast,symbol = bar["symbol"])
+        # self.draw_chart("ma_slow",ma_slow,symbol =bar["symbol"])
+        # if ma_fast > ma_slow:
+        #     if len(self.get_current_position(direction="long")) ==0:
+        #         self.open_order(bar["symbol"],"market",self.pars["lots"],"long")
+        #     self.close_all_position(direction="short")
+        # elif ma_fast < ma_slow:
+        #     if len(self.get_current_position(direction="short")) ==0:
+        #         self.open_order(bar["symbol"],"market",self.pars["lots"],"short")
+        #     self.close_all_position(direction="long")
+        if len(self.get_current_position()) == 0:
+            trailing_sl = {
+                        'sl_price':1,    
+                        'gap':1,                                                # Price move 1 dollar
+                        'ratio':1                                               # Stop loss move 1 dollar
+                    }
+            self.open_order(bar["symbol"],"market",self.pars["lots"],"long",trailing_sl = trailing_sl)
+        else:
+            logging.info(self.get_current_position()[0]['trailing_sl'])
         pass
     
     # Handle Event

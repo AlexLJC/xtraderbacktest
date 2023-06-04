@@ -1,0 +1,27 @@
+{
+    "account_id":"demo_account",
+    "period":["1m"],
+    "backtest_graininess":"1m",
+    "symbols":["ETHUSDT"],
+    "platform":"BINANCE",
+    "start_date": "2019-05-25 08:00:00",
+    "end_date": "2021-01-29 19:59:00",
+    "strategy_name_code": "DM",
+    "strategy_name": "demo",
+    "reverse_mode":"disable",
+    "calendar_event":"disable",
+    "cash":10000,
+    "pre_post_market":"enable",
+    "untradable_period":[
+        {
+            "start":"23:59:59",
+            "end":"23:59:59"
+        }
+    ],
+    "tag":"demo",
+    "custom":{
+        "ma_fast":10,
+        "ma_slow":21,
+        "lots":0.003
+    }
+}

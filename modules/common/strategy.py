@@ -36,6 +36,7 @@ class Strategy():
         self._current_day_filled = False
         self._all_product_info = sys_conf_loader.get_all_products_info()
         self.calendar_list = []
+        self._live_platform = sys_conf_loader.get_sys_conf()["live_platform"]
     def _set_mode(self,mode):
         self._mode = mode
         self._unique_prefix = self._genreate_unique_prefix()                                      # for saving orders and positions to cache database in the live mode
@@ -166,7 +167,10 @@ class Strategy():
             try:
                 s_temp = "_" + symbol.split("_")[1]
             except Exception as e:
-                s_temp = "_US"
+                if sys_conf_loader.get_sys_conf()["live_platform"] == "binance":
+                    s_temp = "_CP"
+                elif sys_conf_loader.get_sys_conf()["live_platform"] == "alpaca":
+                    s_temp = "_US"
         else:
             s_temp = symbol
 
@@ -174,7 +178,10 @@ class Strategy():
             return None
 
         if trailing_sl is not None:
-            trailing_sl["base_line"] = trailing_sl["sl_price"]
+            if direction == "long":
+                trailing_sl["base_line"] = price["ask_1"]
+            else:
+                trailing_sl["base_line"] = price["bid_1"]
 
         order_ref = self._generarate_orderref()
         order = {

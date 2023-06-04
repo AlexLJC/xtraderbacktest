@@ -175,3 +175,4 @@ __cache__/
 
 *zip
 /tools/analyser/merged_results/*.csv
+/modules/common/technical_indicators.py

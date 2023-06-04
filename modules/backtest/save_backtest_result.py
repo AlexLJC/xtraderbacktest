@@ -6,6 +6,7 @@ import datetime
 import json
 import modules.other.sys_conf_loader as sys_conf_loader
 import simplejson
+import pandas as pd
 
 def save_result(backtest_result):
     local_dir = os.path.join(os.getcwd().split('xtraderbacktest')[0],'xtraderbacktest','data','backtest_results',backtest_result["pars"]["strategy_name"])
@@ -22,6 +23,10 @@ def save_result(backtest_result):
         json_str = json_str.replace('NaN','0')
         f.write(json_str)
     f.close()
+    # Save orders as csv
+    position_df = pd.DataFrame(backtest_result['positions'])
+    position_df.to_csv(local_dir + "/" + file_name.replace('.json','_positions.csv'),index=False)
+
     sys_conf = sys_conf_loader.get_sys_conf()
     if sys_conf["backtest_conf"]["backtest_result_remote"]["is_on"] is True:
         remote_stroage_type  =sys_conf["backtest_conf"]["backtest_result_remote"]["type"]

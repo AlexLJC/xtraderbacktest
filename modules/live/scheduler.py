@@ -24,8 +24,10 @@ import queue
 import threading
 import time
 import numpy as np
-import modules.brokers.alpaca.alpaca as alpaca
-import modules.brokers.alpaca.alpaca_api as alpaca_api
+if sys_conf_loader.get_sys_conf()["live_platform"] == "alpaca":
+    import modules.brokers.alpaca.alpaca as alpaca
+    import modules.brokers.alpaca.alpaca_api as alpaca_api
+import modules.brokers.binance_x.binance_x as binance_x
 import dateutil
 import modules.database.redis_x as redis
 import json 
@@ -116,31 +118,45 @@ class Scheduler(modules.common.scheduler.Scheduler):
                     self.strategy._round_check_after_day(tick)
                 
     def quote_call_back(self,channel,redis_data):
-        if alpaca_api.MARKET_DATA_CHANNEL_PREFIX in channel:
-            self.tick_queue.put(redis_data)
-            now = datetime.datetime.now()
-            if self.tick_count > 50 or (now - self.tick_recv_date[redis_data["symbol"]]).total_seconds()> 60:
-                redis.redis_pulish(alpaca_api.ACK_CHANNEL ,json.dumps({"symbol":redis_data["symbol"]}))
-                self.tick_count = 0
-                self.tick_recv_date[redis_data["symbol"]] = now
-            self.tick_count = self.tick_count + 1
-            self._stream_alive_dict[redis_data["symbol"]] = now
-            self._stream_alive[redis_data["symbol"]] = True
+        if sys_conf_loader.get_sys_conf()["live_platform"] == "alpaca":
+            if alpaca_api.MARKET_DATA_CHANNEL_PREFIX in channel:
+                self.tick_queue.put(redis_data)
+                now = datetime.datetime.now()
+                if self.tick_count > 50 or (now - self.tick_recv_date[redis_data["symbol"]]).total_seconds()> 60:
+                    redis.redis_pulish(alpaca_api.ACK_CHANNEL ,json.dumps({"symbol":redis_data["symbol"]}))
+                    self.tick_count = 0
+                    self.tick_recv_date[redis_data["symbol"]] = now
+                self.tick_count = self.tick_count + 1
+                self._stream_alive_dict[redis_data["symbol"]] = now
+                self._stream_alive[redis_data["symbol"]] = True
+        if sys_conf_loader.get_sys_conf()["live_platform"] == "binance":
+            if binance_x.MARKET_DATA_CHANNEL_PREFIX in channel:
+                self.tick_queue.put(redis_data)
+                now = datetime.datetime.now()
+                if self.tick_count > 50 or (now - self.tick_recv_date[redis_data["symbol"]]).total_seconds()> 60:
+                    # redis.redis_pulish(alpaca_api.ACK_CHANNEL ,json.dumps({"symbol":redis_data["symbol"]}))
+                    self.tick_count = 0
+                    self.tick_recv_date[redis_data["symbol"]] = now
+                self.tick_count = self.tick_count + 1
+                self._stream_alive_dict[redis_data["symbol"]] = now
+                self._stream_alive[redis_data["symbol"]] = True
 
     def trade_update_call_back(self,channel,redis_data):
-        if alpaca_api.ORDER_CALLBACK_CHANNEL in channel:
-            #print('===============================trade_update', redis_data,flush=True)
-            if redis_data["event"] == "fill":
-                order = redis_data["order"]
-                client_order_id = order['client_order_id']
-                order_type = 'open'
-                order_hit_price = float(order["filled_avg_price"])
-                if '_close' in client_order_id:
-                    client_order_id = client_order_id.split('_')[0]
-                    order_type = 'close'
-                order_symbol = order["symbol"]
-                order_volume = float(order["filled_qty"]) 
-                self.strategy.order_manager._filled_ing_order(order_symbol,order_type,order_hit_price,order_volume,client_order_id )
+        if sys_conf_loader.get_sys_conf()["live_platform"] == "alpaca":
+            if alpaca_api.ORDER_CALLBACK_CHANNEL in channel:
+                #print('===============================trade_update', redis_data,flush=True)
+                if redis_data["event"] == "fill":
+                    order = redis_data["order"]
+                    client_order_id = order['client_order_id']
+                    order_type = 'open'
+                    order_hit_price = float(order["filled_avg_price"])
+                    if '_close' in client_order_id:
+                        client_order_id = client_order_id.split('_')[0]
+                        order_type = 'close'
+                    order_symbol = order["symbol"]
+                    order_volume = float(order["filled_qty"]) 
+                    self.strategy.order_manager._filled_ing_order(order_symbol,order_type,order_hit_price,order_volume,client_order_id )
+        
 
     def _check_alive(self):
         while True:
@@ -148,7 +164,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
             for symbol in self.strategy.context["symbols"]:
                 if self._stream_alive[symbol] is True:
                     now = datetime.datetime.now()
-                    if (now - self._stream_alive_dict[symbol]).total_seconds()> 400 and now.hour() < 16:
+                    if (now - self._stream_alive_dict[symbol]).total_seconds() > 400 and now.hour() < 16:
                         # Disconnect and send notification to warn
                         self._stream_alive[symbol] = False
                         notifaction.send_message("Market data may be disconnected, symbol:" + symbol + " at " + now.strftime("%Y-%m-%d %H:%M:%S" + ". Try to Restart now."))
@@ -172,18 +188,28 @@ class Scheduler(modules.common.scheduler.Scheduler):
             now = datetime.datetime.now()
             start_str = (now - time_delta).strftime(TIMESTAMP_FORMAT)
             end_str = now.strftime(TIMESTAMP_FORMAT)
-            df_temp = alpaca.stocks_bars(symbol,"1m",start_str,end_str)
+            if self.strategy._live_platform == "binance":
+                df_temp = binance_x.stocks_bars(symbol,"1m",start_str,end_str)
+            elif self.strategy._live_platform == "alpaca":
+                df_temp = alpaca.stocks_bars(symbol,"1m",start_str,end_str)
             self.strategy._preload_data(symbol,df_temp)
             print(df_temp)
         # register the call backs
         logging.info("Registering data callbacks")
         channel_symbol_list = []
         for symbol in symbols:
-            channel_symbol_list.append("ALPACA-Ticks:"+symbol)
-            # Subscribe symbols
-            redis.redis_pulish("ALPACA-Command",json.dumps({"cmd":"subscribe","symbol":symbol}))
+            if self.strategy._live_platform == "alpaca":
+                channel_symbol_list.append("ALPACA-Ticks:"+symbol)
+                # Subscribe symbols
+                redis.redis_pulish("ALPACA-Command",json.dumps({"cmd":"subscribe","symbol":symbol}))
+            elif self.strategy._live_platform == "binance":
+                channel_symbol_list.append("BINANCE-Ticks:"+symbol)
+                # Subscribe symbols
+                redis.redis_pulish("BINANCE-Command",json.dumps({"cmd":"subscribe","symbol":symbol}))
+
         redis.redis_subscribe_channel(channel_symbol_list,process=self.quote_call_back)
-        redis.redis_subscribe_channel(["ALPACA-OrderCallback"],process=self.trade_update_call_back)
+        if self.strategy._live_platform == "alpaca":
+            redis.redis_subscribe_channel(["ALPACA-OrderCallback"],process=self.trade_update_call_back)
         
 
         # start tick processing thread

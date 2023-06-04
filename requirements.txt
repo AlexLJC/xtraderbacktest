@@ -16,3 +16,4 @@ alpaca_trade_api
 python-telegram-bot
 influxdb_client
 MetaTrader5
+ta

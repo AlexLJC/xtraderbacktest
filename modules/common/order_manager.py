@@ -7,14 +7,20 @@ import modules.other.sys_conf_loader as sys_conf_loader
 import modules.common.position 
 import modules.other.check_is_tradable as check_is_tradable
 import datetime 
-import modules.brokers.alpaca.alpaca as alpaca
+
 import modules.database.database_live as database_live
 import modules.notification.notifaction as notifaction
 import modules.database.redis_x as redis
 import json 
+import math
 
 all_products_info = sys_conf_loader.get_all_products_info()
 sys_conf = sys_conf_loader.get_sys_conf()
+if sys_conf_loader.get_sys_conf()["live_platform"] == "alpaca":
+    import modules.brokers.alpaca.alpaca as alpaca
+if sys_conf_loader.get_sys_conf()["live_platform"] == "binance":
+    import modules.brokers.binance_x.binance_x as binance_x
+
 class OrderManager():
     def __init__(self,cash,untradable_times,mode = "backtest",is_reverse = "disable",unique_prefix = 'Xtrader-Cache-Test:AAPL'):
         self.position = modules.common.position.Position(cash)
@@ -189,15 +195,18 @@ class OrderManager():
                 else:
                     point = all_products_info["_" + order["symbol"].split("_")[1]]["point"]
                 if order["direction"] == "long":
-                    if tick["ask_1"] >= (order['trailing_sl']["base_line"] + order['trailing_sl']["gap"] * point):
-                        order['trailing_sl']["sl_price"] = order['trailing_sl']["sl_price"] + order['trailing_sl']["gap"] * point * order['trailing_sl']["ratio"]
-                        order['trailing_sl']["base_line"] = order['trailing_sl']["base_line"] + order['trailing_sl']["gap"] * point
+                    if tick["ask_1"] > (order['trailing_sl']["base_line"] + order['trailing_sl']["gap"]):
+                        movement =  tick["ask_1"] - order['trailing_sl']["base_line"]
+                        multiplier = math.floor(movement / order['trailing_sl']["gap"])
+                        order['trailing_sl']["sl_price"] = order['trailing_sl']["sl_price"] + order['trailing_sl']["gap"] * order['trailing_sl']["ratio"] * multiplier
+                        order['trailing_sl']["base_line"] = order['trailing_sl']["base_line"] + order['trailing_sl']["gap"] * multiplier
                         # update order
                         result = order
                 elif order["direction"] == "short":
-                    if tick["bid_1"] <= (order['trailing_sl']["base_line"] - order['trailing_sl']["gap"] * point):
-                        order['trailing_sl']["sl_price"] = order['trailing_sl']["sl_price"] - order['trailing_sl']["gap"] * point * order['trailing_sl']["ratio"]
-                        order['trailing_sl']["base_line"] = order['trailing_sl']["base_line"] - order['trailing_sl']["gap"] * point
+                    if tick["bid_1"] < (order['trailing_sl']["base_line"] - order['trailing_sl']["gap"]):
+                        multiplier = math.floor((order['trailing_sl']["base_line"] - tick["bid_1"]) / order['trailing_sl']["gap"])
+                        order['trailing_sl']["sl_price"] = order['trailing_sl']["sl_price"] - order['trailing_sl']["gap"]  * order['trailing_sl']["ratio"] * multiplier
+                        order['trailing_sl']["base_line"] = order['trailing_sl']["base_line"] - order['trailing_sl']["gap"] * multiplier
                         # update order
                         result = order
         if should_close:
@@ -334,10 +343,28 @@ class OrderManager():
                             # send to broker live. 
                             order_temp = order
                             order_temp["direction"] = direction
-                            if direction == "long":
-                                alpaca.new_order(order,tick["ask_1"])
-                            if direction == "short":
-                                alpaca.new_order(order,tick["bid_1"])
+                            if sys_conf_loader.get_sys_conf()["live_platform"] == "alpaca":
+                                if direction == "long":
+                                    alpaca.new_order(order,tick["ask_1"])
+                                if direction == "short":
+                                    alpaca.new_order(order,tick["bid_1"])
+                            elif sys_conf_loader.get_sys_conf()["live_platform"] == "binance":
+                                if direction == "long":
+                                    bi_rep = binance_x.open_order(order,tick["bid_1"])
+                                elif direction == "short":
+                                    bi_rep = binance_x.open_order(order,tick["ask_1"])
+                                if bi_rep is not None:
+                                    order_symbol_t = bi_rep["symbol"]
+                                    order_type_t = 'open'
+                                    order_hit_price_t = float(bi_rep["avgPrice"])
+                                    order_volume_t = float(bi_rep["executedQty"])
+                                    order_ref_t = order["order_ref"]
+                                    self._filled_ing_order(order_symbol_t,order_type_t,order_hit_price_t,order_volume_t,order_ref_t)
+                                else:
+                                    # Terrible error 
+                                    logging.error("Terrible error!!!! Failed to open order in binance. Killing it self.")
+                                    import os, signal
+                                    os.kill(os.getpid(), signal.SIGTERM)
 
                         if self._mode == "backtest":
                             u = self.position._open_position(tick,order, order["direction"])
@@ -368,10 +395,28 @@ class OrderManager():
                                     direction = "long"
                             order_temp = order
                             order_temp["direction"] = direction
-                            if direction == "long":
-                                alpaca.close_order(order,tick["bid_1"])
-                            if direction == "short":
-                                alpaca.close_order(order,tick["ask_1"])
+                            if sys_conf_loader.get_sys_conf()["live_platform"] == "alpaca":
+                                if direction == "long":
+                                    alpaca.close_order(order,tick["bid_1"])
+                                if direction == "short":
+                                    alpaca.close_order(order,tick["ask_1"])
+                            elif sys_conf_loader.get_sys_conf()["live_platform"] == "binance":
+                                if direction == "long":
+                                    bi_rep = binance_x.close_order(order,tick["bid_1"])
+                                elif direction == "short":
+                                    bi_rep = binance_x.close_order(order,tick["ask_1"])
+                                if bi_rep is not None:
+                                    order_symbol_t = bi_rep["symbol"]
+                                    order_type_t = 'open'
+                                    order_hit_price_t = float(bi_rep["avgPrice"])
+                                    order_volume_t = float(bi_rep["executedQty"])
+                                    order_ref_t = order["order_ref"]
+                                    self._filled_ing_order(order_symbol_t,order_type_t,order_hit_price_t,order_volume_t,order_ref_t)
+                                else:
+                                    # Terrible error 
+                                    logging.error("Terrible error!!!! Failed to close order in binance. Killing it self.")
+                                    import os, signal
+                                    os.kill(os.getpid(), signal.SIGTERM)
 
                         elif self._mode == "backtest":
                             close_type = "hit"

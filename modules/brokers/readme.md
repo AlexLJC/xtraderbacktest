@@ -1,0 +1,1 @@
+ python -m pip install git+https://github.com/binance/binance-connector-python.git
