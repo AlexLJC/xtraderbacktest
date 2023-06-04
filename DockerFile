@@ -19,6 +19,7 @@ RUN pip install python-telegram-bot
 RUN pip install influxdb_client
 RUN pip install MetaTrader5
 RUN pip install ta
+RUN pip binance-connector
 
 ### This one is the base image for installing relevenat building tools
 ENV TZ=America/New_York
