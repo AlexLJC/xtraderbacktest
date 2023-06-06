@@ -18,3 +18,4 @@ influxdb_client
 MetaTrader5
 ta
 binance-connector
+binance-futures-connector

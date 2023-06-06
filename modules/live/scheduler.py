@@ -57,6 +57,8 @@ class Scheduler(modules.common.scheduler.Scheduler):
             self.tick_recv_date[symbol] = datetime.datetime.now()
             self._stream_alive[symbol] = True
             self._stream_alive_dict[symbol] = datetime.datetime.now()
+            if sys_conf_loader.get_sys_conf()["live_platform"] == "binance":
+                binance_x.preset_for_symbol(symbol)
 
     def _loop_ticks(self):
         tick = {"start":"start"}

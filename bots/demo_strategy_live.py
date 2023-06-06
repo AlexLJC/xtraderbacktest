@@ -25,8 +25,8 @@ class Bot(modules.common.strategy.Strategy):
 
     # Handle Bar
     def handle_bar(self, bar,period):
-        logging.info("new bar "+period + " " + bar["date"])
-        
+        logging.info("new bar "+period + " " + bar["date"] + str(bar))
+        return 
         #logging.info("current_time " + self.current_time)
         df = self.get_bars(bar["symbol"],30,period)
         # print(ti.vwap_session(df,self.current_time[0:10]))

@@ -12,7 +12,7 @@ import modules.other.sys_conf_loader as sys_conf_loader
 import modules.database.redis_x as redis
 
 # WebSocket Stream Client
-from binance.websocket.spot.websocket_stream import SpotWebsocketStreamClient
+from modules.brokers.binance_x.UMFutureWebsocketCLient import UMFuturesWebsocketClient
 import logging
 
 redis.init_mode(mode = "live")
@@ -91,17 +91,14 @@ def _agg_trade_callback(_,message):
         #print("New tick",current_tick[symbol]['symbol'],current_tick[symbol]['ask_1'],current_tick[symbol]['bid_1'],current_tick[symbol]['date'],flush=True)
         #redis.redis_pulish(MARKET_DATA_CHANNEL_PREFIX + symbol,json.dumps(current_tick[symbol]))
 
-
-## @bookTicker callback
-def _book_ticker_callback(_, message):
-    msg = message["data"]
-    symbol = msg['s']
+def _create_new_tick(msg,date):
     bid_price = float(msg['b'])
     ask_price = float(msg['a'])
     bid_size = float(msg['B'])
     ask_size = float(msg['A'])
-    date = datetime.datetime.now().astimezone(tz = tz.gettz('US/Eastern')).strftime("%Y-%m-%d %H:%M:%S") 
-    new_tick = {
+    symbol = msg['s']
+    
+    return  {
             "symbol":symbol,
             "date": date,
             "last_price":bid_price,
@@ -129,18 +126,24 @@ def _book_ticker_callback(_, message):
             "bid_5_volume":bid_size,
             "is_gap" : False
         }
+
+## @bookTicker callback
+def _book_ticker_callback(_, message):
+    msg = message["data"]
+    symbol = msg['s']
+    date = datetime.datetime.now().astimezone(tz = tz.gettz('US/Eastern')).strftime("%Y-%m-%d %H:%M:%S") 
     if symbol not in current_tick.keys():
-        current_tick[symbol] = new_tick
+        current_tick[symbol] = _create_new_tick(msg,date)
         # Send to redis
         #print("Init tick",current_tick[symbol]['symbol'],current_tick[symbol]['ask_1'],current_tick[symbol]['bid_1'],current_tick[symbol]['date'],flush=True)
         redis.redis_pulish(MARKET_DATA_CHANNEL_PREFIX + symbol,json.dumps(current_tick[symbol]))
     elif 'ask_1' in  current_tick[symbol].keys():
-        if current_tick[symbol]['ask_1'] != ask_price \
-            or current_tick[symbol]['bid_1'] != bid_price \
-            or  date[0:16] != current_tick[symbol]['date'][0:16]:
+        # if current_tick[symbol]['ask_1'] != ask_price or        \
+        #         current_tick[symbol]['bid_1'] != bid_price or   \
+        if  date[0:19] != current_tick[symbol]['date'][0:19]:
             redis.redis_pulish(MARKET_DATA_CHANNEL_PREFIX + symbol,json.dumps(current_tick[symbol]))
             # Replace the old tick with new tick
-            current_tick[symbol] = new_tick
+            current_tick[symbol] = _create_new_tick(msg,date)
             # Send to redis
             #print("New tick",current_tick[symbol]['symbol'],current_tick[symbol]['ask_1'],current_tick[symbol]['bid_1'],current_tick[symbol]['date'],flush=True)
             redis.redis_pulish(MARKET_DATA_CHANNEL_PREFIX + symbol,json.dumps(current_tick[symbol]))
@@ -148,7 +151,7 @@ def _book_ticker_callback(_, message):
             # Skip the tick
             pass
     else:
-        current_tick[symbol] = new_tick
+        current_tick[symbol] = _create_new_tick(msg,date)
         # Send to redis
         #print("Init tick",current_tick[symbol],flush=True)
         redis.redis_pulish(MARKET_DATA_CHANNEL_PREFIX + symbol,json.dumps(current_tick[symbol]))
@@ -178,7 +181,7 @@ def stocks_bars(symbol,timeframe,start=None,end=None):
     return temp_df
 def _stocks_bars(symbol,timeframe,start=None,end=None):
     result = None
-    url = 'https://api.binance.com/api/v3/klines?symbol='+symbol+'&interval='+timeframe+'&limit=1000'
+    url = 'https://fapi.binance.com/fapi/v1/klines?symbol='+symbol+'&interval='+timeframe+'&limit=1000'
     if start is None:
         start_iso = 0
     else:
@@ -189,7 +192,8 @@ def _stocks_bars(symbol,timeframe,start=None,end=None):
     else:
         end_iso = datetime.datetime.strptime(end,"%Y-%m-%d %H:%M:%S").astimezone(tz.gettz('US/Eastern')).timestamp()
     url = url + '&endTime='+str(int(end_iso*1000))
-
+    #print(url,requests.get(url).text)
+    #exit()
     responses = requests.get(url).json()
 
     records = []
@@ -208,7 +212,7 @@ def _stocks_bars(symbol,timeframe,start=None,end=None):
         ignore = response[11]
         time_str = datetime.datetime.fromtimestamp(time/1000).astimezone(tz.gettz('UTC')).strftime('%Y-%m-%d %H:%M:%S')
         #print(time_str,time,open_price,high,low,close,volume,close_time,quote_asset_volume,number_of_trades,taker_buy_base_asset_volume,taker_buy_quote_asset_volume,ignore)
-        record = [time_str,open_price, high,low,close,symbol,volume,0,]
+        record = [time_str,float(open_price), float(high),float(low),float(close),symbol,float(volume),0,]
         records.append(record)
         last_time = time
     temp_df = pd.DataFrame(records,columns=["date","open","high","low","close","symbol","volume","open_interest"])
@@ -221,7 +225,7 @@ def _set_position_mode(is_duoal_side_position = "true"):
     secret = binance_conf['SECRET_KEY']
     req = {
         "dualSidePosition":is_duoal_side_position,
-        "recvWindow":"5000",
+        "recvWindow":"50000",
         "timestamp":int(time.time() * 1000)
     }
     req_str = urllib.parse.urlencode(req)
@@ -244,7 +248,7 @@ def _set_margin_type(symbol,margin_type = "ISOLATED"):
     req = {
         "symbol":symbol,
         "marginType":margin_type,
-        "recvWindow":"5000",
+        "recvWindow":"50000",
         "timestamp":int(time.time() * 1000)
     }
     req_str = urllib.parse.urlencode(req)
@@ -267,7 +271,7 @@ def _set_leverage(symbol,leverage = 1):
     req = {
         "symbol":symbol,
         "leverage":leverage,
-        "recvWindow":"5000",
+        "recvWindow":"50000",
         "timestamp":int(time.time() * 1000)
     }
     req_str = urllib.parse.urlencode(req)
@@ -316,7 +320,7 @@ def open_order(order,hit_price):
         "quantity":order["volume"],
         #"price":"1850",
         #"timeInForce":"GTC",
-        "recvWindow":"5000",
+        "recvWindow":"50000",
         "timestamp":int(time.time() * 1000),
         "newClientOrderId":order["order_ref"].split(":")[1],
         "newOrderRespType":"RESULT"
@@ -354,7 +358,7 @@ def close_order(order,hit_price):
         "quantity":order["volume"],
         #"price":"1850",
         #"timeInForce":"GTC",
-        "recvWindow":"5000",
+        "recvWindow":"50000",
         "timestamp":int(time.time() * 1000),
         "newClientOrderId":order["order_ref"].split(":")[1],
         "newOrderRespType":"RESULT"
@@ -380,15 +384,14 @@ def close_order(order,hit_price):
 
 
 if __name__ == "__main__":
-    binance_pricing_client = SpotWebsocketStreamClient(
-            stream_url=binance_conf['URL'],
-            on_message=_process_message,
-            on_open=_on_open_callback,
-            on_close=_on_close_callback,
-            on_error=_on_error_callback,
-            on_ping=_on_ping_callback,
-            on_pong=_on_pong_callback,
-            is_combined=True)
+    # binance_pricing_client = UMFuturesWebsocketClient()
+    binance_pricing_client = UMFuturesWebsocketClient( stream_url=binance_conf['URL'],on_message=_process_message,
+        on_open=_on_open_callback,
+        on_close=_on_close_callback,
+        on_error=_on_error_callback,
+        on_ping=_on_ping_callback,
+        on_pong=_on_pong_callback,
+        is_combined=True)
 
 
 
@@ -403,7 +406,7 @@ if __name__ == "__main__":
     # print("closing binance_client connection")
     #binance_pricing_client.stop()
     # {"cmd":"subscribe","symbol":"btcusdt"}
-    #print(stocks_bars("BTCUSDT","1m","2020-12-31 00:00:00","2021-01-01 00:01:00"))
+    #print(stocks_bars("AMBUSDT","1m","2023-06-05 00:00:00","2023-06-05 04:38:00"))
 
     redis.redis_subscribe_channel([COMMAND_CHANNEL], process = _redis_call_back)
     #open_order()
