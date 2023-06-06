@@ -29,9 +29,9 @@ WORKDIR /home/xtraderbacktest
 
 COPY ./ /home/xtraderbacktest/
 
-WORKDIR /home/xtraderbacktest/modules/broker/
+WORKDIR /home/xtraderbacktest/modules/brokers/
 ENTRYPOINT  ["python3"] 
 
 ## sudo docker rmi xtbbroker; sudo docker build -f DockerFile . -t xtbbroker;
 ## run docker image
-## docker run -d -it --net=host --rm --name xtbbroker-binance_x xtbbroker ./binance_x/binance_x.py <symbol>
+## docker run -d -it --net=host --rm --name xtbbroker-binance_x xtbbroker binance_x/binance_x.py
