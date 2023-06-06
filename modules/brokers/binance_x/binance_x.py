@@ -33,7 +33,7 @@ running_status ={
     "positio_mode_set" :False
 } 
 headers = {"Content-Type": "application/json;charset=utf-8", "X-MBX-APIKEY": binance_conf['API_KEY']}
-
+hightest_lowest = {}
 '''
 Call back from redis to get the ack and order command
 '''
@@ -52,6 +52,8 @@ def _process_command(redis_data):
             #subscribe to binance
             binance_pricing_client.book_ticker(symbol=symbol)
             binance_pricing_client.agg_trade(symbol=symbol)
+            hightest_lowest[symbol] = {
+            }
             print("Subscribe",symbol,flush=True)
 
     if redis_data["cmd"] == "desubscribe":
@@ -135,19 +137,54 @@ def _book_ticker_callback(_, message):
     date = datetime.datetime.now().astimezone(tz = tz.gettz('US/Eastern')).strftime("%Y-%m-%d %H:%M:%S") 
     if symbol not in current_tick.keys():
         current_tick[symbol] = _create_new_tick(msg,date)
+        hightest_lowest[symbol] = {
+            "highest":current_tick[symbol]['ask_1'],
+            "lowest":current_tick[symbol]['bid_1']
+        }
         # Send to redis
         #print("Init tick",current_tick[symbol]['symbol'],current_tick[symbol]['ask_1'],current_tick[symbol]['bid_1'],current_tick[symbol]['date'],flush=True)
         redis.redis_pulish(MARKET_DATA_CHANNEL_PREFIX + symbol,json.dumps(current_tick[symbol]))
     elif 'ask_1' in  current_tick[symbol].keys():
+        if 'highest' not in hightest_lowest[symbol].keys():
+            hightest_lowest[symbol]= {
+                "highest":current_tick[symbol]['ask_1'],
+                "lowest":current_tick[symbol]['bid_1']
+            }
+        pre_highest = hightest_lowest[symbol]['highest']
+        pre_lowest = hightest_lowest[symbol]['lowest']
+
         # if current_tick[symbol]['ask_1'] != ask_price or        \
         #         current_tick[symbol]['bid_1'] != bid_price or   \
-        if  date[0:19] != current_tick[symbol]['date'][0:19]:
+        if  date[0:16] != current_tick[symbol]['date'][0:16]:
             redis.redis_pulish(MARKET_DATA_CHANNEL_PREFIX + symbol,json.dumps(current_tick[symbol]))
             # Replace the old tick with new tick
             current_tick[symbol] = _create_new_tick(msg,date)
             # Send to redis
             #print("New tick",current_tick[symbol]['symbol'],current_tick[symbol]['ask_1'],current_tick[symbol]['bid_1'],current_tick[symbol]['date'],flush=True)
             redis.redis_pulish(MARKET_DATA_CHANNEL_PREFIX + symbol,json.dumps(current_tick[symbol]))
+            
+            hightest_lowest[symbol]= {
+                "highest":current_tick[symbol]['ask_1'],
+                "lowest":current_tick[symbol]['bid_1']
+            }
+        elif current_tick[symbol]['ask_1'] > pre_highest:
+            redis.redis_pulish(MARKET_DATA_CHANNEL_PREFIX + symbol,json.dumps(current_tick[symbol]))
+            # Replace the old tick with new tick
+            current_tick[symbol] = _create_new_tick(msg,date)
+            # Send to redis
+            #print("New tick",current_tick[symbol]['symbol'],current_tick[symbol]['ask_1'],current_tick[symbol]['bid_1'],current_tick[symbol]['date'],flush=True)
+            redis.redis_pulish(MARKET_DATA_CHANNEL_PREFIX + symbol,json.dumps(current_tick[symbol]))
+            
+            hightest_lowest[symbol]['highest'] = current_tick[symbol]['ask_1']
+        elif current_tick[symbol]['bid_1'] < pre_lowest:
+            redis.redis_pulish(MARKET_DATA_CHANNEL_PREFIX + symbol,json.dumps(current_tick[symbol]))
+            # Replace the old tick with new tick
+            current_tick[symbol] = _create_new_tick(msg,date)
+            # Send to redis
+            #print("New tick",current_tick[symbol]['symbol'],current_tick[symbol]['ask_1'],current_tick[symbol]['bid_1'],current_tick[symbol]['date'],flush=True)
+            redis.redis_pulish(MARKET_DATA_CHANNEL_PREFIX + symbol,json.dumps(current_tick[symbol]))
+            
+            hightest_lowest[symbol]['lowest'] = current_tick[symbol]['bid_1']
         else:
             # Skip the tick
             pass
