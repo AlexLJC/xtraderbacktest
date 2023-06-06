@@ -167,7 +167,7 @@ def _book_ticker_callback(_, message):
                 "highest":current_tick[symbol]['ask_1'],
                 "lowest":current_tick[symbol]['bid_1']
             }
-        elif current_tick[symbol]['ask_1'] > pre_highest:
+        elif float(msg['a']) > pre_highest:
             redis.redis_pulish(MARKET_DATA_CHANNEL_PREFIX + symbol,json.dumps(current_tick[symbol]))
             # Replace the old tick with new tick
             current_tick[symbol] = _create_new_tick(msg,date)
@@ -176,7 +176,7 @@ def _book_ticker_callback(_, message):
             redis.redis_pulish(MARKET_DATA_CHANNEL_PREFIX + symbol,json.dumps(current_tick[symbol]))
             
             hightest_lowest[symbol]['highest'] = current_tick[symbol]['ask_1']
-        elif current_tick[symbol]['bid_1'] < pre_lowest:
+        elif float(msg['b']) < pre_lowest:
             redis.redis_pulish(MARKET_DATA_CHANNEL_PREFIX + symbol,json.dumps(current_tick[symbol]))
             # Replace the old tick with new tick
             current_tick[symbol] = _create_new_tick(msg,date)
@@ -419,7 +419,11 @@ def close_order(order,hit_price):
     else:
         return None
 
-
+def get_symbol_info(symbol):
+    url = binance_conf['FAPI_URL'] + "/fapi/v1/exchangeInfo"
+    for sym_info in requests.get(url).json()["symbols"]:
+        if sym_info["symbol"] == symbol:
+            return sym_info
 
 if __name__ == "__main__":
     # binance_pricing_client = UMFuturesWebsocketClient()
@@ -449,4 +453,5 @@ if __name__ == "__main__":
     redis.redis_subscribe_channel([COMMAND_CHANNEL], process = _redis_call_back)
     #open_order()
     #close_order()
+    
     pass 
