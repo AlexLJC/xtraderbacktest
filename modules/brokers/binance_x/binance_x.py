@@ -167,6 +167,7 @@ def _book_ticker_callback(_, message):
                 "highest":current_tick[symbol]['ask_1'],
                 "lowest":current_tick[symbol]['bid_1']
             }
+            return
         elif float(msg['a']) > pre_highest:
             redis.redis_pulish(MARKET_DATA_CHANNEL_PREFIX + symbol,json.dumps(current_tick[symbol]))
             # Replace the old tick with new tick
@@ -176,6 +177,7 @@ def _book_ticker_callback(_, message):
             redis.redis_pulish(MARKET_DATA_CHANNEL_PREFIX + symbol,json.dumps(current_tick[symbol]))
             
             hightest_lowest[symbol]['highest'] = current_tick[symbol]['ask_1']
+            return
         elif float(msg['b']) < pre_lowest:
             redis.redis_pulish(MARKET_DATA_CHANNEL_PREFIX + symbol,json.dumps(current_tick[symbol]))
             # Replace the old tick with new tick
@@ -185,6 +187,7 @@ def _book_ticker_callback(_, message):
             redis.redis_pulish(MARKET_DATA_CHANNEL_PREFIX + symbol,json.dumps(current_tick[symbol]))
             
             hightest_lowest[symbol]['lowest'] = current_tick[symbol]['bid_1']
+            return
         else:
             # Skip the tick
             pass
