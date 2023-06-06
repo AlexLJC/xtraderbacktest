@@ -17,7 +17,7 @@ RUN pip install simplejson
 RUN pip install alpaca_trade_api 
 RUN pip install python-telegram-bot
 RUN pip install influxdb_client
-RUN pip install MetaTrader5
+#RUN pip install MetaTrader5
 RUN pip install ta
 RUN pip install binance-futures-connector==4.0.0rc2
 
