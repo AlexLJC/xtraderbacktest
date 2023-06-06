@@ -12,7 +12,8 @@ import modules.other.sys_conf_loader as sys_conf_loader
 import modules.database.redis_x as redis
 
 # WebSocket Stream Client
-from modules.brokers.binance_x.UMFutureWebsocketCLient import UMFuturesWebsocketClient
+#from modules.brokers.binance_x.UMFutureWebsocketCLient import UMFuturesWebsocketClient
+from binance.websocket.um_futures.websocket_client import UMFuturesWebsocketClient
 import logging
 
 redis.init_mode(mode = "live")

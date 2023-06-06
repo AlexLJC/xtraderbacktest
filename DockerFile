@@ -19,7 +19,7 @@ RUN pip install python-telegram-bot
 RUN pip install influxdb_client
 RUN pip install MetaTrader5
 RUN pip install ta
-RUN pip binance-connector
+RUN pip install binance-futures-connector==4.0.0rc2
 
 ### This one is the base image for installing relevenat building tools
 ENV TZ=America/New_York
@@ -32,4 +32,6 @@ COPY ./ /home/xtraderbacktest/
 WORKDIR /home/xtraderbacktest/bots/
 ENTRYPOINT  ["python3"] 
 
-## sudo docker rmi alex2019/bfjfunds-private:xtraderbacktest; sudo docker build -f DockerFile . -t alex2019/bfjfunds-private:xtraderbacktest;
+## sudo docker rmi xtraderbacktest; sudo docker build -f DockerFile . -t xtraderbacktest;
+## run docker image
+## docker run -d -it --rm --name xtraderbacktest-<unique_name> xtraderbacktest <bot>.py <symbol>
