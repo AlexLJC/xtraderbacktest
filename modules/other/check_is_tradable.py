@@ -33,7 +33,7 @@ def check_market_is_tradable(timestamp_str,symbol):
         try:
             s_temp = "_" + symbol.split("_")[1]
         except Exception as e:
-            s_temp = "_US"
+            s_temp = "_CP"
     else:
         s_temp = symbol
 

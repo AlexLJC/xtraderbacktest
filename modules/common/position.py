@@ -34,7 +34,7 @@ class Position():
             try:
                 s_temp = "_" + order["symbol"].split("_")[1]
             except Exception as e:
-                s_temp = "_US"
+                s_temp = "_CP"
             
         else:
             s_temp = symbol
@@ -117,7 +117,7 @@ class Position():
                     try:
                         s_temp = "_" + position["symbol"].split("_")[1]
                     except Exception as e:
-                        s_temp = "_US"
+                        s_temp = "_CP"
                 else:
                     s_temp = position["symbol"] 
 
@@ -159,7 +159,7 @@ class Position():
             try:
                 s_temp = "_" + symbol.split("_")[1]
             except Exception as e:
-                s_temp = "_US"
+                s_temp = "_CP"
         else:
             s_temp = symbol
 
@@ -208,7 +208,7 @@ class Position():
                     try:
                         s_temp = "_" + position["symbol"].split("_")[1]
                     except Exception as e:
-                        s_temp = "_US"
+                        s_temp = "_CP"
                 else:
                     s_temp = position["symbol"]
 
@@ -242,7 +242,7 @@ class Position():
                 try:
                     s_temp = "_" + symbol.split("_")[1]
                 except Exception as e:
-                    s_temp = "_US"
+                    s_temp = "_CP"
             else:
                 s_temp = symbol
 
