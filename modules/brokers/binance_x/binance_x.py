@@ -354,18 +354,31 @@ def open_order(order,hit_price):
     side = "BUY" if order["direction"] == "long" else "SELL"
     positionSide = "LONG" if order["direction"] == "long" else "SHORT"
     if order['sl'] != 0:
+        # req = {
+        #     "symbol":order["symbol"],
+        #     "side":side,
+        #     "positionSide":positionSide,
+        #     "type":"STOP_MARKET",
+        #     "quantity":order["volume"],
+        #     #"price":"1850",
+        #     #"timeInForce":"GTC",
+        #     "recvWindow":"50000",
+        #     "timestamp":int(time.time() * 1000),
+        #     "newClientOrderId":order["order_ref"].split(":")[1],
+        #     "stopPrice":order['sl'],
+        #     "newOrderRespType":"RESULT"
+        # }
         req = {
             "symbol":order["symbol"],
             "side":side,
             "positionSide":positionSide,
-            "type":"STOP_MARKET",
+            "type":"MARKET",
             "quantity":order["volume"],
             #"price":"1850",
             #"timeInForce":"GTC",
             "recvWindow":"50000",
             "timestamp":int(time.time() * 1000),
             "newClientOrderId":order["order_ref"].split(":")[1],
-            "stopPrice":order['sl'],
             "newOrderRespType":"RESULT"
         }
     else:
