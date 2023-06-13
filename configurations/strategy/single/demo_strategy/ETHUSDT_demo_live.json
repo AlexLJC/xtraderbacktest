@@ -22,6 +22,6 @@
     "custom":{
         "ma_fast":10,
         "ma_slow":21,
-        "lots":0.003
+        "lots":0.004
     }
 }

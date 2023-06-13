@@ -7,10 +7,15 @@ import modules.common.strategy
 import modules.other.sys_conf_loader as sys_conf_loader
 import modules.common.technical_indicators as ti
 import datetime
+import modules.brokers.binance_x.binance_x as binance_x
 
 class Bot(modules.common.strategy.Strategy):
     def __init__(self,pars):
         super(Bot,self).__init__(pars)
+        self.price_precision = {}
+        for symbol in pars["symbols"]:
+            self.price_precision[symbol] = int(binance_x.get_symbol_info(symbol)["pricePrecision"])
+            print(symbol,"precision",self.price_precision[symbol])
         
     # Init
     def init(self):
@@ -51,13 +56,13 @@ class Bot(modules.common.strategy.Strategy):
         if ma_fast > ma_slow:
             if len(self.get_current_position(direction="long")) ==0:
                 logging.info("Opening long orders")
-                self.open_order(bar["symbol"],"market",self.pars["lots"],"long",sl = ma_slow * 0.97)
+                self.open_order(bar["symbol"],"market",self.pars["lots"],"long",sl = round(ma_slow * 0.97,self.price_precision["symbol"]))
                 
             self.close_all_position(direction="short")
         elif ma_fast < ma_slow:
             if len(self.get_current_position(direction="short")) ==0:
                 logging.info("Opening short orders")
-                self.open_order(bar["symbol"],"market",self.pars["lots"],"short",sl = ma_slow * 1.03)
+                self.open_order(bar["symbol"],"market",self.pars["lots"],"short",sl =  round(ma_slow * 1.03,self.price_precision["symbol"]))
             self.close_all_position(direction="long")
         #logging.info(self.order_manager._orders)
         pass
