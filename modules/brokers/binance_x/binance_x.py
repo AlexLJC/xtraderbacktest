@@ -353,19 +353,35 @@ def open_order(order,hit_price):
     secret = binance_conf['SECRET_KEY']
     side = "BUY" if order["direction"] == "long" else "SELL"
     positionSide = "LONG" if order["direction"] == "long" else "SHORT"
-    req = {
-        "symbol":order["symbol"],
-        "side":side,
-        "positionSide":positionSide,
-        "type":"MARKET",
-        "quantity":order["volume"],
-        #"price":"1850",
-        #"timeInForce":"GTC",
-        "recvWindow":"50000",
-        "timestamp":int(time.time() * 1000),
-        "newClientOrderId":order["order_ref"].split(":")[1],
-        "newOrderRespType":"RESULT"
-    }
+    if order['sl'] != 0:
+        req = {
+            "symbol":order["symbol"],
+            "side":side,
+            "positionSide":positionSide,
+            "type":"STOP_MARKET",
+            "quantity":order["volume"],
+            #"price":"1850",
+            #"timeInForce":"GTC",
+            "recvWindow":"50000",
+            "timestamp":int(time.time() * 1000),
+            "newClientOrderId":order["order_ref"].split(":")[1],
+            "stopPrice":order['sl'],
+            "newOrderRespType":"RESULT"
+        }
+    else:
+        req = {
+            "symbol":order["symbol"],
+            "side":side,
+            "positionSide":positionSide,
+            "type":"MARKET",
+            "quantity":order["volume"],
+            #"price":"1850",
+            #"timeInForce":"GTC",
+            "recvWindow":"50000",
+            "timestamp":int(time.time() * 1000),
+            "newClientOrderId":order["order_ref"].split(":")[1],
+            "newOrderRespType":"RESULT"
+        }
     req_str = urllib.parse.urlencode(req)
     req_str = req_str.replace("%27", "%22")
     signature = hmac.new(secret.encode('utf-8'), req_str.encode('utf-8'), hashlib.sha256).hexdigest()

@@ -51,13 +51,13 @@ class Bot(modules.common.strategy.Strategy):
         if ma_fast > ma_slow:
             if len(self.get_current_position(direction="long")) ==0:
                 logging.info("Opening long orders")
-                self.open_order(bar["symbol"],"market",self.pars["lots"],"long")
+                self.open_order(bar["symbol"],"market",self.pars["lots"],"long",sl = ma_slow * 0.97)
                 
             self.close_all_position(direction="short")
         elif ma_fast < ma_slow:
             if len(self.get_current_position(direction="short")) ==0:
                 logging.info("Opening short orders")
-                self.open_order(bar["symbol"],"market",self.pars["lots"],"short")
+                self.open_order(bar["symbol"],"market",self.pars["lots"],"short",sl = ma_slow * 1.03)
             self.close_all_position(direction="long")
         #logging.info(self.order_manager._orders)
         pass
