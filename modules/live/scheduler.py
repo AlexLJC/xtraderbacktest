@@ -162,19 +162,23 @@ class Scheduler(modules.common.scheduler.Scheduler):
 
     def _check_alive(self):
         while True:
-            should_restart = False
-            for symbol in self.strategy.context["symbols"]:
-                if self._stream_alive[symbol] is True:
-                    now = datetime.datetime.now()
-                    if (now - self._stream_alive_dict[symbol]).total_seconds() > 400 and now.hour() < 16:
-                        # Disconnect and send notification to warn
-                        self._stream_alive[symbol] = False
-                        notifaction.send_message("Market data may be disconnected, symbol:" + symbol + " at " + now.strftime("%Y-%m-%d %H:%M:%S" + ". Try to Restart now."))
-                        should_restart = True
-                        # Try to restart itself
-                        if should_restart is True:
-                            redis.redis_rpush("BotQueue",json.dumps({"cmd":"restart","symbol":symbol}) )
-            time.sleep(10)
+            try:
+                should_restart = False
+                for symbol in self.strategy.context["symbols"]:
+                    if self._stream_alive[symbol] is True:
+                        now = datetime.datetime.now()
+                        
+                        if (now - self._stream_alive_dict[symbol]).total_seconds() > 400 and now.hour() < 16:
+                            # Disconnect and send notification to warn
+                            self._stream_alive[symbol] = False
+                            notifaction.send_message("Market data may be disconnected, symbol:" + symbol + " at " + now.strftime("%Y-%m-%d %H:%M:%S" + ". Try to Restart now."))
+                            should_restart = True
+                            # Try to restart itself
+                            if should_restart is True:
+                                redis.redis_rpush("BotQueue",json.dumps({"cmd":"restart","symbol":symbol}) )
+                time.sleep(10)
+            except Exception as e:
+                logging.error("Error in check alive.")
 
     def start(self):
         logging.info("Live Scheduler Start.")

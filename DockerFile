@@ -30,7 +30,7 @@ WORKDIR /home/xtraderbacktest
 COPY ./ /home/xtraderbacktest/
 
 WORKDIR /home/xtraderbacktest/bots/
-ENTRYPOINT  ["python3"] 
+ENTRYPOINT  ["python3","-W","ignore"] 
 
 ## sudo docker rmi xtraderbacktest; sudo docker build -f DockerFile . -t xtraderbacktest;
 ## run docker image
