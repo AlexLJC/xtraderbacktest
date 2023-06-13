@@ -127,9 +127,9 @@ class Scheduler(modules.common.scheduler.Scheduler):
                 if self.tick_count > 50 or (now - self.tick_recv_date[redis_data["symbol"]]).total_seconds()> 60:
                     redis.redis_pulish(alpaca_api.ACK_CHANNEL ,json.dumps({"symbol":redis_data["symbol"]}))
                     self.tick_count = 0
-                    self.tick_recv_date[redis_data["symbol"]] = now
+                    self.tick_recv_date[redis_data["symbol"]] = datetime.datetime.now()
                 self.tick_count = self.tick_count + 1
-                self._stream_alive_dict[redis_data["symbol"]] = now
+                self._stream_alive_dict[redis_data["symbol"]] = datetime.datetime.now()
                 self._stream_alive[redis_data["symbol"]] = True
         if sys_conf_loader.get_sys_conf()["live_platform"] == "binance":
             if binance_x.MARKET_DATA_CHANNEL_PREFIX in channel:
@@ -138,9 +138,9 @@ class Scheduler(modules.common.scheduler.Scheduler):
                 if self.tick_count > 50 or (now - self.tick_recv_date[redis_data["symbol"]]).total_seconds()> 60:
                     # redis.redis_pulish(alpaca_api.ACK_CHANNEL ,json.dumps({"symbol":redis_data["symbol"]}))
                     self.tick_count = 0
-                    self.tick_recv_date[redis_data["symbol"]] = now
+                    self.tick_recv_date[redis_data["symbol"]] = datetime.datetime.now()
                 self.tick_count = self.tick_count + 1
-                self._stream_alive_dict[redis_data["symbol"]] = now
+                self._stream_alive_dict[redis_data["symbol"]] = datetime.datetime.now()
                 self._stream_alive[redis_data["symbol"]] = True
 
     def trade_update_call_back(self,channel,redis_data):
