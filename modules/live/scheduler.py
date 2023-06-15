@@ -164,7 +164,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
         while True:
             try:
                 should_restart = False
-                for symbol in self.strategy.context["symbols"]:
+                for symbol in self._stream_alive_dict.keys():
                     if self._stream_alive[symbol] is True:
                         now = datetime.datetime.now()
                         
@@ -178,7 +178,8 @@ class Scheduler(modules.common.scheduler.Scheduler):
                                 redis.redis_rpush("BotQueue",json.dumps({"cmd":"restart","symbol":symbol}) )
                 time.sleep(10)
             except Exception as e:
-                logging.error("Error in check alive.")
+                logging.error("Error in check alive." + e)
+                pass
 
     def start(self):
         logging.info("Live Scheduler Start.")
