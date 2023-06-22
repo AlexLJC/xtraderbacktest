@@ -341,7 +341,7 @@ def preset_for_symbol(symbol):
     if symbol not in running_status["symbol_preset"]:
         ## Set Margin Type to ISOLATED
         ## Set Leverage to 10x
-        if _set_margin_type(symbol,"ISOLATED") and _set_leverage(symbol,1):
+        if _set_margin_type(symbol,"ISOLATED") and _set_leverage(symbol,15):
             running_status["symbol_preset"].append(symbol)
     
 
