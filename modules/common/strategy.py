@@ -122,7 +122,7 @@ class Strategy():
         'ratio':0.5
     }
     '''
-    def open_order(self, symbol, order_type,  volume, direction, limit_price = 0, tp = 0, sl = 0, expiration = 0, mutiple_exits = None, trailing_sl = None, extra = None, force_price = None):
+    def open_order(self, symbol, order_type,  volume, direction, limit_price = 0, tp = 0, sl = 0, expiration = 0, mutiple_exits = None, trailing_sl = None, extra = None, force_price = None, force_sl = None):
         price = self.current_tick[symbol]
         if order_type == "limit":
             if direction == "long":
@@ -211,7 +211,8 @@ class Strategy():
             "profit":0,
             "swap":0,
             "open_force_price":force_price,
-            "close_force_price":None
+            "close_force_price":None,
+            "force_sl":force_sl
         }
         self.order_manager._append_to_orders(order)
 

@@ -71,12 +71,16 @@ def william_fractal(df):
     return df
     
 # Average True Range 
-def atr(df, ave_n):
+def atr(df, ave_n,is_rma = True):
     df = df.copy(deep = True)
     local_max = pd.Series(pd.concat([df["high"], df["close"].shift()], axis=1).max(axis=1), name="LocalMax")
     local_min = pd.Series(pd.concat([df["low"], df["close"].shift()], axis=1).min(axis=1), name="LocalMin")
     TR_s = pd.Series(local_max - local_min, name="TR")
-    ATR_s = pd.Series(TR_s.rolling(window=ave_n, min_periods=ave_n).mean(), name='ATR')
+    if is_rma:
+        # ATR_s = pd.Series(TR_s.ewm(span=ave_n, min_periods=ave_n).mean(), name='ATR')
+        ATR_s = pd.Series(TR_s.ewm(alpha=1 / ave_n, min_periods=ave_n, adjust=False).mean(), name='ATR')
+    else:
+        ATR_s = pd.Series(TR_s.rolling(window=ave_n, min_periods=ave_n).mean(), name='ATR')
     df = df.join(TR_s).join(ATR_s)
     return df
 

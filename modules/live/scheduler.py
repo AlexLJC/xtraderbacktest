@@ -180,6 +180,16 @@ class Scheduler(modules.common.scheduler.Scheduler):
             except Exception as e:
                 #logging.error("Error in check alive." + e)
                 pass
+    
+    def _send_check_alive_to_redis(self):
+        while True:
+            try:
+                if self.strategy._live_platform == "binance":
+                    redis.redis_pulish(binance_x.COMMAND_CHANNEL ,json.dumps({"cmd":"check_alive"}))
+                time.sleep(60)
+            except Exception as e:
+                logging.error("Error in check alive." + e)
+                pass
 
     def start(self):
         logging.info("Live Scheduler Start.")
@@ -225,6 +235,8 @@ class Scheduler(modules.common.scheduler.Scheduler):
         strategy_t.start()
         # check_alive_t = threading.Thread(target = self._check_alive)
         # check_alive_t.start()
+        check_alive_r = threading.Thread(target = self._send_check_alive_to_redis)
+        check_alive_r.start()
         strategy_t.join()
 
         if self.stop_by_error is True:

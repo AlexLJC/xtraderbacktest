@@ -62,14 +62,36 @@ def _process_command(redis_data):
             #desubscribe to binance
             binance_pricing_client.unsubscribe(stream="{}@bookTicker".format(symbol.lower()))
             binance_pricing_client.unsubscribe(stream="{}@aggTrade".format(symbol.lower()))
-
             del current_tick[symbol]
             del heart_beat[symbol]
             subscribe_set.remove(symbol)
             print("Desubscribe",symbol,flush=True)
     if redis_data["cmd"] == "stop":
         binance_pricing_client.stop()
-
+    if redis_data["cmd"] == "check_alive":
+        for symbol in heart_beat.keys():
+            heart_beat_time = heart_beat[symbol]
+            if (datetime.datetime.now() - heart_beat_time).total_seconds() > 60:
+                print("Heart beat lost for symbol",symbol,flush=True)
+                #desubscribe to binance
+                binance_pricing_client.unsubscribe(stream="{}@bookTicker".format(symbol.lower()))
+                binance_pricing_client.unsubscribe(stream="{}@aggTrade".format(symbol.lower()))
+                del current_tick[symbol]
+                del heart_beat[symbol]
+                subscribe_set.remove(symbol)
+                print("Desubscribe",symbol,flush=True)
+                print("Resubscribe",symbol,flush=True)
+                #subscribe to binance
+                current_tick[symbol] = {}
+                heart_beat[symbol] = datetime.datetime.now()
+                subscribe_set.add(symbol)
+                #subscribe to binance
+                binance_pricing_client.book_ticker(symbol=symbol)
+                binance_pricing_client.agg_trade(symbol=symbol)
+                hightest_lowest[symbol] = {
+                }
+                print("Resubscribed",symbol,flush=True)
+                
 
 def _process_message(_,message):
     message = json.loads(message)
@@ -87,6 +109,7 @@ def _agg_trade_callback(_,message):
     price = float(msg['p'])
     quantity = abs(float(msg['q']))
     # date = datetime.datetime.now().astimezone(tz = tz.gettz('US/Eastern')).strftime("%Y-%m-%d %H:%M:%S") 
+    heart_beat[symbol] = datetime.datetime.now()
     if symbol in current_tick.keys():
         current_tick[symbol]['last_price'] = price
         current_tick[symbol]['volume'] = current_tick[symbol]['volume'] + quantity
@@ -135,6 +158,7 @@ def _book_ticker_callback(_, message):
     msg = message["data"]
     symbol = msg['s']
     date = datetime.datetime.now().astimezone(tz = tz.gettz('US/Eastern')).strftime("%Y-%m-%d %H:%M:%S") 
+    heart_beat[symbol] = datetime.datetime.now()
     if symbol not in current_tick.keys():
         current_tick[symbol] = _create_new_tick(msg,date)
         hightest_lowest[symbol] = {
@@ -354,28 +378,12 @@ def open_order(order,hit_price):
     side = "BUY" if order["direction"] == "long" else "SELL"
     positionSide = "LONG" if order["direction"] == "long" else "SHORT"
     if order['sl'] != 0:
-        # req = {
-        #     "symbol":order["symbol"],
-        #     "side":side,
-        #     "positionSide":positionSide,
-        #     "type":"STOP_MARKET",
-        #     "quantity":order["volume"],
-        #     #"price":"1850",
-        #     #"timeInForce":"GTC",
-        #     "recvWindow":"50000",
-        #     "timestamp":int(time.time() * 1000),
-        #     "newClientOrderId":order["order_ref"].split(":")[1],
-        #     "stopPrice":order['sl'],
-        #     "newOrderRespType":"RESULT"
-        # }
         req = {
             "symbol":order["symbol"],
             "side":side,
             "positionSide":positionSide,
             "type":"MARKET",
             "quantity":order["volume"],
-            #"price":"1850",
-            #"timeInForce":"GTC",
             "recvWindow":"50000",
             "timestamp":int(time.time() * 1000),
             "newClientOrderId":order["order_ref"].split(":")[1],
@@ -388,8 +396,6 @@ def open_order(order,hit_price):
             "positionSide":positionSide,
             "type":"MARKET",
             "quantity":order["volume"],
-            #"price":"1850",
-            #"timeInForce":"GTC",
             "recvWindow":"50000",
             "timestamp":int(time.time() * 1000),
             "newClientOrderId":order["order_ref"].split(":")[1],
@@ -406,8 +412,33 @@ def open_order(order,hit_price):
         headers
     )
     response = session.post(base_url + "/fapi/v1/order", params=req)
-    logging.info("Response BI: " + str(response.json()))
-    
+    logging.info("Response of Open order from BI: " + str(response.json()))
+    if 'force_sl' in order.keys() and order['force_sl'] is not None:
+        req_force_sl = {
+            "symbol":order["symbol"],
+            "side": "BUY" if order["direction"] == "short" else "SELL",
+            "positionSide": "LONG" if order["direction"] == "long" else "SHORT",
+            "type":"STOP",
+            "stopPrice":order['force_sl'],
+            "price":order['force_sl'],
+            "quantity":order["volume"],
+            "recvWindow":"50000",
+            "timestamp":int(time.time() * 1000),
+            "newClientOrderId":order["order_ref"].split(":")[1][::-1],
+            "newOrderRespType":"RESULT"
+        }
+        req_str = urllib.parse.urlencode(req_force_sl)
+        req_str = req_str.replace("%27", "%22")
+        signature = hmac.new(secret.encode('utf-8'), req_str.encode('utf-8'), hashlib.sha256).hexdigest()
+        req_force_sl['signature'] = signature
+        logging.info("Sending request to BI: " + str(req_str))
+        base_url = binance_conf['FAPI_URL']
+        session = requests.Session()
+        session.headers.update(
+            headers
+        )
+        response_sl = session.post(base_url + "/fapi/v1/order", params=req_force_sl)
+        logging.info("Response BI: " + str(response_sl.json()))
     if response.status_code == 200:
         return response.json()
     else:
@@ -426,8 +457,6 @@ def close_order(order,hit_price):
         "positionSide":positionSide,
         "type":"MARKET",
         "quantity":order["volume"],
-        #"price":"1850",
-        #"timeInForce":"GTC",
         "recvWindow":"50000",
         "timestamp":int(time.time() * 1000),
         "newClientOrderId":order["order_ref"].split(":")[1],
@@ -444,8 +473,28 @@ def close_order(order,hit_price):
         headers
     )
     response = session.post(base_url + "/fapi/v1/order", params=req)
-    logging.info("Response BI: " + str(response.json()))
+    logging.info("Response of Close Order from BI: " + str(response.json()))
     
+    ## Cancel corresponding sl force order
+    if 'force_sl' in order.keys() and order['force_sl'] is not None:
+        req_cancel = {
+            "symbol":order["symbol"],
+            "origclientorderid":order["order_ref"].split(":")[1][::-1],
+            "timestamp":int(time.time() * 1000),
+        }
+        req_str = urllib.parse.urlencode(req_cancel)
+        req_str = req_str.replace("%27", "%22")
+        signature = hmac.new(secret.encode('utf-8'), req_str.encode('utf-8'), hashlib.sha256).hexdigest()
+        req_cancel['signature'] = signature
+        logging.info("Sending cancel request to BI: " + str(req_cancel))
+        base_url = binance_conf['FAPI_URL']
+        session = requests.Session()
+        session.headers.update(
+            headers
+        )
+        response_cancel = session.delete(base_url + "/fapi/v1/order", params=req_cancel)
+        logging.info("Response of cancel order from BI: " + str(response_cancel.json()))
+
     if response.status_code == 200:
         return response.json()
     else:
@@ -458,7 +507,6 @@ def get_symbol_info(symbol):
             return sym_info
 
 if __name__ == "__main__":
-    # binance_pricing_client = UMFuturesWebsocketClient()
     binance_pricing_client = UMFuturesWebsocketClient( stream_url=binance_conf['URL'],on_message=_process_message,
         on_open=_on_open_callback,
         on_close=_on_close_callback,
@@ -466,7 +514,7 @@ if __name__ == "__main__":
         on_ping=_on_ping_callback,
         on_pong=_on_pong_callback,
         is_combined=True)
-
+    redis.redis_subscribe_channel([COMMAND_CHANNEL], process = _redis_call_back)
 
 
     # # my_client.book_ticker(symbol="btcusdt")
@@ -482,8 +530,15 @@ if __name__ == "__main__":
     # {"cmd":"subscribe","symbol":"btcusdt"}
     #print(stocks_bars("AMBUSDT","1m","2023-06-05 00:00:00","2023-06-05 04:38:00"))
 
-    redis.redis_subscribe_channel([COMMAND_CHANNEL], process = _redis_call_back)
-    #open_order()
-    #close_order()
+    # order = {
+    #     "symbol":"ETHUSDT",
+    #     "direction":"long",
+    #     "volume":0.004,
+    #     "order_ref":"test:1234567890",
+    #     "tp":2000,
+    #     "force_sl":1900
+    # }
+    # open_order(order,1919)
+    #close_order(order,1910)
     
     pass 
