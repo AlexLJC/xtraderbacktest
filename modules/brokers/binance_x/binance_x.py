@@ -109,7 +109,7 @@ def _agg_trade_callback(_,message):
     price = float(msg['p'])
     quantity = abs(float(msg['q']))
     # date = datetime.datetime.now().astimezone(tz = tz.gettz('US/Eastern')).strftime("%Y-%m-%d %H:%M:%S") 
-    heart_beat[symbol] = datetime.datetime.now()
+    heart_beat[symbol.lower()] = datetime.datetime.now()
     if symbol in current_tick.keys():
         current_tick[symbol]['last_price'] = price
         current_tick[symbol]['volume'] = current_tick[symbol]['volume'] + quantity
@@ -158,7 +158,7 @@ def _book_ticker_callback(_, message):
     msg = message["data"]
     symbol = msg['s']
     date = datetime.datetime.now().astimezone(tz = tz.gettz('US/Eastern')).strftime("%Y-%m-%d %H:%M:%S") 
-    heart_beat[symbol] = datetime.datetime.now()
+    heart_beat[symbol.lower()] = datetime.datetime.now()
     if symbol not in current_tick.keys():
         current_tick[symbol] = _create_new_tick(msg,date)
         hightest_lowest[symbol] = {
