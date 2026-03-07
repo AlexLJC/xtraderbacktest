@@ -42,7 +42,11 @@ class Scheduler(modules.common.scheduler.Scheduler):
             self.use_pre_post_market_data = True
         else:
             self.use_pre_post_market_data = False
-        self.ohlc = OHLCManager(mode = sys_conf_loader.get_sys_conf()["backtest_conf"]["price_data_mode"]["mode"],symbols = strategy.context["symbols"],fr = self.strategy.context["start_date"],to = self.strategy.context["end_date"],graininess=self.backtest_graininess,pre_post_market=self.use_pre_post_market_data)
+        if self.fake_tick is True:
+            self.ohlc = OHLCManager(mode = sys_conf_loader.get_sys_conf()["backtest_conf"]["price_data_mode"]["mode"],symbols = strategy.context["symbols"],fr = self.strategy.context["start_date"],to = self.strategy.context["end_date"],graininess=self.backtest_graininess,pre_post_market=self.use_pre_post_market_data)
+        else:
+            self.ohlc = OHLCManager(mode = sys_conf_loader.get_sys_conf()["backtest_conf"]["price_data_mode"]["mode"],symbols = strategy.context["symbols"],fr = self.strategy.context["start_date"],to = self.strategy.context["end_date"],graininess=self.backtest_graininess,pre_post_market=self.use_pre_post_market_data,use_real_tick=True)
+        
         self.strategy.init()
 
     def _generate_queue(self,fr,to):
@@ -104,11 +108,11 @@ class Scheduler(modules.common.scheduler.Scheduler):
         # loop ticks
         logging.info("Start looping ticks.")
         display_dict = {
-            # "deposit":str(round(self.strategy.order_manager.position.deposit,2)),
-            # "total_pnl":str(round(self.strategy.order_manager.position.deposit - self.strategy.order_manager.position._init_deposit,2)),
-            # "float_pnl":str(round(self.strategy.order_manager.position.float_pnl,2)),
-            # "positions":str(len(self.strategy.get_current_position())),
-            # "date":""
+            "deposit":str(round(self.strategy.order_manager.position.deposit,2)),
+            "total_pnl":str(round(self.strategy.order_manager.position.deposit - self.strategy.order_manager.position._init_deposit,2)),
+            "float_pnl":str(round(self.strategy.order_manager.position.float_pnl,2)),
+            "positions":str(len(self.strategy.get_current_position())),
+            "date":""
         }
         with tqdm(total=total_ticks,desc="Tick Looper", postfix = display_dict, colour="green", ascii=True) as loop_tick_bar:
             try:
@@ -199,7 +203,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
         loop_tick_bar.close()
 
     def _send_real_ticks(self,real_ticks):
-        with tqdm(total=len(real_ticks),desc="Tick Sender",color="green",  ascii=True) as loop_tick_bar:
+        with tqdm(total=len(real_ticks),desc="Tick Sender",  ascii=True) as loop_tick_bar:
             for tick in real_ticks:
                 self.tick_queue.put(tick)
                 loop_tick_bar.update(1) 
@@ -317,7 +321,7 @@ class Scheduler(modules.common.scheduler.Scheduler):
             return None,None
 
 class OHLCManager():
-    def __init__(self, mode, symbols, fr, to, graininess="1m",pre_post_market = True):
+    def __init__(self, mode, symbols, fr, to, graininess="1m",pre_post_market = True,use_real_tick = False):
         self._mode = mode
         self._symbols = symbols
         self._ohlc = {}
@@ -336,7 +340,13 @@ class OHLCManager():
                         #print(symbol)
                         #print(pre_post_market)
                         #exit(0)
-                        df = price_loader.load_price(symbol,self._fr_load,self._to,"backtest",print_log=False)
+                        if use_real_tick == False:
+                            df = price_loader.load_price(symbol,self._fr_load,self._to,"backtest",print_log=False)
+                        else: 
+                            # Convert tick data into ohlc
+                            tick_dict,tick_df = tick_loader._load_local_tick_storage(symbol,self._fr_load,self._to)
+                            df =  ticks_generater.ticks_to_ohlc(tick_df)
+                            pass
                         df = price_period_converter.convert(df,self.graininess, pre_post_market = pre_post_market)
                         self._ohlc[symbol] = df
                         #print(df)

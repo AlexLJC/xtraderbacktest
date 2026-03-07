@@ -2,7 +2,7 @@ import os
 import sys
 sys.path.append(os.path.join(os.getcwd().split('xtraderbacktest')[0],'xtraderbacktest'))
 import modules.other.sys_conf_loader as sys_conf_loader
-
+import pandas as pd
 import datetime
 
 TIMESTAMP_FORMAT="%Y-%m-%d %H:%M:%S"
@@ -70,4 +70,25 @@ def generate_fake_ticks(symbol,date,row):
             }
             result.append(tick)
             i = i + 1
+    return result
+
+# Convert ticks to ohlc in 1 minute
+def ticks_to_ohlc(tick_df):
+    result = None
+    tick_df_copy = tick_df.copy()
+    if tick_df is not None:
+        tick_df_copy['open'] = tick_df['bid_1']
+        tick_df_copy['high'] = tick_df['bid_1']
+        tick_df_copy['low'] = tick_df['bid_1']
+        tick_df_copy['close'] = tick_df['bid_1']
+        tick_df_copy['volume'] = tick_df['volume']
+        tick_df_copy['open_interest'] = tick_df['open_interest']
+        tick_df_copy['date'] = pd.to_datetime(tick_df['date'])
+        # set date as index
+        tick_df_copy.set_index('date', inplace=True)
+        
+        # drop the columns except open, high, low, close, volume, open_interest date
+        result = tick_df_copy.resample('1T').agg({'open': 'first', 'high': 'max', 'low': 'min', 'close': 'last', 'volume': 'sum', 'open_interest': 'last'})
+        result['symbol'] = tick_df_copy['symbol'][0]
+        #print(result)
     return result
